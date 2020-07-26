@@ -13,15 +13,16 @@ class PlayersDB:
         self.conn = sqlite3.connect("players.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + legue_name + '''
-                    (name text, amplua integer, team text, 
-                    price real, old_popularity integer, 
+                    (first_name text, second_name text, team text, 
+                    amplua integer, price real, old_popularity integer, 
                     new_popularity integer, rating integer)
                 ''')
-    
+
+    '''   
     def update_coefs(self):
         driver = webdriver.Firefox()
         driver.get(self.fonbet_url)
-
+    '''
     def update_page(self, url):
         driver = webdriver.Firefox()
         driver.get(url)
