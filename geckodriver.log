@@ -70,3 +70,1060 @@
 1595796209111	Marionette	INFO	Listening on port 34027
 1595796209199	Marionette	WARN	TLS certificate errors will be ignored for this session
 1595796213217	Marionette	INFO	Stopped listening on port 34027
+1595797100259	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile96xZ06"
+1595797102429	Marionette	INFO	Listening on port 36309
+1595797102466	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797107724	Marionette	INFO	Stopped listening on port 36309
+1595797137221	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAPsRAP"
+1595797139449	Marionette	INFO	Listening on port 33817
+1595797139531	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797154083	Marionette	INFO	Stopped listening on port 33817
+1595797204774	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5ui0aP"
+1595797207288	Marionette	INFO	Listening on port 41329
+1595797207386	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797222078	Marionette	INFO	Stopped listening on port 41329
+1595797243723	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileEziuZH"
+1595797245955	Marionette	INFO	Listening on port 41907
+1595797246300	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797287751	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileh66HQP"
+1595797289731	Marionette	INFO	Listening on port 38531
+1595797289768	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797294118	Marionette	INFO	Stopped listening on port 38531
+1595797316269	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5J2FlU"
+1595797318419	Marionette	INFO	Listening on port 45191
+1595797318475	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595797323367	Marionette	INFO	Stopped listening on port 45191
+1595797332697	Marionette	INFO	Stopped listening on port 41907
+1595859543640	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileO4lNN3"
+1595859545913	Marionette	INFO	Listening on port 39029
+1595859545946	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595859553960	Marionette	INFO	Stopped listening on port 39029
+1595859607944	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiRtK7y"
+1595859609917	Marionette	INFO	Listening on port 39261
+1595859609992	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595859618413	Marionette	INFO	Stopped listening on port 39261
+1595859911821	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMaqL3T"
+1595859914090	Marionette	INFO	Listening on port 42225
+1595859914127	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595859920125	Marionette	INFO	Stopped listening on port 42225
+1595860595014	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilez1Ruxz"
+1595860597263	Marionette	INFO	Listening on port 43667
+1595860597321	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595860603992	Marionette	INFO	Stopped listening on port 43667
+1595860647471	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileRhX6En"
+1595860649908	Marionette	INFO	Listening on port 38443
+1595860649977	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595860663072	Marionette	INFO	Stopped listening on port 38443
+1595860715709	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileRemwn2"
+1595860718022	Marionette	INFO	Listening on port 44757
+1595860718114	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595860726027	Marionette	INFO	Stopped listening on port 44757
+1595860745648	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilel0g4Zs"
+1595860747942	Marionette	INFO	Listening on port 44001
+1595860747955	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595860754645	Marionette	INFO	Stopped listening on port 44001
+1595875418883	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileh0IMs6"
+1595875421311	Marionette	INFO	Listening on port 35555
+1595875421389	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875428132	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileL0GqAZ"
+1595875430772	Marionette	INFO	Listening on port 39861
+1595875430839	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875449835	Marionette	INFO	Stopped listening on port 39861
+1595875450353	Marionette	INFO	Stopped listening on port 35555
+1595875514204	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5qBOwf"
+1595875516990	Marionette	INFO	Listening on port 36489
+1595875517012	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875616711	Marionette	INFO	Stopped listening on port 36489
+1595875637134	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileDOAT4L"
+1595875639606	Marionette	INFO	Listening on port 32991
+1595875639642	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875646368	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilehROO5S"
+1595875648940	Marionette	INFO	Listening on port 35483
+1595875648975	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875778114	Marionette	INFO	Stopped listening on port 35483
+1595875779660	Marionette	INFO	Stopped listening on port 32991
+1595875886403	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileCc3Bs0"
+1595875888775	Marionette	INFO	Listening on port 39431
+1595875888809	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875896120	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileGzcQsL"
+1595875898552	Marionette	INFO	Listening on port 33921
+1595875898627	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595875942771	Marionette	INFO	Stopped listening on port 33921
+1595875944086	Marionette	INFO	Stopped listening on port 39431
+1595876035266	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilenXM12d"
+1595876037640	Marionette	INFO	Listening on port 43673
+1595876037673	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876044598	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileIodhvp"
+1595876046865	Marionette	INFO	Listening on port 45625
+1595876046904	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876049409	Marionette	INFO	Stopped listening on port 45625
+1595876059470	Marionette	INFO	Stopped listening on port 43673
+1595876070196	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileVZWthw"
+1595876072591	Marionette	INFO	Listening on port 37515
+1595876072605	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876079725	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileTbHH6f"
+1595876081904	Marionette	INFO	Listening on port 35673
+1595876081936	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876089659	Marionette	INFO	Stopped listening on port 35673
+1595876252047	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiCC4Up"
+1595876254360	Marionette	INFO	Listening on port 41891
+1595876254461	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876268094	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileV9vJP2"
+1595876270311	Marionette	INFO	Listening on port 33891
+1595876270401	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876295575	Marionette	INFO	Stopped listening on port 33891
+1595876296094	Marionette	INFO	Stopped listening on port 37515
+1595876299208	Marionette	INFO	Stopped listening on port 41891
+1595876813775	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileChBObW"
+1595876816229	Marionette	INFO	Listening on port 34109
+1595876816283	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876824863	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemuBEBC"
+1595876827181	Marionette	INFO	Listening on port 43377
+1595876827271	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876945718	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilexujBqf"
+1595876948230	Marionette	INFO	Listening on port 42203
+1595876948328	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876956567	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile2wPhPM"
+1595876958830	Marionette	INFO	Listening on port 41529
+1595876958873	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595876977689	Marionette	INFO	Stopped listening on port 41529
+1595876978151	Marionette	INFO	Stopped listening on port 43377
+1595876979963	Marionette	INFO	Stopped listening on port 34109
+1595876979970	Marionette	INFO	Stopped listening on port 42203
+1595877158092	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileI361jX"
+1595877160739	Marionette	INFO	Listening on port 38871
+1595877160798	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877168693	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemdYPfu"
+1595877171130	Marionette	INFO	Listening on port 34845
+1595877171201	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877221320	Marionette	INFO	Stopped listening on port 38871
+1595877221633	Marionette	INFO	Stopped listening on port 34845
+1595877302329	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileH1fodG"
+1595877304652	Marionette	INFO	Listening on port 32881
+1595877304736	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877316967	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepHyomT"
+1595877319221	Marionette	INFO	Listening on port 40045
+1595877319275	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877324459	Marionette	INFO	Stopped listening on port 40045
+1595877405471	Marionette	INFO	Stopped listening on port 32881
+1595877420448	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileivV2nJ"
+1595877422746	Marionette	INFO	Listening on port 46735
+1595877422760	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877431208	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile232Xsm"
+1595877433457	Marionette	INFO	Listening on port 46465
+1595877433515	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877471363	Marionette	INFO	Stopped listening on port 46465
+1595877472980	Marionette	INFO	Stopped listening on port 46735
+1595877477684	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile0kYbWg"
+1595877480065	Marionette	INFO	Listening on port 38001
+1595877480091	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877487875	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAJJ84H"
+1595877490256	Marionette	INFO	Listening on port 34203
+1595877490292	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877533298	Marionette	INFO	Stopped listening on port 34203
+1595877534692	Marionette	INFO	Stopped listening on port 38001
+1595877741664	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile1M7u6O"
+1595877744318	Marionette	INFO	Listening on port 37369
+1595877744372	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877752617	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilevYDPRk"
+1595877754824	Marionette	INFO	Listening on port 45077
+1595877754933	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877765295	Marionette	INFO	Stopped listening on port 45077
+1595877809680	Marionette	INFO	Stopped listening on port 37369
+1595877810273	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilevcVfH9"
+1595877812636	Marionette	INFO	Listening on port 41203
+1595877812680	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877819747	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiL8su9"
+1595877821937	Marionette	INFO	Listening on port 39071
+1595877821959	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877828641	Marionette	INFO	Stopped listening on port 39071
+1595877845817	Marionette	INFO	Stopped listening on port 41203
+1595877855792	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileCeBk3a"
+1595877858336	Marionette	INFO	Listening on port 45211
+1595877858399	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877867426	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileYvreQ4"
+1595877869899	Marionette	INFO	Listening on port 40115
+1595877869937	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877887842	Marionette	INFO	Stopped listening on port 40115
+1595877891709	Marionette	INFO	Stopped listening on port 45211
+1595877912023	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile27UFPl"
+1595877914405	Marionette	INFO	Listening on port 43871
+1595877914430	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877921722	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAnuan0"
+1595877924009	Marionette	INFO	Listening on port 37693
+1595877924036	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877951482	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFOugUK"
+1595877954110	Marionette	INFO	Listening on port 33095
+1595877954189	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595877964111	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileOIKOya"
+1595877966346	Marionette	INFO	Listening on port 42597
+1595877966418	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878073373	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7TsEmv"
+1595878076068	Marionette	INFO	Listening on port 42121
+1595878076084	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878083215	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile9wHKen"
+1595878085855	Marionette	INFO	Listening on port 37797
+1595878085943	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878221581	Marionette	INFO	Stopped listening on port 37797
+1595878226089	Marionette	INFO	Stopped listening on port 42597
+1595878228424	Marionette	INFO	Stopped listening on port 33095
+1595878230900	Marionette	INFO	Stopped listening on port 42121
+1595878232348	Marionette	INFO	Stopped listening on port 37693
+1595878233922	Marionette	INFO	Stopped listening on port 43871
+1595878254495	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemn5PA6"
+1595878256837	Marionette	INFO	Listening on port 41943
+1595878256904	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878275994	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile1RkObb"
+1595878277957	Marionette	INFO	Listening on port 43721
+1595878278003	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878317070	Marionette	INFO	Stopped listening on port 41943
+1595878319533	Marionette	INFO	Stopped listening on port 43721
+1595878876071	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilekC7D0C"
+1595878878696	Marionette	INFO	Listening on port 44279
+1595878878781	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878886064	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilezPCGT8"
+1595878888466	Marionette	INFO	Listening on port 38467
+1595878888472	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595878934617	Marionette	INFO	Stopped listening on port 38467
+1595878936013	Marionette	INFO	Stopped listening on port 44279
+1595879604568	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilekRq3PU"
+1595879606794	Marionette	INFO	Listening on port 44701
+1595879606874	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879614010	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile0Z2YPI"
+1595879616252	Marionette	INFO	Listening on port 37801
+1595879616319	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879623304	Marionette	INFO	Stopped listening on port 37801
+1595879729325	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemp6lKH"
+1595879731695	Marionette	INFO	Listening on port 39251
+1595879731732	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879739218	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileGlLyT1"
+1595879741481	Marionette	INFO	Listening on port 33681
+1595879741525	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879748665	Marionette	INFO	Stopped listening on port 33681
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595879793091	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileXYa52b"
+1595879795571	Marionette	INFO	Listening on port 32889
+1595879795599	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879802546	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileWV4at7"
+1595879804754	Marionette	INFO	Listening on port 37385
+1595879804852	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595879842339	Marionette	INFO	Stopped listening on port 32889
+1595879842923	Marionette	INFO	Stopped listening on port 39251
+1595879844064	Marionette	INFO	Stopped listening on port 37385
+1595879844978	Marionette	INFO	Stopped listening on port 44701
+1595884664540	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5Q5h8u"
+1595884667516	Marionette	INFO	Listening on port 37913
+1595884667548	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595884687492	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileslLsJN"
+1595884691333	Marionette	INFO	Listening on port 44911
+1595884691413	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595884705096	Marionette	INFO	Stopped listening on port 44911
+1595884714098	Marionette	INFO	Stopped listening on port 37913
+1595885151544	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile9II8hG"
+1595885155122	Marionette	INFO	Listening on port 43395
+1595885155157	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885161710	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile1Ul08g"
+1595885164536	Marionette	INFO	Listening on port 34207
+1595885164646	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885177677	Marionette	INFO	Stopped listening on port 34207
+1595885190466	Marionette	INFO	Stopped listening on port 43395
+1595885355470	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilec0krcw"
+1595885359089	Marionette	INFO	Listening on port 41457
+1595885359181	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885367983	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiles7x6AB"
+1595885370970	Marionette	INFO	Listening on port 46439
+1595885370998	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885386920	Marionette	INFO	Stopped listening on port 46439
+1595885529763	Marionette	INFO	Stopped listening on port 41457
+1595885568891	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7rGz37"
+1595885572392	Marionette	INFO	Listening on port 41035
+1595885572405	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885581940	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileKTXD7L"
+1595885584420	Marionette	INFO	Listening on port 37997
+1595885584448	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885609117	Marionette	INFO	Stopped listening on port 37997
+1595885669160	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile65PNwh"
+1595885672555	Marionette	INFO	Listening on port 42857
+1595885672584	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885679390	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiler8vpv0"
+1595885682788	Marionette	INFO	Listening on port 36569
+1595885682812	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885755637	Marionette	INFO	Stopped listening on port 42857
+1595885757120	Marionette	INFO	Stopped listening on port 36569
+1595885757856	Marionette	INFO	Stopped listening on port 41035
+1595885773792	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAgVKFr"
+1595885776799	Marionette	INFO	Listening on port 43837
+1595885776812	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885784605	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilejz7VI0"
+1595885787174	Marionette	INFO	Listening on port 39245
+1595885787214	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595885796924	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595885868748	Marionette	INFO	Stopped listening on port 39245
+1595885871311	Marionette	INFO	Stopped listening on port 43837
+1595886199279	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilefq1tqZ"
+1595886201951	Marionette	INFO	Listening on port 41833
+1595886201990	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886210372	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFk85fS"
+1595886213451	Marionette	INFO	Listening on port 36863
+1595886213495	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886221678	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886222195	Marionette	INFO	Stopped listening on port 36863
+1595886226963	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilea91ooq"
+1595886230127	Marionette	INFO	Listening on port 33521
+1595886230175	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886237416	Marionette	INFO	Stopped listening on port 33521
+1595886242386	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileG0NM2s"
+1595886245998	Marionette	INFO	Listening on port 35879
+1595886246099	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886252557	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886253053	Marionette	INFO	Stopped listening on port 35879
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886262786	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiSnfae"
+1595886265800	Marionette	INFO	Listening on port 44553
+1595886265895	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886274015	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886274507	Marionette	INFO	Stopped listening on port 44553
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886279256	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileTn84a2"
+1595886282474	Marionette	INFO	Listening on port 41257
+1595886282569	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886291716	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886292039	Marionette	INFO	Stopped listening on port 41257
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886295697	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileo3wQKW"
+1595886299127	Marionette	INFO	Listening on port 38733
+1595886299210	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886309781	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886310144	Marionette	INFO	Stopped listening on port 38733
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886314940	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileV3sTed"
+1595886318255	Marionette	INFO	Listening on port 46233
+1595886318350	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886326422	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886326711	Marionette	INFO	Stopped listening on port 46233
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886332778	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileeAoUP4"
+1595886336243	Marionette	INFO	Listening on port 39755
+1595886336287	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886346121	Marionette	INFO	Stopped listening on port 39755
+1595886350805	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilew7wr43"
+1595886353860	Marionette	INFO	Listening on port 38991
+1595886353915	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886363063	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886363367	Marionette	INFO	Stopped listening on port 38991
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886369228	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileg4CU66"
+1595886372512	Marionette	INFO	Listening on port 45045
+1595886372539	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595886380328	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595886380846	Marionette	INFO	Stopped listening on port 45045
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595886385529	Marionette	INFO	Stopped listening on port 41833
+1595889136169	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileHAO9Oa"
+1595889139534	Marionette	INFO	Listening on port 41327
+1595889139631	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889146326	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFnw6xZ"
+1595889149235	Marionette	INFO	Listening on port 46587
+1595889149337	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889157570	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889158152	Marionette	INFO	Stopped listening on port 46587
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889162987	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileT2JiIZ"
+1595889166522	Marionette	INFO	Listening on port 44801
+1595889166596	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889174152	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889175753	Marionette	INFO	Stopped listening on port 44801
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889184503	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilekOFhEl"
+1595889187926	Marionette	INFO	Listening on port 43129
+1595889188015	Marionette	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+1595889200291	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7WcZ1P"
+1595889203838	Marionette	INFO	Listening on port 46375
+1595889203902	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889211304	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilev8k1Kx"
+1595889213852	Marionette	INFO	Listening on port 46229
+1595889213920	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889223199	Marionette	INFO	Stopped listening on port 46229
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889227951	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileqqcJB6"
+1595889230958	Marionette	INFO	Listening on port 44915
+1595889231064	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889239031	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889239694	Marionette	INFO	Stopped listening on port 44915
+1595889244321	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileyt4yun"
+1595889247155	Marionette	INFO	Listening on port 42063
+1595889247234	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889255871	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889256313	Marionette	INFO	Stopped listening on port 42063
+1595889260927	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilejBTrgs"
+1595889263924	Marionette	INFO	Listening on port 44323
+1595889263941	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889271258	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889271682	Marionette	INFO	Stopped listening on port 44323
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889277400	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileN1MCoN"
+1595889280614	Marionette	INFO	Listening on port 38091
+1595889280715	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889289615	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889290409	Marionette	INFO	Stopped listening on port 38091
+1595889294173	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileLbEGrT"
+1595889297092	Marionette	INFO	Listening on port 44811
+1595889297199	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889304371	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889305010	Marionette	INFO	Stopped listening on port 44811
+1595889314562	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileehOkT2"
+1595889318088	Marionette	INFO	Listening on port 43435
+1595889318201	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889325624	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889326063	Marionette	INFO	Stopped listening on port 43435
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889330830	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileziR5Ma"
+1595889333938	Marionette	INFO	Listening on port 33889
+1595889333954	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889343035	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889343528	Marionette	INFO	Stopped listening on port 33889
+1595889348202	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileaWAsAf"
+1595889350840	Marionette	INFO	Listening on port 36355
+1595889350915	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889356888	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595889357424	Marionette	INFO	Stopped listening on port 36355
+1595889362494	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile1mkcJ9"
+1595889365116	Marionette	INFO	Listening on port 39067
+1595889365202	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595889374196	Marionette	INFO	Stopped listening on port 39067
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595889382778	Marionette	INFO	Stopped listening on port 46375
+1595952553992	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileBmfbfv"
+1595952556214	Marionette	INFO	Listening on port 33789
+1595952556304	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952562861	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileNIxSPa"
+1595952565037	Marionette	INFO	Listening on port 42361
+1595952565070	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952574519	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952574841	Marionette	INFO	Stopped listening on port 42361
+1595952578416	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemTTCT9"
+1595952580481	Marionette	INFO	Listening on port 46219
+1595952580524	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952587180	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952587858	Marionette	INFO	Stopped listening on port 46219
+1595952593465	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFiLWK0"
+1595952595991	Marionette	INFO	Listening on port 37587
+1595952596086	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952606149	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952606481	Marionette	INFO	Stopped listening on port 37587
+1595952611044	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFwJ17R"
+1595952613546	Marionette	INFO	Listening on port 35577
+1595952613586	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952620633	Marionette	INFO	Stopped listening on port 35577
+1595952627507	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileeKMkyT"
+1595952629843	Marionette	INFO	Listening on port 35227
+1595952629918	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952637917	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952638422	Marionette	INFO	Stopped listening on port 35227
+1595952643018	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilePBtm4e"
+1595952645513	Marionette	INFO	Listening on port 36991
+1595952645527	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952655119	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952655495	Marionette	INFO	Stopped listening on port 36991
+1595952660137	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilefxk62J"
+1595952662630	Marionette	INFO	Listening on port 40887
+1595952662645	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952669741	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952670361	Marionette	INFO	Stopped listening on port 40887
+1595952674971	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilezOjOWz"
+1595952677278	Marionette	INFO	Listening on port 44949
+1595952677382	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952684552	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952685066	Marionette	INFO	Stopped listening on port 44949
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952689510	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileTZVvdb"
+1595952691798	Marionette	INFO	Listening on port 34645
+1595952691830	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952698371	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952698806	Marionette	INFO	Stopped listening on port 34645
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952704456	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileVonaYF"
+1595952706727	Marionette	INFO	Listening on port 35861
+1595952706771	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952712290	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952712640	Marionette	INFO	Stopped listening on port 35861
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952717248	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7310Ir"
+1595952719666	Marionette	INFO	Listening on port 44173
+1595952719756	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952729042	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile3k2kC9"
+1595952731253	Marionette	INFO	Listening on port 41957
+1595952731350	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952737577	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952737946	Marionette	INFO	Stopped listening on port 41957
+1595952742645	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilesk1B66"
+1595952745662	Marionette	INFO	Listening on port 38707
+1595952745752	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952760113	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952760551	Marionette	INFO	Stopped listening on port 38707
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952765129	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileR140cP"
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1595952786382	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilehBftAX"
+1595952788780	Marionette	INFO	Listening on port 34551
+1595952788795	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952796647	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileY7nx3E"
+1595952798966	Marionette	INFO	Listening on port 45071
+1595952799055	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952805963	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952806407	Marionette	INFO	Stopped listening on port 45071
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952811044	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileXysL0f"
+1595952813379	Marionette	INFO	Listening on port 39053
+1595952813451	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952820694	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952821010	Marionette	INFO	Stopped listening on port 39053
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952825715	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilegidwJQ"
+1595952827962	Marionette	INFO	Listening on port 46209
+1595952828031	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952834790	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952835157	Marionette	INFO	Stopped listening on port 46209
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952838771	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilevwb07p"
+1595952840751	Marionette	INFO	Listening on port 37699
+1595952840788	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952846817	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952847160	Marionette	INFO	Stopped listening on port 37699
+1595952851747	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileJ8afJh"
+1595952853924	Marionette	INFO	Listening on port 41035
+1595952853953	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952861486	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952861935	Marionette	INFO	Stopped listening on port 41035
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952866438	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileOB70OR"
+1595952868678	Marionette	INFO	Listening on port 43981
+1595952868746	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952874253	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952874655	Marionette	INFO	Stopped listening on port 43981
+1595952879219	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile2ZZl3o"
+1595952881431	Marionette	INFO	Listening on port 35953
+1595952881527	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952888609	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952888968	Marionette	INFO	Stopped listening on port 35953
+1595952893565	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7An1Yq"
+1595952895755	Marionette	INFO	Listening on port 44185
+1595952895774	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952902701	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952903192	Marionette	INFO	Stopped listening on port 44185
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952907855	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileaP1ly0"
+1595952910192	Marionette	INFO	Listening on port 40531
+1595952910264	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952919299	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952919606	Marionette	INFO	Stopped listening on port 40531
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952926101	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileODmofN"
+1595952928416	Marionette	INFO	Listening on port 34467
+1595952928515	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952935434	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595952935781	Marionette	INFO	Stopped listening on port 34467
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595952938338	Marionette	INFO	Stopped listening on port 34551
+1595952981784	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileC4oLpJ"
+1595952984356	Marionette	INFO	Listening on port 36433
+1595952984390	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595952992010	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileOlYWaw"
+1595952994275	Marionette	INFO	Listening on port 41489
+1595952994316	Marionette	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1595957384627	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileowHIyF"
+1595957386971	Marionette	INFO	Listening on port 40805
+1595957387034	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957394651	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileoPhTiX"
+1595957396791	Marionette	INFO	Listening on port 45405
+1595957396860	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957404555	Marionette	INFO	Stopped listening on port 45405
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595957409182	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileZRaKZc"
+1595957411354	Marionette	INFO	Listening on port 41259
+1595957411390	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957422226	Marionette	INFO	Stopped listening on port 41259
+1595957426838	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilen006Cm"
+1595957429029	Marionette	INFO	Listening on port 34479
+1595957429050	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957444535	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595957444887	Marionette	INFO	Stopped listening on port 34479
+1595957449477	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileVN4b9Y"
+1595957451654	Marionette	INFO	Listening on port 43467
+1595957451684	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957463703	Marionette	INFO	Stopped listening on port 43467
+1595957468319	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileSjFLg5"
+1595957470355	Marionette	INFO	Listening on port 39795
+1595957470426	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957476070	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595957476480	Marionette	INFO	Stopped listening on port 39795
+1595957481106	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilejymyFB"
+1595957483104	Marionette	INFO	Listening on port 38811
+1595957483127	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957492024	Marionette	INFO	Stopped listening on port 38811
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595957496644	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile154uqA"
+1595957498847	Marionette	INFO	Listening on port 40497
+1595957498860	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957510411	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595957510726	Marionette	INFO	Stopped listening on port 40497
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595957514277	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepXMmBN"
+1595957516446	Marionette	INFO	Listening on port 35871
+1595957516484	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957524446	Marionette	INFO	Stopped listening on port 35871
+1595957528063	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile4DjpHJ"
+1595957530187	Marionette	INFO	Listening on port 34023
+1595957530269	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957535482	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595957535816	Marionette	INFO	Stopped listening on port 34023
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595957540406	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile0VPchx"
+1595957542511	Marionette	INFO	Listening on port 34605
+1595957542613	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595957550078	Marionette	INFO	Stopped listening on port 34605
+1595957553638	Marionette	INFO	Stopped listening on port 40805
+1595960853645	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileIf5RHm"
+1595960856208	Marionette	INFO	Listening on port 34731
+1595960856254	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960864511	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiledD0W0j"
+1595960867085	Marionette	INFO	Listening on port 40915
+1595960867118	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960874745	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595960875177	Marionette	INFO	Stopped listening on port 40915
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595960879658	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilerISN2q"
+1595960882329	Marionette	INFO	Listening on port 35495
+1595960882366	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960890160	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595960890687	Marionette	INFO	Stopped listening on port 35495
+1595960896183	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileSxcdTI"
+1595960898862	Marionette	INFO	Listening on port 33227
+1595960898894	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960907812	Marionette	INFO	Stopped listening on port 33227
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595960912405	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileW9XiCv"
+1595960914620	Marionette	INFO	Listening on port 36873
+1595960914716	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960921775	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595960922213	Marionette	INFO	Stopped listening on port 36873
+1595960925798	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileqx3cAa"
+1595960928045	Marionette	INFO	Listening on port 44399
+1595960928106	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960936402	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595960936754	Marionette	INFO	Stopped listening on port 44399
+1595960941212	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileTn2Nop"
+1595960943418	Marionette	INFO	Listening on port 39481
+1595960943519	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960950552	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595960950890	Marionette	INFO	Stopped listening on port 39481
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595960956406	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileBjTVPS"
+1595960958431	Marionette	INFO	Listening on port 42067
+1595960958533	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960969865	Marionette	INFO	Stopped listening on port 42067
+1595960977368	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilejMKuXr"
+1595960979509	Marionette	INFO	Listening on port 46799
+1595960979575	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595960987974	Marionette	INFO	Stopped listening on port 46799
+1595960991546	Marionette	INFO	Stopped listening on port 34731
+1595963468077	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileuCdvyt"
+1595963470967	Marionette	INFO	Listening on port 43471
+1595963470987	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963479172	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileqoNX7O"
+1595963482107	Marionette	INFO	Listening on port 43185
+1595963482181	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963488130	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963488533	Marionette	INFO	Stopped listening on port 43185
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595963498161	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilefCWyH2"
+1595963500771	Marionette	INFO	Listening on port 33447
+1595963500870	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963506165	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963506653	Marionette	INFO	Stopped listening on port 33447
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595963515128	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile6cUKKu"
+1595963517605	Marionette	INFO	Listening on port 38767
+1595963517637	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963525131	Marionette	INFO	Stopped listening on port 38767
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595963529740	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepQ66LS"
+1595963532041	Marionette	INFO	Listening on port 33141
+1595963532059	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963540002	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963540383	Marionette	INFO	Stopped listening on port 33141
+1595963544983	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilexmGdc6"
+1595963547482	Marionette	INFO	Listening on port 43525
+1595963547497	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963553753	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963554113	Marionette	INFO	Stopped listening on port 43525
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595963559723	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFmN3JO"
+1595963562186	Marionette	INFO	Listening on port 40515
+1595963562229	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963568829	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963569302	Marionette	INFO	Stopped listening on port 40515
+1595963573831	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepNQLE6"
+1595963576286	Marionette	INFO	Listening on port 39245
+1595963576340	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963583250	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:245:13
+TimedPromise@chrome://marionette/content/sync.js:230:10
+interaction.flushEventLoop@chrome://marionette/content/interaction.js:416:10
+webdriverClickElement@chrome://marionette/content/interaction.js:182:31
+1595963583582	Marionette	INFO	Stopped listening on port 39245
+1595963591159	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileJY8Hjn"
+1595963593660	Marionette	INFO	Listening on port 36533
+1595963593673	Marionette	WARN	TLS certificate errors will be ignored for this session
+1595963601275	Marionette	INFO	Stopped listening on port 36533
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+1595963604969	Marionette	INFO	Stopped listening on port 43471
