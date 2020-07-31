@@ -33,7 +33,6 @@ def get_team(team_url):
     for i in range(len(players)):
         players_id.append(players[i].get_attribute('data-id'))
     result = [] 
-    #driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
     driver.quit()
     procs = [] 
     for i in range(len(players)):
@@ -42,7 +41,6 @@ def get_team(team_url):
         proc.start()
     for proc in procs:
         proc.join()
-    #get_player_name(team_url, players_id[0])
     return result
 
 if __name__=='__main__':
