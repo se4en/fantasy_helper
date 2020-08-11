@@ -6,10 +6,9 @@ class Exception(BaseException):
         pass
 
 class PlayersDB:
-    def __init__(self, legue_name, legue_url, fonbet_url):
+    def __init__(self, legue_name, legue_url):
         self.legue_name = legue_name
         self.legue_url = legue_url
-        self.fonbet_url = fonbet_url
         self.conn = sqlite3.connect("players.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + legue_name + '''
@@ -60,5 +59,5 @@ class PlayersDB:
         pass
     
 if __name__=='__main__':
-    Spain = PlayersDB('испания', 'https://www.sports.ru/fantasy/football/tournament/49.html', 'https://www.fonbet.ru/bets/football/11922/')
+    Spain = PlayersDB('испания', 'https://www.sports.ru/fantasy/football/tournament/49.html')
     Spain.update()

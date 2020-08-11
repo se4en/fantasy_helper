@@ -3,13 +3,16 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from aiogram.utils.markdown import text
+from aiogram.utils.emoji import emojize
 
 class LegueDB():
     """
     Include table in db for one legue
     """
-    def __init__(self, legue_name, fonbet_url):
+    def __init__(self, legue_name, fonbet_url, repr_name=None):
         self.legue_name = legue_name
+        self.repr_name = repr_name
         self.fonbet_url = fonbet_url
         self.teams = []
         self.coefs = []
@@ -18,7 +21,12 @@ class LegueDB():
         self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + legue_name + '''
                     (team_name text, team_vs_name text, coef_for real, coef_against real)
                 ''')    
-    
+    def __str__(self):
+        return emojize(":ru: " + self.repr_name)
+
+    def get_name(self):
+        return self.legue_name
+        
     def update_match_name(self, match_name):
         """
         Return list with pair of team names
