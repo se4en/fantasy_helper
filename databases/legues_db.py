@@ -3,8 +3,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from aiogram.utils.markdown import text
+import functools
+
 from aiogram.utils.emoji import emojize
+from aiogram.utils.markdown import text, bold, italic, code, pre
 
 class LegueDB():
     """
@@ -21,8 +23,9 @@ class LegueDB():
         self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + legue_name + '''
                     (team_name text, team_vs_name text, coef_for real, coef_against real)
                 ''')    
+
     def __str__(self):
-        return emojize(":ru: " + self.repr_name)
+        return ":ru: " + self.repr_name
 
     def get_name(self):
         return self.legue_name
@@ -98,17 +101,60 @@ class LegueDB():
         # colect insert data
         insert_data = []
         for i in range(0,len(self.teams),2):
-            insert_data.append( (self.teams[i], self.teams[i+1], self.coefs[i][0], self.coefs[i][1]) )
-            insert_data.append( (self.teams[i+1], self.teams[i], self.coefs[i+1][0], self.coefs[i+1][1]) )
+            insert_data.append( (self.teams[i] + ' [д]', self.teams[i+1], self.coefs[i][0], self.coefs[i][1]) )
+            insert_data.append( (self.teams[i+1] + ' [г]', self.teams[i], self.coefs[i+1][0], self.coefs[i+1][1]) )
         # insert data to db
         self.cursor.executemany('INSERT INTO ' + self.legue_name + ' VALUES (?,?,?,?)', insert_data)    
+        self.conn.commit()
     
     def get_coefs(self):
         """
         Return list of tuple of row from db for each team
         """
         self.cursor.execute('SELECT * FROM ' + self.legue_name)
-        return self.cursor.fetchall()
+        all_coefs = self.cursor.fetchall()
+        all_coefs.sort(key=lambda line: line[2])
+        result = ["Атакующий потенциал:\n",]
+        result += list(map(functools.partial(self.__trsansform_coefs, type="for"), all_coefs))
+        result += ["\nЗащитный потенциал:\n"]
+        all_coefs.sort(key=lambda line: line[3])
+        result += list(map(functools.partial(self.__trsansform_coefs, type="against"), all_coefs))
+        return ('\n').join(result)
+
+    def __trsansform_coefs(self, db_tup, type="for"):
+        """
+        Transform row from db to string line
+        """
+        if type=="for":
+            coef = emojize(self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + " "*3 if len(str(db_tup[2]))==4 
+                          else self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "0" + " "*3)
+        else:
+            coef = emojize(self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + " "*3 if len(str(db_tup[3]))==4 
+                          else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + " "*3)
+        team1_max_len = 10
+        if len(db_tup[0])<=team1_max_len + 4:
+            team1 = bold(db_tup[0] + " "*3)
+        else:
+            team1 = bold(db_tup[0][:team1_max_len] + " " + db_tup[0].split()[-1] + " "*3)
+        team2_max_len = 10
+        if len(db_tup[1])<=team2_max_len:
+            team2 = italic("vs " + db_tup[1])
+        else:
+            team2 = italic("vs " + db_tup[1][:team2_max_len])
+        return text(coef, team1, team2, sep="")
+
+    def __emojize_coef(self, coef):
+        """
+        Return emoji to coef
+        """
+        if coef<=1.5:
+            return " :green_book:"
+        elif coef<=2.0:
+            return " :ledger:"
+        elif coef<=3.0:
+            return " :orange_book:"
+        else:
+            return " :closed_book:"
 
 if __name__=='__main__':
     Italy = LegueDB('Италия', 'https://www.fonbet.ru/bets/football/11924/')

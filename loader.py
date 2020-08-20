@@ -8,7 +8,7 @@ from databases.users_db import UsersDB
 
 bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
-Legues = [
+legues = [
     LegueDB('Russia', 'https://www.fonbet.ru/bets/football/11935/', 'РПЛ')
 ]
 Users = UsersDB()
