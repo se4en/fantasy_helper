@@ -10,9 +10,19 @@ class UsersDB:
                             (tg_id int, profile_url text)
                             """)
 
-    def add_user(self, tg_id, profile_url):
+    def add_user(self, tg_id, profile_url=None):
         self.cursor.execute('INSERT INTO users VALUES (?, ?)', (tg_id, profile_url))
         self.conn.commit()
+    
+    def add_profile(self, tg_id, profile_url):
+        # поменять!
+        self.cursor.execute('INSERT INTO users VALUES (?, ?)', (tg_id, profile_url))
+        self.conn.commit()
+
+    def check_password(self, tg_id):
+        self.cursor.execute('SELECT * FROM users WHERE tg_id=?', [(tg_id)])
+        result = self.cursor.fetchone()
+        return True if result else False
 
     def get_profile(self, tg_id):
         self.cursor.execute('SELECT * FROM users WHERE tg_id=?', [(tg_id)])

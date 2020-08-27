@@ -25,7 +25,14 @@ class LegueDB():
                 ''')    
 
     def __str__(self):
-        return ":ru: " + self.repr_name
+        return emojize(self.__emojize_name() + " " + self.repr_name)
+
+    def __emojize_name(self):
+        emoji_dict = {
+            "Russia" : "🇷🇺",
+            "France" : "🇫🇷"
+        }
+        return emoji_dict[self.legue_name]
 
     def get_name(self):
         return self.legue_name
@@ -109,7 +116,7 @@ class LegueDB():
     
     def get_coefs(self):
         """
-        Return list of tuple of row from db for each team
+        Return message to user
         """
         self.cursor.execute('SELECT * FROM ' + self.legue_name)
         all_coefs = self.cursor.fetchall()
@@ -126,17 +133,17 @@ class LegueDB():
         Transform row from db to string line
         """
         if type=="for":
-            coef = emojize(self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + " "*3 if len(str(db_tup[2]))==4 
-                          else self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "0" + " "*3)
+            coef = emojize(self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "  " if len(str(db_tup[2]))==4 
+                          else self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "0" + "  ")
         else:
-            coef = emojize(self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + " "*3 if len(str(db_tup[3]))==4 
-                          else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + " "*3)
-        team1_max_len = 10
+            coef = emojize(self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "  " if len(str(db_tup[3]))==4 
+                          else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + "  ")
+        team1_max_len = 9
         if len(db_tup[0])<=team1_max_len + 4:
-            team1 = bold(db_tup[0] + " "*3)
+            team1 = bold(db_tup[0] + "  ")
         else:
-            team1 = bold(db_tup[0][:team1_max_len] + " " + db_tup[0].split()[-1] + " "*3)
-        team2_max_len = 10
+            team1 = bold(db_tup[0][:team1_max_len] + " " + db_tup[0].split()[-1] + "  ")
+        team2_max_len = 9
         if len(db_tup[1])<=team2_max_len:
             team2 = italic("vs " + db_tup[1])
         else:
@@ -148,13 +155,13 @@ class LegueDB():
         Return emoji to coef
         """
         if coef<=1.5:
-            return " :green_book:"
+            return "🟩"
         elif coef<=2.0:
-            return " :ledger:"
+            return "🟨"
         elif coef<=3.0:
-            return " :orange_book:"
+            return "🟧"
         else:
-            return " :closed_book:"
+            return "🟥"
 
 if __name__=='__main__':
     Italy = LegueDB('Италия', 'https://www.fonbet.ru/bets/football/11924/')

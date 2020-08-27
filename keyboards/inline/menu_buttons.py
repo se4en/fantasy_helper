@@ -9,6 +9,10 @@ menu_keyboard.insert(InlineKeyboardButton(
     callback_data=menu_callback.new(choice_name="coefs")
 ))
 menu_keyboard.insert(InlineKeyboardButton(
+    text=emojize("Популярные игроки:"), 
+    callback_data=menu_callback.new(choice_name="popular")
+))
+menu_keyboard.insert(InlineKeyboardButton(
     text=emojize("Привязать профиль"), 
     callback_data=menu_callback.new(choice_name="profile")
 ))
@@ -16,6 +20,7 @@ menu_keyboard.insert(InlineKeyboardButton(
     text=emojize("Помощь"), 
     callback_data=menu_callback.new(choice_name="help")
 ))
+
 
 back_to_menu_keyboard = InlineKeyboardMarkup()
 back_to_menu_keyboard.insert(InlineKeyboardButton(
