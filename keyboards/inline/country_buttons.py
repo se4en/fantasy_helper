@@ -21,3 +21,4 @@ def create_country_back_keyboard(callback: CallbackData):
         text=emojize(":leftwards_arrow_with_hook: Назад"),
         callback_data=callback.new(legue_name="back_to_list")
     ))
+    return country_back_keyboard

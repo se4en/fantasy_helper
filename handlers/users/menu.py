@@ -29,7 +29,7 @@ async def to_players(call: CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(menu_callback.filter(choice_name="profile"))
-async def bot_geturl(call: CallbackQuery, callback_data: dict):
+async def to_profile(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await Check.getting_profile.set()
     await call.message.answer(text="Отправь ссылку на свой профиль на sports.ru:")
