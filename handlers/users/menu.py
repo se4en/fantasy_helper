@@ -7,6 +7,7 @@ from loader import users, legues, players
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
 from keyboards.inline.callback_datas import menu_callback, coefs_callback, players_callback
 from keyboards.inline.country_buttons import create_country_keyboard
+from keyboards.inline.admin_buttons import admin_keyboard
 from states.checking import Check
 
 @dp.callback_query_handler(state=Check.no_checking)
@@ -41,6 +42,12 @@ async def to_help(call: CallbackQuery, callback_data: dict):
     answer = ["Для получения справки воспользуйтесь командой /help.",
               "С вопросами и предложениями обращайтесь к @click_here."]
     await call.message.answer(text=("\n").join(answer), reply_markup=back_to_menu_keyboard)
+
+@dp.callback_query_handler(state=Check.no_checking)
+@dp.callback_query_handler(menu_callback.filter(choice_name="admin"))
+async def to_admin(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer(text="Доступные инструменты:", reply_markup=admin_keyboard)
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(menu_callback.filter(choice_name="back_to_menu"))

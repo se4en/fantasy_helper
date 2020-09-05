@@ -4,3 +4,6 @@ class Check(StatesGroup):
     no_checking = State()
     checking_password = State()
     getting_profile = State()
+    # admin states
+    add_sourse = State()
+    delete_sourse = State()

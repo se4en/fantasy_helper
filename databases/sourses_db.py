@@ -42,6 +42,17 @@ class Sourses:
         }
         return emoji_dict[number]
 
+    @staticmethod
+    def unrepr_name(repr_name):
+        name_dict = {
+            "РПЛ" : "Russia",
+            "АПЛ" : "England",
+            "Лига 1" : "France",
+            "ЛаЛига" : "Spain",
+            "Чемпионшип" : "Championship"
+        }
+        return name_dict[repr_name]
+
     def add_sourse(self, legue_name, repr_name, link, discription):
         self.cursor.execute("INSERT INTO sourses VALUES (?,?,?,?)", 
             (legue_name, repr_name, link, discription)
@@ -55,7 +66,7 @@ class Sourses:
     def get_legues(self):
         self.cursor.execute("SELECT DISTINCT legue_name, repr_name FROM sourses")
         return self.cursor.fetchall()
-        
+
     def get_sourses(self, legue_name):
         self.cursor.execute("""
             SELECT * FROM sourses

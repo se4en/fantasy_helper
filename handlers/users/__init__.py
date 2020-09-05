@@ -4,5 +4,6 @@ from .menu import dp
 from .coefs import dp
 from .check import dp
 from .players import dp
+from .admin import dp
 
 __all__ = ["dp"]
