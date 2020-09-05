@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, ParseMode
 
 from loader import dp
 from loader import users, legues, players
-from keyboards.inline.menu_buttons import menu_keyboard, back_to_menu_keyboard
+from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
 from keyboards.inline.callback_datas import menu_callback, coefs_callback, players_callback
 from keyboards.inline.country_buttons import create_country_keyboard
 from states.checking import Check
@@ -46,4 +46,4 @@ async def to_help(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(menu_callback.filter(choice_name="back_to_menu"))
 async def back_to_menu(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Меню:", reply_markup=menu_keyboard)
+    await call.message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))

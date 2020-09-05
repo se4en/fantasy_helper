@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import functools
-
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text, bold, italic, code, pre
 
@@ -121,9 +120,9 @@ class LegueDB():
         self.cursor.execute('SELECT * FROM ' + self.legue_name)
         all_coefs = self.cursor.fetchall()
         all_coefs.sort(key=lambda line: line[2])
-        result = ["Атакующий потенциал:\n",]
+        result = ["\U0001F5E1 Атакующий потенциал:\n",]
         result += list(map(functools.partial(self.__trsansform_coefs, type="for"), all_coefs))
-        result += ["\nЗащитный потенциал:\n"]
+        result += ["\n\U0001F6E1 Защитный потенциал:\n"]
         all_coefs.sort(key=lambda line: line[3])
         result += list(map(functools.partial(self.__trsansform_coefs, type="against"), all_coefs))
         return ('\n').join(result)

@@ -1,18 +1,14 @@
 import sqlite3
+from aiogram.utils.markdown import text, bold, italic, code, pre
 
 class Sourses:
-    def __init__(self, legue_name, repr_name=None):
-        self.legue_name = legue_name
-        self.repr_name = repr_name
+    def __init__(self):
         self.conn = sqlite3.connect("legues.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS sourses
-            (legue_name text, link text, discription text)
-        """)    
-
-    def get_name(self):
-        return self.legue_name
+            (legue_name text, repr_name, link text, discription text)
+        """)
 
     @staticmethod
     def emojize_name(country_name):
@@ -46,15 +42,20 @@ class Sourses:
         }
         return emoji_dict[number]
 
-    def __str__(self):
-        return self.emojize_name(self.legue_name) + " " + self.repr_name
-
-    def add_sourse(self, legue_name, link, discription):
-        self.cursor.execute("INSERT INTO sourses VALUES (?,?,?)", 
-            (legue_name, link, discription)
+    def add_sourse(self, legue_name, repr_name, link, discription):
+        self.cursor.execute("INSERT INTO sourses VALUES (?,?,?,?)", 
+            (legue_name, repr_name, link, discription)
         )
         self.conn.commit()
 
+    def delete_sourse(self, link):
+        self.cursor.execute("DELETE FROM sourses WHERE link = ? ", link)
+        self.conn.commit()
+
+    def get_legues(self):
+        self.cursor.execute("SELECT DISTINCT legue_name, repr_name FROM sourses")
+        return self.cursor.fetchall()
+        
     def get_sourses(self, legue_name):
         self.cursor.execute("""
             SELECT * FROM sourses
@@ -64,4 +65,8 @@ class Sourses:
         return self.__transform_sourses(sourses)
 
     def __transform_sourses(self, sourses_list):
-        for i in 
+        result = []
+        for i in len(sourses_list):
+            result += [self.emojize_number(i+1) + " " +
+                sourses_list[i][1] + " " + italic(sourses_list[i][2])]
+        return ('\n').join(result)

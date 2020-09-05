@@ -6,14 +6,14 @@ from loader import dp
 from loader import players
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, players_callback
-from keyboards.inline.menu_buttons import menu_keyboard
+from keyboards.inline.menu_buttons import create_menu_keyboard
 from keyboards.inline.country_buttons import create_country_keyboard, create_country_back_keyboard
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(players_callback.filter(legue_name="cancel",))
 async def to_menu_from_coefs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Меню: ", reply_markup=menu_keyboard)
+    await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(0))
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(players_callback.filter(legue_name="back_to_list",))
