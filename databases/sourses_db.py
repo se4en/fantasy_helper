@@ -63,7 +63,7 @@ class Sourses:
             "Spain" : "ЛаЛига",
             "Championship" : "Чемпионшип"
         }
-        return name_dict[name]
+        return Sourses.emojize_name(name) + " " + name_dict[name]
 
     def add_sourse(self, legue_name, repr_name, link, discription):
         self.cursor.execute("INSERT INTO sourses VALUES (?,?,?,?)", 
@@ -91,6 +91,5 @@ class Sourses:
         result = []
         for i in range(len(sourses_list)):
             result += [emojize(self.emojize_number(i+1)) + " " + 
-            italic(sourses_list[i][2]) + "\n" + sourses_list[i][3]]
-            result += []
+            sourses_list[i][2] + "\n" + italic(sourses_list[i][3])]
         return ('\n').join(result)

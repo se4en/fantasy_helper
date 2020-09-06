@@ -7,8 +7,7 @@ from states.checking import Check
 from keyboards.inline.callback_datas import admin_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
 
-@dp.callback_query_handler(state=Check.no_checking)
-@dp.callback_query_handler(admin_callback.filter(tool_name="add_sourse",))
+@dp.callback_query_handler(admin_callback.filter(tool_name="add_sourse",), state=Check.no_checking)
 async def add_sourse_start(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await Check.add_sourse.set()
@@ -31,8 +30,7 @@ async def add_sourse_finish(message: types.Message):
         pass 
     await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
 
-@dp.callback_query_handler(state=Check.no_checking)
-@dp.callback_query_handler(admin_callback.filter(tool_name="delete_sourse",))
+@dp.callback_query_handler(admin_callback.filter(tool_name="delete_sourse",), state=Check.no_checking)
 async def delete_sourse_start(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await Check.add_sourse.set()
@@ -45,8 +43,7 @@ async def delete_sourse_finish(message: types.Message):
     sourses.delete_sourse(user_message[1])    
     await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
 
-@dp.callback_query_handler(state=Check.no_checking)
-@dp.callback_query_handler(admin_callback.filter(tool_name="cancel",))
+@dp.callback_query_handler(admin_callback.filter(tool_name="cancel",), state=Check.no_checking)
 async def to_menu_from_admin(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(call.message.from_user.id))
