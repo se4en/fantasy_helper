@@ -8,6 +8,7 @@ from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_key
 from keyboards.inline.callback_datas import menu_callback, coefs_callback, players_callback
 from keyboards.inline.country_buttons import create_country_keyboard
 from keyboards.inline.admin_buttons import admin_keyboard
+from keyboards.inline.sourses_buttons import create_sourses_keyboard
 from states.checking import Check
 
 @dp.callback_query_handler(state=Check.no_checking)
@@ -25,6 +26,15 @@ async def to_players(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:", 
         reply_markup=create_country_keyboard(players, players_callback), 
+        parse_mode=ParseMode.MARKDOWN
+    ) 
+
+@dp.callback_query_handler(state=Check.no_checking)
+@dp.callback_query_handler(menu_callback.filter(choice_name="sourses"))
+async def to_sourses(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer("Доступные чемпионаты:", 
+        reply_markup=create_sourses_keyboard(), 
         parse_mode=ParseMode.MARKDOWN
     ) 
 

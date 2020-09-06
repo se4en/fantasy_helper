@@ -6,4 +6,6 @@ coefs_callback  = CallbackData("coefs", "legue_name")
 
 players_callback  = CallbackData("players", "legue_name")
 
+sourses_callback = CallbackData("sourses", "legue_name")
+
 admin_callback = CallbackData("admin", "tool_name")

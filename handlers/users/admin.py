@@ -31,11 +31,7 @@ async def add_sourse_finish(message: types.Message):
 async def delete_sourse_start(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await Check.add_sourse.set()
-    answer = ["Чтобы удалить источник, отправь в одном сообщении:",
-              " - название чемпионата как в списке(!),",
-              " - затем на новой строке ссылку."
-    ]
-    await call.message.answer(text = ('\n').join(answer))
+    await call.message.answer(text = "Чтобы удалить источник, отправь ссылку на него.")
 
 @dp.message_handler(state=Check.delete_sourse)
 async def delete_sourse_finish(message: types.Message):

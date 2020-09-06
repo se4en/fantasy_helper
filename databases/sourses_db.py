@@ -43,7 +43,7 @@ class Sourses:
         return emoji_dict[number]
 
     @staticmethod
-    def unrepr_name(repr_name):
+    def unrepresent_name(repr_name):
         name_dict = {
             "РПЛ" : "Russia",
             "АПЛ" : "England",
@@ -64,7 +64,7 @@ class Sourses:
         self.conn.commit()
 
     def get_legues(self):
-        self.cursor.execute("SELECT DISTINCT legue_name, repr_name FROM sourses")
+        self.cursor.execute("SELECT DISTINCT legue_name FROM sourses")
         return self.cursor.fetchall()
 
     def get_sourses(self, legue_name):
