@@ -13,7 +13,7 @@ from keyboards.inline.country_buttons import create_country_keyboard, create_cou
 @dp.callback_query_handler(coefs_callback.filter(legue_name="cancel",))
 async def to_menu_from_coefs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(0))
+    await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(call.message.from_user.id))
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(coefs_callback.filter(legue_name="back_to_list",))

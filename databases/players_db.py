@@ -59,11 +59,9 @@ class PlayersDB:
         """)
         whorst_players = self.cursor.fetchall()
         self.popular_list = ["\U0001F4C8 Популярные игроки:\n"]
-        print(self.popular_list)
         self.popular_list += self.__transform_players(best_players)
         self.popular_list += ["\n\U0001F4C9 Непопулярные игроки:\n"]
         self.popular_list += self.__transform_players(whorst_players)
-        print(self.popular_list)
 
     def __transform_players(self, players_list):
         result = []
@@ -124,7 +122,6 @@ class PlayersDB:
         driver.get(url)
         players_on_page = driver.find_elements_by_tag_name('tr')
         count_of_players_on_page = len(players_on_page)
-        print(count_of_players_on_page)
         if count_of_players_on_page < 2:
             driver.close()
             return False
@@ -155,7 +152,6 @@ class PlayersDB:
                 """, 
                 (new_popularity, 0, player_name))
             else:
-                print(f"set dif pop {new_popularity} - {player_data[3]}")
                 self.cursor.execute("UPDATE " + self.legue_name + """
                     SET dif_popularity = ?
                     WHERE first_name = ?

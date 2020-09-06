@@ -7,10 +7,10 @@ from loader import sourses
 def create_sourses_keyboard():
     sourses_keyboard = InlineKeyboardMarkup(row_width=1)
     legues = sourses.get_legues()
-    for legue, legue_name in legues:
+    for legue in legues:
         sourses_keyboard.insert(InlineKeyboardButton(
-            text = legue_name,
-            callback_data=sourses_callback.new(legue_name=legue)
+            text = sourses.represent_name(legue[0]),
+            callback_data=sourses_callback.new(legue_name=legue[0])
         ))
     sourses_keyboard.insert(InlineKeyboardButton(
         text=emojize(":leftwards_arrow_with_hook: Назад"), 

@@ -63,4 +63,4 @@ async def to_admin(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(menu_callback.filter(choice_name="back_to_menu"))
 async def back_to_menu(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))
+    await call.message.answer(text="Меню:", reply_markup=create_menu_keyboard(call.message.from_user.id))

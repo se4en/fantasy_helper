@@ -1,9 +1,10 @@
 import sqlite3
-from aiogram.utils.markdown import text, bold, italic, code, pre
+from aiogram.utils.emoji import emojize
+from aiogram.utils.markdown import bold, italic
 
 class Sourses:
     def __init__(self):
-        self.conn = sqlite3.connect("legues.db")
+        self.conn = sqlite3.connect("sourses.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS sourses
@@ -53,6 +54,17 @@ class Sourses:
         }
         return name_dict[repr_name]
 
+    @staticmethod
+    def represent_name(name):
+        name_dict = {
+            "Russia" : "РПЛ",
+            "England" : "АПЛ",
+            "France" : "Лига 1",
+            "Spain" : "ЛаЛига",
+            "Championship" : "Чемпионшип"
+        }
+        return name_dict[name]
+
     def add_sourse(self, legue_name, repr_name, link, discription):
         self.cursor.execute("INSERT INTO sourses VALUES (?,?,?,?)", 
             (legue_name, repr_name, link, discription)
@@ -71,13 +83,14 @@ class Sourses:
         self.cursor.execute("""
             SELECT * FROM sourses
             WHERE legue_name = ?
-        """, legue_name)
+        """, (legue_name,))
         sourses = self.cursor.fetchall()
         return self.__transform_sourses(sourses)
 
     def __transform_sourses(self, sourses_list):
         result = []
-        for i in len(sourses_list):
-            result += [self.emojize_number(i+1) + " " +
-                sourses_list[i][1] + " " + italic(sourses_list[i][2])]
+        for i in range(len(sourses_list)):
+            result += [emojize(self.emojize_number(i+1)) + " " + 
+            italic(sourses_list[i][2]) + "\n" + sourses_list[i][3]]
+            result += []
         return ('\n').join(result)

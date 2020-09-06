@@ -1,3 +1,5 @@
 .env
 *.log
 .idea
+__pycache__/
+*.py[cod]

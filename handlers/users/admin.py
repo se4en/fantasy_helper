@@ -23,8 +23,13 @@ async def add_sourse_start(call: CallbackQuery, callback_data: dict):
 async def add_sourse_finish(message: types.Message):
     await Check.no_checking.set()
     user_message = message.text.split('\n')
-    sourses.add_sourse(sourses.unrepr_name(user_message[0]), user_message[0], user_message[1], user_message[2])    
-    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))
+    if len(user_message)==3:
+        sourses.add_sourse(sourses.unrepresent_name(user_message[0]), user_message[0], user_message[1], user_message[2])    
+    elif len(user_message)==2:
+        sourses.add_sourse(sourses.unrepresent_name(user_message[0]), user_message[0], user_message[1], "")
+    else:
+        pass 
+    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(admin_callback.filter(tool_name="delete_sourse",))
@@ -38,10 +43,10 @@ async def delete_sourse_finish(message: types.Message):
     await Check.no_checking.set()
     user_message = message.text.split('\n')
     sourses.delete_sourse(user_message[1])    
-    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))
+    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
 
 @dp.callback_query_handler(state=Check.no_checking)
 @dp.callback_query_handler(admin_callback.filter(tool_name="cancel",))
 async def to_menu_from_admin(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(0))
+    await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(call.message.from_user.id))

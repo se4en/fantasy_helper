@@ -11,7 +11,7 @@ async def bot_checking_password(message: types.Message):
     if message.text==config.PASSWORD:
         await Check.no_checking.set()
         users.add_user(message.from_user.id)
-        await message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))
+        await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
     else:
         await message.answer(text="Пароль неверный!\nПовторите попытку:")
 
@@ -19,4 +19,4 @@ async def bot_checking_password(message: types.Message):
 async def bot_start(message: types.Message):
     await Check.no_checking.set()
     users.add_profile(message.from_user.id, message.text)
-    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(0))
+    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
