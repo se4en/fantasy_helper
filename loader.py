@@ -11,7 +11,9 @@ bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
 legues = [
     LegueDB('Russia', 'https://www.fonbet.ru/bets/football/11935/', 'РПЛ'),
-    LegueDB('France', 'https://www.fonbet.ru/bets/football/11920/', 'Лига 1')
+    LegueDB('France', 'https://www.fonbet.ru/bets/football/11920/', 'Лига 1'),
+    LegueDB('England', 'https://www.fonbet.ru/bets/football/11918/', 'АПЛ'),
+    LegueDB('Germany', 'https://www.fonbet.ru/bets/football/11916/', 'Бундеслига'),
 ]
 users = UsersDB()
 players = [

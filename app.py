@@ -3,8 +3,8 @@ async def on_startup(dp):
     await on_startup_notify(dp)
 
     from loader import legues, players
-    #for pl_legue in players:
-    #   pl_legue.update_db()
+    for legue in legues:
+        legue.update_db()
 
 if __name__ == '__main__':
     from aiogram import executor

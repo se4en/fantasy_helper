@@ -48,7 +48,7 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
-        driver = webdriver.Firefox()
+        driver = webdriver.Firefox(executable_path=r'/usr/local/bin/geckodriver')
         driver.get(match_link)
         coef_1 = []
         coef_2 = []
@@ -77,7 +77,7 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
-        driver = webdriver.Firefox()
+        driver = webdriver.Firefox(executable_path=r'/usr/local/bin/geckodriver')
         driver.get(self.fonbet_url)
         try:
             table_rows = WebDriverWait(driver, 10).until(
@@ -133,10 +133,10 @@ class LegueDB():
         """
         if type=="for":
             coef = emojize(self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "  " if len(str(db_tup[2]))==4 
-                          else self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "0" + "  ")
+                           else self.__emojize_coef(db_tup[2]) + " " + str(db_tup[2]) + "0" + "  ")
         else:
             coef = emojize(self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "  " if len(str(db_tup[3]))==4 
-                          else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + "  ")
+                           else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + "  ")
         team1_max_len = 9
         if len(db_tup[0])<=team1_max_len + 4:
             team1 = bold(db_tup[0] + "  ")
@@ -161,9 +161,3 @@ class LegueDB():
             return "🟧"
         else:
             return "🟥"
-
-if __name__=='__main__':
-    Italy = LegueDB('Италия', 'https://www.fonbet.ru/bets/football/11924/')
-    Italy.update_db()
-    coefs = Italy.get_coefs()
-    print(coefs)
