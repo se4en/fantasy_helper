@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import functools
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text, bold, italic, code, pre
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 class LegueDB():
     """
@@ -48,7 +49,9 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
-        driver = webdriver.Firefox()
+        cap = DesiredCapabilities().FIREFOX
+        cap["marionette"] = False
+        driver = webdriver.Firefox(capabilities=cap)
         driver.get(match_link)
         coef_1 = []
         coef_2 = []
@@ -77,7 +80,9 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
-        driver = webdriver.Firefox()
+        cap = DesiredCapabilities().FIREFOX
+        cap["marionette"] = False
+        driver = webdriver.Firefox(capabilities=cap)
         driver.get(self.fonbet_url)
         try:
             table_rows = WebDriverWait(driver, 10).until(
