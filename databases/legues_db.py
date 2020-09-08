@@ -7,6 +7,7 @@ import functools
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text, bold, italic, code, pre
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
 
 class LegueDB():
     """
@@ -49,9 +50,13 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
+        binary = r'usr/bin/firefox'
+        options = Options()
+        options.set_headless(headless=True)
+        options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        cap["marionette"] = False
-        driver = webdriver.Firefox(capabilities=cap, executable_path="/usr/local/bin/")
+        #cap["marionette"] = False
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/")
         driver.get(match_link)
         coef_1 = []
         coef_2 = []
@@ -80,9 +85,12 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
+        binary = r'usr/bin/firefox'
+        options = Options()
+        options.set_headless(headless=True)
+        options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        cap["marionette"] = False
-        driver = webdriver.Firefox(capabilities=cap, executable_path="/usr/local/bin/")
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/")
         driver.get(self.fonbet_url)
         try:
             table_rows = WebDriverWait(driver, 10).until(
