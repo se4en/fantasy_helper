@@ -3,6 +3,8 @@ from selenium import webdriver
 
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import bold
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
 
 class PlayersDB:
     def __init__(self, legue_name, legue_url, repr_name=None):
@@ -27,7 +29,16 @@ class PlayersDB:
     def emojize_name(country_name):
         emoji_dict = {
             "Russia" : "🇷🇺",
-            "France" : "🇫🇷"
+            "France" : "🇫🇷",
+            "England" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "Championship" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "Turckey" : "🇹🇷",
+            "Portugal" : "🇵🇹",
+            "Netherlands" : "🇳🇱",
+            "Italy" : "🇮🇹",
+            "Europe" : "🇪🇺",
+            "Spain" : "🇪🇸",
+            "Germany" : "🇩🇪"
         }
         return emoji_dict[country_name]
 
@@ -83,14 +94,23 @@ class PlayersDB:
                     (first_name text, team text, amplua integer, 
                     new_popularity integer, dif_popularity integer)
                 ''')
+        self.cursor.execute("DELETE FROM " + self.legue_name)
+        self.conn.commit()
         self.create_page(self.popular_players_url)
         j = 2
         while self.create_page(self.popular_players_url + '?p=' + str(j)):
             j = j + 1
 
     def create_page(self, url):
-        driver = webdriver.Firefox()
+        binary = r'/usr/bin/firefox'
+        options = Options()
+        options.set_headless(headless=True)
+        options.binary = binary
+        cap = DesiredCapabilities().FIREFOX
+        #cap["marionette"] = False
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(url)
+        print(f"{self.legue_name} creating page ...")
         players_on_page = driver.find_elements_by_tag_name('tr')
         count_of_players_on_page = len(players_on_page)
         if count_of_players_on_page < 2:
@@ -118,7 +138,13 @@ class PlayersDB:
             j = j + 1
 
     def update_page(self, url, new_round):
-        driver = webdriver.Firefox()
+        binary = r'/usr/bin/firefox'
+        options = Options()
+        options.set_headless(headless=True)
+        options.binary = binary
+        cap = DesiredCapabilities().FIREFOX
+        #cap["marionette"] = False
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(url)
         players_on_page = driver.find_elements_by_tag_name('tr')
         count_of_players_on_page = len(players_on_page)

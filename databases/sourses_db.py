@@ -17,6 +17,7 @@ class Sourses:
             "Russia" : "🇷🇺",
             "France" : "🇫🇷",
             "England" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "Championship" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
             "Turkey" : "🇹🇷",
             "Portugal" : "🇵🇹",
             "Netherlands" : "🇳🇱",
@@ -50,7 +51,10 @@ class Sourses:
             "АПЛ" : "England",
             "Лига 1" : "France",
             "ЛаЛига" : "Spain",
-            "Чемпионшип" : "Championship"
+            "Чемпионшип" : "Championship",
+            "Эрдевизи" : "Netherlands",
+            "Бундеслига" : "Germany",
+            "Суперлига" : "Turkey",
         }
         return name_dict[repr_name]
 
@@ -61,7 +65,10 @@ class Sourses:
             "England" : "АПЛ",
             "France" : "Лига 1",
             "Spain" : "ЛаЛига",
-            "Championship" : "Чемпионшип"
+            "Championship" : "Чемпионшип",
+            "Netherlands" : "Эрдевизи",
+            "Germany" : "Бундеслига",
+            "Turkey" : "Суперлига",
         }
         return Sourses.emojize_name(name) + " " + name_dict[name]
 

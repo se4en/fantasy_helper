@@ -27,6 +27,14 @@ async def to_players(call: CallbackQuery, callback_data: dict):
         parse_mode=ParseMode.MARKDOWN
     ) 
 
+@dp.callback_query_handler(menu_callback.filter(choice_name="top"), state=Check.no_checking)
+async def to_top(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer("Эта функция скоро станет доступна\nМеню:", 
+        reply_markup=create_menu_keyboard(call.message.from_user.id), 
+        parse_mode=ParseMode.MARKDOWN
+    ) 
+
 @dp.callback_query_handler(menu_callback.filter(choice_name="sourses"), state=Check.no_checking)
 async def to_sourses(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)

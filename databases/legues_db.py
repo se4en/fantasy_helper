@@ -34,7 +34,8 @@ class LegueDB():
             "Russia" : "🇷🇺",
             "France" : "🇫🇷",
             "England" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-            "Turkey" : "🇹🇷",
+            "Championship" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "Turckey" : "🇹🇷",
             "Portugal" : "🇵🇹",
             "Netherlands" : "🇳🇱",
             "Italy" : "🇮🇹",
@@ -171,12 +172,12 @@ class LegueDB():
         else:
             coef = emojize(self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "  " if len(str(db_tup[3]))==4 
                            else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + "  ")
-        team1_max_len = 9
+        team1_max_len = 8
         if len(db_tup[0])<=team1_max_len + 4:
             team1 = bold(db_tup[0] + "  ")
         else:
             team1 = bold(db_tup[0][:team1_max_len] + " " + db_tup[0].split()[-1] + "  ")
-        team2_max_len = 9
+        team2_max_len = 8
         if len(db_tup[1])<=team2_max_len:
             team2 = italic("vs " + db_tup[1])
         else:
