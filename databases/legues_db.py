@@ -6,8 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import functools
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text, bold, italic, code, pre
-#from webdriver_manager.chrome import ChromeDriverManager
-
 
 class LegueDB():
     """
@@ -50,10 +48,7 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
-        #cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
-        #driver = webdriver.Firefox(executable_path=r'/usr/local/bin/geckodriver', capabilities=cap)#, firefox_binary='/path/to/firefox/binary')
-        driver = webdriver.Chrome(executable_path="/usr/local/bin/")#ChromeDriverManager().install())
+        driver = webdriver.Firefox()
         driver.get(match_link)
         coef_1 = []
         coef_2 = []
@@ -82,17 +77,7 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
-        #from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-        #binary = FirefoxBinary('/usr/local/bin/firefox/firefox') # в моём случае
-        #cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
-        #driver = webdriver.Firefox(executable_path=r'/usr/local/bin/geckodriver', capabilities=cap, firefox_binary=binary)#, firefox_binary='/path/to/firefox/binary')
-        
-        from selenium.webdriver.chrome.options import Options
-        chrome_options = Options()
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-setuid-sandbox")
-        driver = webdriver.Chrome(chrome_options=chrome_options)#executable_path="/usr/local/bin/")#ChromeDriverManager().install())
+        driver = webdriver.Firefox()
         driver.get(self.fonbet_url)
         try:
             table_rows = WebDriverWait(driver, 10).until(
