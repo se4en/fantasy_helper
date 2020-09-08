@@ -70,3 +70,8 @@ class UsersDB:
         for proc in procs:
             proc.join()
         return result
+
+    def get_all(self):
+        self.cursor.execute('SELECT DISTINCT tg_id FROM users')
+        result = self.cursor.fetchall()
+        return result

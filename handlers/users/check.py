@@ -1,4 +1,5 @@
 from aiogram import types
+from aiogram.types import CallbackQuery
 
 from data import config
 from loader import dp
