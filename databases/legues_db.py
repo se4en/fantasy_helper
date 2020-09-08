@@ -51,7 +51,7 @@ class LegueDB():
         """
         cap = DesiredCapabilities().FIREFOX
         cap["marionette"] = False
-        driver = webdriver.Firefox(capabilities=cap)
+        driver = webdriver.Firefox(capabilities=cap, executable_path="/usr/local/bin/")
         driver.get(match_link)
         coef_1 = []
         coef_2 = []
@@ -82,7 +82,7 @@ class LegueDB():
         """
         cap = DesiredCapabilities().FIREFOX
         cap["marionette"] = False
-        driver = webdriver.Firefox(capabilities=cap)
+        driver = webdriver.Firefox(capabilities=cap, executable_path="/usr/local/bin/")
         driver.get(self.fonbet_url)
         try:
             table_rows = WebDriverWait(driver, 10).until(
