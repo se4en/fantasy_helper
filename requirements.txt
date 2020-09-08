@@ -2,3 +2,4 @@ python-dotenv
 emoji
 selenium
 aiogram==2.9.2
+webdriver-manager
