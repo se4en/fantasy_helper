@@ -19,21 +19,30 @@ class LegueDB():
         self.fonbet_url = fonbet_url
         self.teams = []
         self.coefs = []
-        self.conn = sqlite3.connect("legues.db")
+        self.conn = sqlite3.connect("legues.db", check_same_thread = False)
         self.cursor = self.conn.cursor()
         self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + legue_name + '''
                     (team_name text, team_vs_name text, coef_for real, coef_against real)
                 ''')    
 
     def __str__(self):
-        return emojize(self.__emojize_name() + " " + self.repr_name)
+        return emojize(LegueDB.emojize_name(self.legue_name) + " " + self.repr_name)
 
-    def __emojize_name(self):
+    @staticmethod
+    def emojize_name(country_name):
         emoji_dict = {
             "Russia" : "🇷🇺",
-            "France" : "🇫🇷"
+            "France" : "🇫🇷",
+            "England" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "Turkey" : "🇹🇷",
+            "Portugal" : "🇵🇹",
+            "Netherlands" : "🇳🇱",
+            "Italy" : "🇮🇹",
+            "Europe" : "🇪🇺",
+            "Spain" : "🇪🇸",
+            "Germany" : "🇩🇪"
         }
-        return emoji_dict[self.legue_name]
+        return emoji_dict[country_name]
 
     def get_name(self):
         return self.legue_name
@@ -50,14 +59,15 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
-        binary = r'usr/bin/firefox'
+        binary = r'/usr/bin/firefox'
         options = Options()
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
         #cap["marionette"] = False
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/")
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(match_link)
+        print(f"updating match coefs {self.legue_name} ...")
         coef_1 = []
         coef_2 = []
         try:
@@ -85,20 +95,22 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
-        binary = r'usr/bin/firefox'
+        binary = r'/usr/bin/firefox'
         options = Options()
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/")
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(self.fonbet_url)
+        print(f"updating coefs {self.legue_name} ...")
         try:
             table_rows = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'table'))
             ).find_elements_by_class_name('table__row')
-        except:
+        except Exception as ex:
             # отправить сообщение об ошибке
             driver.quit()
+            print(ex)
         self.coefs = [] # list of pairs of coefs
         self.teams = [] # list of teams' names
         for i in range(len(table_rows)-2):
@@ -107,6 +119,15 @@ class LegueDB():
                 )
             self.teams += self.update_match_name(
                 table_rows[i+1].find_element_by_class_name('table__match-title-text').text
+                )
+        if self.update_match_coefs(
+            table_rows[i+2].find_element_by_class_name('table__match-title-text').get_attribute("href")
+            ):  
+            self.coefs += self.update_match_coefs(
+                table_rows[i+2].find_element_by_class_name('table__match-title-text').get_attribute("href")
+                )
+            self.teams += self.update_match_name(
+                table_rows[i+2].find_element_by_class_name('table__match-title-text').text
                 )
         driver.quit()
 

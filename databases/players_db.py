@@ -10,7 +10,7 @@ class PlayersDB:
         self.legue_url = legue_url
         self.repr_name = repr_name
         self.popular_list = []
-        self.conn = sqlite3.connect("players.db")
+        self.conn = sqlite3.connect("players.db", check_same_thread = False)
         self.cursor = self.conn.cursor()
         # https://www.sports.ru/fantasy/football/tournament/49.html
         split_url = self.legue_url.split('/')

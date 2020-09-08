@@ -1,11 +1,10 @@
 import sqlite3
 from selenium import webdriver
 from multiprocessing import Process
-from aiogram.utils.markdown import text, bold, italic, code, pre
 
 class UsersDB:
     def __init__(self):
-        self.conn = sqlite3.connect("users.db")
+        self.conn = sqlite3.connect("users.db", check_same_thread = False)
         self.cursor = self.conn.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS users
                             (tg_id int, profile_url text)

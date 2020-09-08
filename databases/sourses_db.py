@@ -4,7 +4,7 @@ from aiogram.utils.markdown import bold, italic
 
 class Sourses:
     def __init__(self):
-        self.conn = sqlite3.connect("sourses.db")
+        self.conn = sqlite3.connect("sourses.db", check_same_thread = False)
         self.cursor = self.conn.cursor()
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS sourses
