@@ -167,24 +167,29 @@ class PlayersDB:
             WHERE first_name = ?
         """, (player_name, )) 
         player_data = self.cursor.fetchone()
-        if player_data==[]:
-            return False
-        else:
-            if new_round:
-                self.cursor.execute("UPDATE " + self.legue_name + """
-                    SET new_popularity = ? ,
-                        dif_popularity = ?
-                    WHERE first_name = ?
-                """, 
-                (new_popularity, 0, player_name))
+        try:
+            if not player_data:
+                return False
+            elif player_data==[]:
+                return False
             else:
-                self.cursor.execute("UPDATE " + self.legue_name + """
-                    SET dif_popularity = ?
-                    WHERE first_name = ?
-                """, 
-                (new_popularity - player_data[3], player_name))
-            self.conn.commit()
-            return True
+                if new_round:
+                    self.cursor.execute("UPDATE " + self.legue_name + """
+                        SET new_popularity = ? ,
+                            dif_popularity = ?
+                        WHERE first_name = ?
+                    """, 
+                    (new_popularity, 0, player_name))
+                else:
+                    self.cursor.execute("UPDATE " + self.legue_name + """
+                        SET dif_popularity = ?
+                        WHERE first_name = ?
+                    """, 
+                    (new_popularity - player_data[3], player_name))
+                self.conn.commit()
+                return True
+        except:
+            return False
 
 if __name__=='__main__':
     Spain = PlayersDB('Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html', 'ЛаЛига')

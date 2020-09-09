@@ -6,6 +6,6 @@ from updates import on_startup
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.create_task(on_startup(False))
+    loop.create_task(on_startup())
     loop.create_task(executor.start_polling(dp))
     loop.run_forever()
