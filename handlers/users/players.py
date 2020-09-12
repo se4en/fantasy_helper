@@ -19,7 +19,7 @@ async def back_to_coefs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
                               reply_markup=create_country_keyboard(players, players_callback),
-                              parse_mode=ParseMode.HTML)
+                              parse_mode=ParseMode.MARKDOWN)
 
 @dp.callback_query_handler(players_callback.filter(), state=Check.no_checking)
 async def get_coefs(call: CallbackQuery, callback_data: dict):
@@ -29,4 +29,4 @@ async def get_coefs(call: CallbackQuery, callback_data: dict):
         if players_legue.get_name()==legue_name:
             await call.message.answer(text=players_legue.get_popular(),
                                       reply_markup=create_country_back_keyboard(players_callback),
-                                      parse_mode=ParseMode.HTML)
+                                      parse_mode=ParseMode.MARKDOWN)

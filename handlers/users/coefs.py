@@ -18,8 +18,7 @@ async def to_menu_from_coefs(call: CallbackQuery, callback_data: dict):
 async def back_to_coefs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
-                              reply_markup=create_country_keyboard(legues, coefs_callback),
-                              parse_mode=ParseMode.HTML)
+                              reply_markup=create_country_keyboard(legues, coefs_callback))
 
 @dp.callback_query_handler(coefs_callback.filter(), state=Check.no_checking)
 async def get_coefs(call: CallbackQuery, callback_data: dict):

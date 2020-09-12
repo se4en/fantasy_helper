@@ -178,9 +178,9 @@ class LegueDB():
             team1 = f"<b>{db_tup[0][:team1_max_len]} {db_tup[0].split()[-1]} </b>"
         team2_max_len = 8
         if len(db_tup[1])<=team2_max_len:
-            team2 = f"<i>vs + {db_tup[1]}</i>"
+            team2 = f"<i>vs {db_tup[1]}</i>"
         else:
-            team2 = f"vs {db_tup[1][:team2_max_len]}</i>"
+            team2 = f"<i>vs {db_tup[1][:team2_max_len]}</i>"
         return text(coef, team1, team2, sep="")
 
     def __emojize_coef(self, coef):

@@ -132,6 +132,8 @@ class PlayersDB:
         self.conn.commit()
 
     def update_db(self, new_round=False):
+        self.cursor.execute(f"UPDATE {self.legue_name} SET dif_popularity = 0")
+        self.conn.commit()
         self.update_page(self.popular_players_url, new_round)
         j = 2
         while self.update_page(self.popular_players_url + '?p=' + str(j), new_round):
