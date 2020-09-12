@@ -25,14 +25,14 @@ async def update_players_after_deadline(*args):
             players_legue.create_db()
             await notify_admin(dp, f"### players {players_legue.legue_name} deadline updated")
 
-async def on_startup(at_start=True, timeout=6*60*60):
+async def on_startup(at_start=True, timeout=12*60*60):
     await notify_admin(dp, "### bot started")
     if at_start:
-        # await update_coefs()
         await update_players()
+        await update_coefs()
     while True:
         await notify_admin(dp, "### start sleeping")
         await asyncio.sleep(timeout)
         await notify_admin(dp, "### end sleeping")
-        await update_coefs()
         await update_players()
+        await update_coefs()

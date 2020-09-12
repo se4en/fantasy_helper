@@ -146,7 +146,12 @@ class PlayersDB:
         #cap["marionette"] = False
         driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(url)
-        players_on_page = driver.find_elements_by_tag_name('tr')
+        try:
+            players_on_page = driver.find_elements_by_tag_name('tr')
+        except:
+            print("exceptin")
+            driver.close()
+            return False
         count_of_players_on_page = len(players_on_page)
         if count_of_players_on_page < 2:
             driver.close()
