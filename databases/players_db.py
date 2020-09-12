@@ -1,6 +1,8 @@
 import sqlite3
 from selenium import webdriver
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import bold
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -149,9 +151,11 @@ class PlayersDB:
         driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(url)
         try:
-            players_on_page = driver.find_elements_by_tag_name('tr')
+            players_on_page = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.TAG_NAME, 'tr'))
+            )
+            #= driver.find_elements_by_tag_name('tr')
         except:
-            print("exceptin")
             driver.close()
             return False
         count_of_players_on_page = len(players_on_page)
