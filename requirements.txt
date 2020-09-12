@@ -1,7 +1,5 @@
 python-dotenv
 emoji
 selenium
-aiogram==2.9.2
+aiogram
 twisted
-firefox
-webdriver-manager

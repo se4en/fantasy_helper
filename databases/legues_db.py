@@ -65,7 +65,6 @@ class LegueDB():
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
         driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(match_link)
         print(f"updating match coefs {self.legue_name} ...")
@@ -174,14 +173,14 @@ class LegueDB():
                            else self.__emojize_coef(db_tup[3]) + " " + str(db_tup[3]) + "0" + "  ")
         team1_max_len = 8
         if len(db_tup[0])<=team1_max_len + 4:
-            team1 = bold(db_tup[0] + "  ")
+            team1 = f"<b>{db_tup[0]} </b>"
         else:
-            team1 = bold(db_tup[0][:team1_max_len] + " " + db_tup[0].split()[-1] + "  ")
+            team1 = f"<b>{db_tup[0][:team1_max_len]} {db_tup[0].split()[-1]} </b>"
         team2_max_len = 8
         if len(db_tup[1])<=team2_max_len:
-            team2 = italic("vs " + db_tup[1])
+            team2 = f"<i>vs + {db_tup[1]}</i>"
         else:
-            team2 = italic("vs " + db_tup[1][:team2_max_len])
+            team2 = f"vs {db_tup[1][:team2_max_len]}</i>"
         return text(coef, team1, team2, sep="")
 
     def __emojize_coef(self, coef):

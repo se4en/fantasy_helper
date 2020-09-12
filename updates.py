@@ -22,12 +22,16 @@ async def update_players_after_deadline(*args):
     if args==():    
         for players_legue in players:
             await notify_admin(dp, f"### start players {players_legue.legue_name} deadline updating ...")
-            players_legue.create_db()
+            players_legue.update_db(new_round=True)
             await notify_admin(dp, f"### players {players_legue.legue_name} deadline updated")
 
-async def on_startup(at_start=True, timeout=12*60*60):
+async def on_startup(at_start=False, deadline=False, timeout=12*60*60):
     await notify_admin(dp, "### bot started")
-    if at_start:
+    if deadline:
+        await update_players_after_deadline()
+        if at_start:
+            update_coefs()
+    elif at_start:
         await update_players()
         await update_coefs()
     while True:

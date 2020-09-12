@@ -17,7 +17,9 @@ async def to_menu_from_coefs(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(players_callback.filter(legue_name="back_to_list",), state=Check.no_checking)
 async def back_to_coefs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer("Доступные чемпионаты:", reply_markup=create_country_keyboard(players, players_callback), parse_mode=ParseMode.MARKDOWN)
+    await call.message.answer("Доступные чемпионаты:",
+                              reply_markup=create_country_keyboard(players, players_callback),
+                              parse_mode=ParseMode.HTML)
 
 @dp.callback_query_handler(players_callback.filter(), state=Check.no_checking)
 async def get_coefs(call: CallbackQuery, callback_data: dict):
@@ -25,4 +27,6 @@ async def get_coefs(call: CallbackQuery, callback_data: dict):
     legue_name = callback_data["legue_name"]
     for players_legue in players:
         if players_legue.get_name()==legue_name:
-            await call.message.answer(text=players_legue.get_popular(), reply_markup=create_country_back_keyboard(players_callback), parse_mode=ParseMode.MARKDOWN)
+            await call.message.answer(text=players_legue.get_popular(),
+                                      reply_markup=create_country_back_keyboard(players_callback),
+                                      parse_mode=ParseMode.HTML)
