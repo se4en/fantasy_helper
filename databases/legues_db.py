@@ -65,7 +65,7 @@ class LegueDB():
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
+        driver = webdriver.Firefox(firefox_binary=binary)#firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(match_link)
         print(f"updating match coefs {self.legue_name} ...")
         coef_1 = []
@@ -101,7 +101,7 @@ class LegueDB():
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
+        driver = webdriver.Firefox(firefox_binary=binary)#options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(self.fonbet_url)
         print(f"updating coefs {self.legue_name} ...")
         try:

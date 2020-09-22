@@ -32,8 +32,8 @@ async def on_startup(at_start=False, deadline=False, timeout=12*60*60):
         if at_start:
             update_coefs()
     elif at_start:
-        await update_players()
-        #await update_coefs()
+        #await update_players()
+        await update_coefs()
     while True:
         await notify_admin(dp, "### start sleeping")
         await asyncio.sleep(timeout)
