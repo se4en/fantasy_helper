@@ -55,6 +55,7 @@ class Sourses:
             "Эрдевизи" : "Netherlands",
             "Бундеслига" : "Germany",
             "Суперлига" : "Turkey",
+            "Серия А" : "Italy"
         }
         return name_dict[repr_name]
 
@@ -69,6 +70,7 @@ class Sourses:
             "Netherlands" : "Эрдевизи",
             "Germany" : "Бундеслига",
             "Turkey" : "Суперлига",
+            "Italy" : "Италия"
         }
         return Sourses.emojize_name(name) + " " + name_dict[name]
 

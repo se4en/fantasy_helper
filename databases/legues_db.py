@@ -81,7 +81,8 @@ class LegueDB():
             )[8]
             for_coefs_2 = driver.find_elements_by_class_name('table__details')[9]
             against_coef = driver.find_elements_by_class_name('table__details')[0]
-        except:
+        except Exception as ex:
+            print(ex)
             # отправить сообщение об ошибке
             driver.quit()
         coef_1.append(float(for_coefs_1.find_elements_by_class_name('table__grid-row')[2].find_elements_by_tag_name('td')[1].text))
@@ -104,9 +105,13 @@ class LegueDB():
         driver.get(self.fonbet_url)
         print(f"updating coefs {self.legue_name} ...")
         try:
+            print(WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'table'))
+            ))
             table_rows = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'table'))
             ).find_elements_by_class_name('table__row')
+
         except Exception as ex:
             # отправить сообщение об ошибке
             driver.quit()
@@ -139,6 +144,7 @@ class LegueDB():
         # clear table
         self.cursor.execute('DELETE FROM ' + self.legue_name)
         # colect insert data
+        print(self.teams, self.coefs)
         insert_data = []
         for i in range(0,len(self.teams),2):
             insert_data.append( (self.teams[i] + ' [д]', self.teams[i+1], self.coefs[i][0], self.coefs[i][1]) )

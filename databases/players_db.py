@@ -1,12 +1,8 @@
 import sqlite3
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import bold
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.firefox.options import Options
+import requests
+from bs4 import BeautifulSoup
 
 class PlayersDB:
     def __init__(self, legue_name, legue_url, repr_name=None):
@@ -104,27 +100,18 @@ class PlayersDB:
             j = j + 1
 
     def create_page(self, url):
-        binary = r'/usr/bin/firefox'
-        options = Options()
-        options.set_headless(headless=True)
-        options.binary = binary
-        cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
-        driver.get(url)
-        print(f"{self.legue_name} creating page ...")
-        players_on_page = driver.find_elements_by_tag_name('tr')
-        count_of_players_on_page = len(players_on_page)
-        if count_of_players_on_page < 2:
-            driver.close()
-            return False
-        for i in range(count_of_players_on_page-1):
-            player_name = players_on_page[i+1].find_element_by_class_name('name').text
-            player_amplua = players_on_page[i+1].find_element_by_class_name('overBox').text.split('\n')[1]
-            player_population = int(players_on_page[i+1].find_elements_by_tag_name('td')[1].text)
-            player_team = players_on_page[i+1].find_elements_by_tag_name('a')[1].text
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'lxml')
+        players = soup.find_all("tr")
+        for i in range(len(players) - 1):
+            player_population = int(players[i+1].find_all("td")[-1].text)
+            player_info = players[i+1].find("div", {"class": "overBox"}).text.split("\n")
+            player_name = player_info[1]
+            player_amplua = player_info[2]
+            player_team = player_info[3]
             self.__add_player(player_name, player_amplua, player_population, player_team)
-        driver.close()
+        if len(players) < 51:
+            return False
         return True
 
     def __add_player(self, player_name, player_amplua, player_population, player_team):
@@ -142,35 +129,20 @@ class PlayersDB:
             j = j + 1
 
     def update_page(self, url, new_round):
-        binary = r'/usr/bin/firefox'
-        options = Options()
-        options.set_headless(headless=True)
-        options.binary = binary
-        cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
-        driver.get(url)
-        try:
-            players_on_page = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.TAG_NAME, 'tr'))
-            )
-            #= driver.find_elements_by_tag_name('tr')
-        except:
-            driver.close()
-            return False
-        count_of_players_on_page = len(players_on_page)
-        if count_of_players_on_page < 2:
-            driver.close()
-            return False
-        for i in range(count_of_players_on_page-1):
-            player_name = players_on_page[i+1].find_element_by_class_name('name').text
-            new_population = int(players_on_page[i+1].find_elements_by_tag_name('td')[1].text)
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'lxml')
+        players = soup.find_all("tr")
+        for i in range(len(players)-1):
+            player_name = players[i+1].find("a").text
+            new_population = int(players[i+1].find_all("td")[-1].text)
             # update row in db
             if not self.__update_player(player_name, new_population, new_round):
-                player_amplua = players_on_page[i+1].find_element_by_class_name('overBox').text.split('\n')[1]
-                player_team = players_on_page[i+1].find_elements_by_tag_name('a')[1].text
+                player_info = players[i+1].find("div", {"class": "overBox"}).text.split("\n")
+                player_amplua = player_info[2]
+                player_team = player_info[3]
                 self.__add_player(player_name, player_amplua, new_population, player_team)
-        driver.close()
+        if len(players) < 51:
+            return False
         return True
 
     def __update_player(self, player_name, new_popularity, new_round):
@@ -201,7 +173,3 @@ class PlayersDB:
                 return True
         except:
             return False
-
-if __name__=='__main__':
-    Spain = PlayersDB('Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html', 'ЛаЛига')
-    Spain.update_db()

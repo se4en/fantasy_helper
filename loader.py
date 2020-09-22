@@ -17,7 +17,8 @@ legues = [
     LegueDB('Spain', 'https://www.fonbet.ru/bets/football/11922/', 'ЛаЛига'),
     LegueDB('Netherlands', 'https://www.fonbet.ru/bets/football/12967/', 'Эрдевизи'),
     LegueDB('Championship', 'https://www.fonbet.ru/bets/football/12018/', 'Чемпионшип'),
-    LegueDB('Turckey', 'https://www.fonbet.ru/bets/football/12973/', 'Суперлига')
+    LegueDB('Turckey', 'https://www.fonbet.ru/bets/football/12973/', 'Суперлига'),
+    LegueDB('Italy', 'https://www.fonbet.ru/bets/football/11924/', 'Серия А')
 ]
 users = UsersDB()
 players = [
@@ -28,6 +29,7 @@ players = [
     PlayersDB('Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html', 'ЛаЛига'),
     PlayersDB('Netherlands', 'https://www.sports.ru/fantasy/football/tournament/54.html', 'Эрдевизи'),
     PlayersDB('Championship', 'https://www.sports.ru/fantasy/football/tournament/205.html', 'Чемпионшип'),
-    PlayersDB('Turckey', 'https://www.sports.ru/fantasy/football/tournament/246.html', 'Суперлига')
+    PlayersDB('Turckey', 'https://www.sports.ru/fantasy/football/tournament/246.html', 'Суперлига'),
+    PlayersDB('Italy', 'https://www.sports.ru/fantasy/football/tournament/48.html', 'Серия А')
 ]
 sourses = Sourses()
