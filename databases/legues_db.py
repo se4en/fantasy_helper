@@ -60,12 +60,14 @@ class LegueDB():
         Return list of lists with pairs of team coefss, like
         [ [coef1_for, coef1_ag], [coef2_for, coef2_ag]] 
         """
+        if not match_link:
+            return False
         binary = r'/usr/bin/firefox'
         options = Options()
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_options=options, executable_path="/usr/local/bin/geckodriver")
+        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(match_link)
         print(f"updating match coefs {self.legue_name} ...")
         coef_1 = []
@@ -101,7 +103,7 @@ class LegueDB():
         options.set_headless(headless=True)
         options.binary = binary
         cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_binary=binary, executable_path="/usr/local/bin/geckodriver")
+        driver = webdriver.Firefox(firefox_binary=binary, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
         driver.get(self.fonbet_url)
         print(f"updating coefs {self.legue_name} ...")
         try:
