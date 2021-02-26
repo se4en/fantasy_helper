@@ -13,10 +13,11 @@ class LegueDB():
     """
     Include table in db for one legue
     """
-    def __init__(self, legue_name, fonbet_url, repr_name=None):
+    def __init__(self, legue_name, fonbet_url, sprots_url, repr_name=None):
         self.legue_name = legue_name
         self.repr_name = repr_name
         self.fonbet_url = fonbet_url
+        self.sports_url = sports_url
         self.teams = []
         self.coefs = []
         self.conn = sqlite3.connect("legues.db", check_same_thread = False)
@@ -62,62 +63,16 @@ class LegueDB():
         """
         if not match_link:
             return False
-        binary = r'/usr/bin/firefox'
-        options = Options()
-        options.set_headless(headless=True)
-        options.binary = binary
-        cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_options=options, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
-        driver.get(match_link)
-        print(f"updating match coefs {self.legue_name} ...")
-        coef_1 = []
-        coef_2 = []
-        try:
-            old_view = WebDriverWait(driver, 20).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'container--159-u'))
-            )
-            button = old_view.find_element_by_tag_name('a')
-            button.click()
-            for_coefs_1 = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, 'table__details'))
-            )[8]
-            for_coefs_2 = driver.find_elements_by_class_name('table__details')[9]
-            against_coef = driver.find_elements_by_class_name('table__details')[0]
-        except Exception as ex:
-            print(ex)
-            # отправить сообщение об ошибке
-            driver.quit()
         coef_1.append(float(for_coefs_1.find_elements_by_class_name('table__grid-row')[2].find_elements_by_tag_name('td')[1].text))
         coef_1.append(float(against_coef.find_elements_by_class_name('table__grid-row')[2].find_elements_by_tag_name('td')[2].text))
         coef_2.append(float(for_coefs_2.find_elements_by_class_name('table__grid-row')[2].find_elements_by_tag_name('td')[1].text))
         coef_2.append(float(against_coef.find_elements_by_class_name('table__grid-row')[1].find_elements_by_tag_name('td')[2].text))
-        driver.quit()
         return [coef_1, coef_2]
 
     def update_coefs(self):
         """
         Update self.teams and self.coefs
         """
-        binary = r'/usr/bin/firefox'
-        options = Options()
-        options.set_headless(headless=True)
-        options.binary = binary
-        cap = DesiredCapabilities().FIREFOX
-        driver = webdriver.Firefox(firefox_binary=binary, capabilities=cap, executable_path="/usr/local/bin/geckodriver")
-        driver.get(self.fonbet_url)
-        print(f"updating coefs {self.legue_name} ...")
-        try:
-            print(WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'table'))
-            ))
-            table_rows = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'table'))
-            ).find_elements_by_class_name('table__row')
-
-        except Exception as ex:
-            # отправить сообщение об ошибке
-            driver.quit()
-            print(ex)
         self.coefs = [] # list of pairs of coefs
         self.teams = [] # list of teams' names
         for i in range(len(table_rows)-2):
@@ -136,7 +91,6 @@ class LegueDB():
             self.teams += self.update_match_name(
                 table_rows[i+2].find_element_by_class_name('table__match-title-text').text
                 )
-        driver.quit()
 
     def update_db(self):
         """

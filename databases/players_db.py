@@ -173,3 +173,6 @@ class PlayersDB:
                 return True
         except:
             return False
+
+    def look_for_updates():
+        pass
