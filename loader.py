@@ -37,18 +37,30 @@ legues = [
 ]
 users = UsersDB()
 players = [
-    PlayersDB('Russia', 'https://www.sports.ru/fantasy/football/tournament/31.html', 'РПЛ'),
-    PlayersDB('France', 'https://www.sports.ru/fantasy/football/tournament/51.html', 'Лига 1'),
-    PlayersDB('England', 'https://www.sports.ru/fantasy/football/tournament/52.html', 'АПЛ'),
-    PlayersDB('Germany', 'https://www.sports.ru/fantasy/football/tournament/50.html', 'Бундеслига'),
-    PlayersDB('Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html', 'ЛаЛига'),
-    PlayersDB('Netherlands', 'https://www.sports.ru/fantasy/football/tournament/54.html', 'Эрдевизи'),
-    PlayersDB('Championship', 'https://www.sports.ru/fantasy/football/tournament/205.html', 'Чемпионшип'),
-    PlayersDB('Turckey', 'https://www.sports.ru/fantasy/football/tournament/246.html', 'Суперлига'),
-    PlayersDB('Italy', 'https://www.sports.ru/fantasy/football/tournament/48.html', 'Серия А'),
-    PlayersDB('Portugal', 'https://www.sports.ru/fantasy/football/tournament/207.html', 'Португалия'),
-    PlayersDB('UEFA_1', 'https://www.sports.ru/fantasy/football/tournament/57.html', 'Лига Чемпионов'),
-    PlayersDB('UEFA_2', 'https://www.sports.ru/fantasy/football/tournament/56.html', 'Лига Европы')
+    PlayersDB('Russia', 'https://www.sports.ru/fantasy/football/tournament/31.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2220643.html' 'РПЛ'),
+    PlayersDB('France', 'https://www.sports.ru/fantasy/football/tournament/51.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2232514.html', 'Лига 1'),
+    PlayersDB('England', 'https://www.sports.ru/fantasy/football/tournament/52.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243551.html', 'АПЛ'),
+    PlayersDB('Germany', 'https://www.sports.ru/fantasy/football/tournament/50.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243555.html', 'Бундеслига'),
+    PlayersDB('Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243562.html', 'ЛаЛига'),
+    PlayersDB('Netherlands', 'https://www.sports.ru/fantasy/football/tournament/54.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243575.html', 'Эрдевизи'),
+    PlayersDB('Championship', 'https://www.sports.ru/fantasy/football/tournament/205.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243558.html', 'Чемпионшип'),
+    PlayersDB('Turckey', 'https://www.sports.ru/fantasy/football/tournament/246.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2243571.html', 'Суперлига'),
+    PlayersDB('Italy', 'https://www.sports.ru/fantasy/football/tournament/48.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2258596.html', 'Серия А'),
+    PlayersDB('Portugal', 'https://www.sports.ru/fantasy/football/tournament/207.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2258098.html', 'Португалия'),
+    PlayersDB('UEFA_1', 'https://www.sports.ru/fantasy/football/tournament/57.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2283074.html', 'Лига Чемпионов'),
+    PlayersDB('UEFA_2', 'https://www.sports.ru/fantasy/football/tournament/56.html', \
+            'https://www.sports.ru/fantasy/football/team/points/2284228.html', 'Лига Европы')
 ]
 
 sourses = Sourses()

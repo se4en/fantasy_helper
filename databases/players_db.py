@@ -3,11 +3,14 @@ from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import bold
 import requests
 from bs4 import BeautifulSoup
+import datetime
 
 class PlayersDB:
-    def __init__(self, legue_name, legue_url, repr_name=None):
+    def __init__(self, legue_name, legue_url, sports_url, repr_name=None):
         self.legue_name = legue_name
         self.legue_url = legue_url
+        self.sports_url = sports_url
+        self.deadline = datetime.datetime.now()
         self.repr_name = repr_name
         self.popular_list = []
         self.conn = sqlite3.connect("players.db", check_same_thread = False)
@@ -56,6 +59,41 @@ class PlayersDB:
             10 : "\U0001F51F"
         }
         return emoji_dict[number]
+
+    def __transform_deadline(self, new_deadline):
+        day, month_time = new_deadline.split(' ')
+        month, time = month_time.split('|')
+
+        day = int(day)
+        month = {
+            "января" : 1,
+            "февраля" : 2,
+            "марта" : 3,
+            "апреля" : 4,
+            "мая" : 5,
+            "июня" : 6,
+            "июля" : 7,
+            "августа" : 8,
+            "сентября" : 9,
+            "октября" : 10,
+            "ноября" : 11,
+            "декабря" : 12
+        }[month]
+        hour, minute = list(map(int, time.split(":")))
+        return datetime.datetime(datetime.datetime.now().year, month, day, hour, minute)
+
+    def __try_update_deadline(self):
+        if datetime.datetime.now() < self.deadline:
+            return False
+        response = requests.get("https://www.sports.ru/fantasy/football/team/points/2284228.html")
+        soup = BeautifulSoup(response.text, 'lxml')
+        buf = soup.find("div", {"class": "pageLayout"}).find("div", {"class": "tabs-container mB20"})
+        new_deadline = buf.find_all("table", {"class": "profile-table"})[0].find_all("tr")[1].find("td")
+        self.deadline = self.__transform_deadline(new_deadline)
+        return True
+
+    def look_for_updates(self):
+        self.update_db(self.__try_update_deadline())
 
     def __update_popular_list(self):
         self.cursor.execute('SELECT * FROM ' + self.legue_name + """
