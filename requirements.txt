@@ -1,6 +1,5 @@
 python-dotenv
 emoji
-selenium
 aiogram
 bs4
 requests
