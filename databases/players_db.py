@@ -34,7 +34,8 @@ class PlayersDB:
             "Portugal" : "🇵🇹",
             "Netherlands" : "🇳🇱",
             "Italy" : "🇮🇹",
-            "Europe" : "🇪🇺",
+            "UEFA_1" : "🇪🇺",
+            "UEFA_2" : "🇪🇺",
             "Spain" : "🇪🇸",
             "Germany" : "🇩🇪"
         }
