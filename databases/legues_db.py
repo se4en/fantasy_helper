@@ -74,12 +74,18 @@ class LegueDB():
     def __try_update_deadline(self):
         if datetime.datetime.now() < self.deadline:
             return False
-        response = requests.get("https://www.sports.ru/fantasy/football/team/points/2284228.html")
+        response = requests.get(self.sports_url)
         soup = BeautifulSoup(response.text, 'lxml')
         buf = soup.find("div", {"class": "pageLayout"}).find("div", {"class": "tabs-container mB20"})
         new_deadline = buf.find_all("table", {"class": "profile-table"})[0].find_all("tr")[1].find("td")
         self.deadline = self.__transform_deadline(new_deadline)
         return True
+
+    def __update_games_count(self):
+        response = requests.get(self.sports_url)
+        soup = BeautifulSoup(response.text, 'lxml')
+        buf = soup.find("div", {"class": "pageLayout"}).find("div", {"class": "stat mB20"})
+        self.games_count = len(buf.find("table").find("tbody").find_all("tr"))
 
     def update_match_name(self, match_name):
         """
@@ -105,24 +111,22 @@ class LegueDB():
         """
         Update self.teams and self.coefs
         """
+        if self.__try_update_deadline():
+            self.__update_games_count()
+
         self.coefs = [] # list of pairs of coefs
         self.teams = [] # list of teams' names
-        for i in range(len(table_rows)-2):
-            self.coefs += self.update_match_coefs(
-                table_rows[i+1].find_element_by_class_name('table__match-title-text').get_attribute("href")
-                )
-            self.teams += self.update_match_name(
-                table_rows[i+1].find_element_by_class_name('table__match-title-text').text
-                )
-        if self.update_match_coefs(
-            table_rows[i+2].find_element_by_class_name('table__match-title-text').get_attribute("href")
-            ):  
-            self.coefs += self.update_match_coefs(
-                table_rows[i+2].find_element_by_class_name('table__match-title-text').get_attribute("href")
-                )
-            self.teams += self.update_match_name(
-                table_rows[i+2].find_element_by_class_name('table__match-title-text').text
-                )
+
+        try:
+            for i in range(self.games_count):
+                self.coefs += self.update_match_coefs(
+                    table_rows[i+1].find_element_by_class_name('table__match-title-text').get_attribute("href")
+                    )
+                self.teams += self.update_match_name(
+                    table_rows[i+1].find_element_by_class_name('table__match-title-text').text
+                    )
+        except:
+            pass
 
     def update_db(self):
         """
@@ -140,8 +144,6 @@ class LegueDB():
         # insert data to db
         self.cursor.executemany('INSERT INTO ' + self.legue_name + ' VALUES (?,?,?,?)', insert_data)    
         self.conn.commit()
-
-    def try_update_games_count(self):
 
 
     def get_coefs(self):
