@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 
 
-class Fonbet:
+class XBet:
 
     def __init__(self, leagues: dict = None):
         if leagues:
@@ -12,7 +12,6 @@ class Fonbet:
             return
 
         self._leagues = {
-            # 'Russia': 'https://1xstavka.ru/line/Football/225733-Russia-Premier-League/106035340-Ural-Nizhniy-Novgorod/',
             'Russia': 'https://1xstavka.ru/line/Football/225733-Russia-Premier-League/',
             'England': 'https://1xstavka.ru/line/Football/88637-England-Premier-League/',
             'France': 'https://1xstavka.ru/line/Football/12821-France-Ligue-1/',
@@ -34,12 +33,22 @@ class Fonbet:
             away_team = match_info['awayTeam']['name']
             match_url = match_info['url']
 
+            if "голы" in home_team or "специальное" in home_team:  # not match
+                return True
 
+            response = requests.get(match_url)
+            print(response.text)
+            soup = BeautifulSoup(response.text, 'lxml')
+
+            away_koeff_down = float(soup.find_all("span", string="Индивидуальный тотал 1 Меньше 0.5")[0]. \
+                parent.find("span", {"class": "koeff"}).text)
+            print("result:")
+            print(away_koeff_down)
 
             print(home_team, away_team, match_url)
-        except:
+        except Exception as ex:
             # logs here
-            print("Caught it!")
+            print(ex)
             return False
         else:
             return True
@@ -54,6 +63,10 @@ class Fonbet:
             soup = BeautifulSoup(response.text, 'lxml')
 
             all_matches = json.loads("".join(soup.find("script", {"type": "application/ld+json"}).contents))
+
+            # здесь надо получать матчи в туре, чтобы отмечать в бд, относится ли матч к текуущему туру
+
+
             return all(list(map(lambda x: self._update_match(league_name, x), all_matches)))
         except:
             # logs here
@@ -66,5 +79,22 @@ class Fonbet:
 
 
 if __name__ == "__main__":
-    fon = Fonbet()
-    fon.update_all()
+
+    #_1x = XBet()
+    #_1x.update_all()
+    _url = "https://1xstavka.ru/line/Football/225733-Russia-Premier-League/106034824-Rostov-Dynamo-Moscow/"
+
+    """
+    response = requests.get(_url)
+    print(response.text)
+    soup = BeautifulSoup(response.text, 'lxml')
+    """
+
+
+    session = HTMLSession()
+    r = session.get(_url)
+
+    r.html.render()
+
+
+    print(r.html.find("#allBetsTable", first=True).html)
