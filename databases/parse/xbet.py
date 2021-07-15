@@ -36,14 +36,29 @@ class XBet:
             if "голы" in home_team or "специальное" in home_team:  # not match
                 return True
 
-            response = requests.get(match_url)
-            print(response.text)
-            soup = BeautifulSoup(response.text, 'lxml')
+            session = HTMLSession()
+            r = session.get(_url)
 
-            away_koeff_down = float(soup.find_all("span", string="Индивидуальный тотал 1 Меньше 0.5")[0]. \
-                parent.find("span", {"class": "koeff"}).text)
-            print("result:")
-            print(away_koeff_down)
+            # render JS
+            r.html.render(retries=1, wait=0.1, timeout=20)
+
+            game_html = r.html.find("#allBetsTable", first=True)
+
+            # 4 - list index of block with only needed koeffs
+            total_1_all = game_html.find(containing="Индивидуальный тотал 1-го")[4]
+            total_1_more_1_5 = float(total_1_all.find("div", containing="1.5 Б", first=True)
+                                     .find("i", first=True).text)
+            total_1_less_0_5 = float(total_1_all.find("div", containing="0.5 М", first=True)
+                                     .find("i", first=True).text)
+
+            total_2_all = game_html.find(containing="Индивидуальный тотал 2-го")[4]
+            total_2_more_1_5 = float(total_2_all.find("div", containing="1.5 Б", first=True)
+                                     .find("i", first=True).text)
+            total_2_less_0_5 = float(total_2_all.find("div", containing="0.5 М", first=True)
+                                     .find("i", first=True).text)
+
+            # here we need update table
+            # we need find Team like: home_team = Leagues.find_by_name()
 
             print(home_team, away_team, match_url)
         except Exception as ex:
@@ -82,7 +97,7 @@ if __name__ == "__main__":
 
     #_1x = XBet()
     #_1x.update_all()
-    _url = "https://1xstavka.ru/line/Football/225733-Russia-Premier-League/106034824-Rostov-Dynamo-Moscow/"
+    _url = "https://1xstavka.ru/line/Football/127733-Spain-La-Liga/106480371-Celta-Atletico-Madrid/"
 
     """
     response = requests.get(_url)
@@ -94,7 +109,29 @@ if __name__ == "__main__":
     session = HTMLSession()
     r = session.get(_url)
 
-    r.html.render()
+    r.html.render(retries=1, wait=0.1, timeout=20)
 
 
-    print(r.html.find("#allBetsTable", first=True).html)
+    game_html = r.html.find("#allBetsTable", first=True)
+
+
+
+    # 4 - list index of block with only needed coefs
+    total_1_all = game_html.find(containing="Индивидуальный тотал 1-го")[4]
+    total_1_more_1_5 = float(total_1_all.find("div", containing="1.5 Б", first=True)
+                           .find("i", first=True).text)
+    total_1_less_0_5 = float(total_1_all.find("div", containing="0.5 М", first=True)
+                           .find("i", first=True).text)
+
+    total_2_all = game_html.find(containing="Индивидуальный тотал 2-го")[4]
+    total_2_more_1_5 = float(total_2_all.find("div", containing="1.5 Б", first=True)
+                           .find("i", first=True).text)
+    total_2_less_0_5 = float(total_2_all.find("div", containing="0.5 М", first=True)
+                           .find("i", first=True).text)
+
+
+    print(game_html.html)
+
+    print("AFter:")
+
+    print(total_1_more_1_5, total_1_less_0_5, total_2_more_1_5, total_2_less_0_5)
