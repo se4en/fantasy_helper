@@ -1,7 +1,7 @@
-python-dotenv
-emoji
-aiogram
-bs4
-requests
-requests_html
-lxml
+python-dotenv==0.15.0
+emoji==1.2.0
+aiogram==2.11.2
+bs4==0.0.1
+requests==2.25.1
+requests_html==0.10.0
+lxml==4.6.2

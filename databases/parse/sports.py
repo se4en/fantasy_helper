@@ -1,16 +1,32 @@
 import requests
-import json
 from bs4 import BeautifulSoup
-from requests_html import HTMLSession
 from datetime import datetime
 
 
 class Sports:
 
-    def __init__(self, leagues: dict = None):
-
+    def __init__(self, leagues: dict = None, leagues_teams: dict = None):
         if leagues:
             self._leagues = leagues
+            return
+        else:
+            self._leagues = {
+                'Russia', 'https://www.sports.ru/fantasy/football/tournament/31.html',
+                'France', 'https://www.sports.ru/fantasy/football/tournament/51.html',
+                'England', 'https://www.sports.ru/fantasy/football/tournament/52.html',
+                'Germany', 'https://www.sports.ru/fantasy/football/tournament/50.html',
+                'Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html',
+                'Netherlands', 'https://www.sports.ru/fantasy/football/tournament/54.html',
+                'Championship', 'https://www.sports.ru/fantasy/football/tournament/205.html',
+                'Turkey', 'https://www.sports.ru/fantasy/football/tournament/246.html',
+                'Italy', 'https://www.sports.ru/fantasy/football/tournament/48.html',
+                'Portugal', 'https://www.sports.ru/fantasy/football/tournament/207.html',
+                'UEFA_1', 'https://www.sports.ru/fantasy/football/tournament/57.html',
+                'UEFA_2', 'https://www.sports.ru/fantasy/football/tournament/56.html',
+            }
+
+        if leagues_teams is not None:
+            self._leagues_teams = leagues_teams
             return
         self._leagues_teams = {
             'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html', # ok
@@ -77,6 +93,7 @@ class Sports:
             # logs here
             print("Caught it!", ex)
             return None
+
 
 if __name__ == "__main__":
     sports = Sports()
