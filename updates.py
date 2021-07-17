@@ -12,7 +12,7 @@ async def update_players():
     for players_legue in players:
         players_legue.look_for_updates()
 
-async def on_startup(at_start=False, timeout=3*60*60):
+async def on_startup(at_start=False, timeout=3*60*60): # timeout == 3 hours
     await notify_admin(dp, "### bot started")
     if at_start:
         await update_players()

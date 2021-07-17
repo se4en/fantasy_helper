@@ -3,4 +3,5 @@ emoji
 aiogram
 bs4
 requests
+requests_html
 lxml

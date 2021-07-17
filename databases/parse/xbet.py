@@ -26,7 +26,7 @@ class XBet:
             'UEFA_2': 'https://www.fonbet.ru/bets/football/15290',
         }
 
-    def _update_match(self, league_name: str, match_info: dict) -> bool:
+    def _update_match(self, league_name: str, match_info: dict, cur_tour: bool = False) -> bool:
 
         try:
             home_team = match_info['homeTeam']['name']
