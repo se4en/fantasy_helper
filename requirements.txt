@@ -5,3 +5,5 @@ bs4==0.0.1
 requests==2.25.1
 requests_html==0.10.0
 lxml==4.6.3
+sqlalchemy==1.4.2
+psycopg2==2.9.1

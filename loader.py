@@ -2,10 +2,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from data import config
-from databases.legues_db import LegueDB
-from databases.players_db import PlayersDB
-from databases.users_db import UsersDB
-from databases.sourses_db import Sourses
+from db.legues_db import LegueDB
+from db.players_db import PlayersDB
+from db.users_db import UsersDB
+from db.sourses_db import Sourses
 
 bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
