@@ -43,7 +43,7 @@ class Sports:
             'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2284228.html',
         }
 
-    def _transform_deadline(self, deadline: str) -> datetime:
+    def __transform_deadline(self, deadline: str) -> datetime:
         day, month_time = deadline.split(' ')
         month, time = month_time.split('|')
 
