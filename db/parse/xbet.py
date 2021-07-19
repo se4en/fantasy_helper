@@ -2,11 +2,19 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
+from sqlalchemy import and_
+from sqlalchemy.orm import Session as SQLSession
+
+from db.parse.sports import Sports
+from db.database import Session
+from db.models.coeff import Coeff
 
 
 class XBet:
 
     def __init__(self, leagues: dict = None):
+        self.sports = Sports()
+
         if leagues:
             self._leagues = leagues
             return
@@ -26,18 +34,18 @@ class XBet:
             'UEFA_2': 'https://www.fonbet.ru/bets/football/15290',
         }
 
-    def _update_match(self, league_name: str, match_info: dict, cur_tour: bool = False) -> bool:
-
+    def __update_match(self, league_name: str, match_info: dict,
+                       cur_tour: bool = False, new_round: bool = True) -> bool:
         try:
             home_team = match_info['homeTeam']['name']
             away_team = match_info['awayTeam']['name']
             match_url = match_info['url']
 
             if "голы" in home_team or "специальное" in home_team:  # not match
-                return True
+                return False
 
-            session = HTMLSession()
-            r = session.get(_url)
+            html_session = HTMLSession()
+            r = html_session.get(match_url)
 
             # render JS
             r.html.render(retries=1, wait=0.1, timeout=20)
@@ -57,18 +65,45 @@ class XBet:
             total_2_less_0_5 = float(total_2_all.find("div", containing="0.5 М", first=True)
                                      .find("i", first=True).text)
 
-            # here we need update table
-            # we need find Team like: home_team = Leagues.find_by_name()
-
-            print(home_team, away_team, match_url)
+            # update db
+            db_session: SQLSession = Session()
+            if new_round:
+                home_coeff = Coeff(
+                    home_team, away_team, league_name,
+                    total_1_more_1_5, total_2_less_0_5, True, cur_tour
+                )
+                away_coeff = Coeff(
+                    away_team, home_team, league_name,
+                    total_2_more_1_5, total_1_less_0_5, False, cur_tour
+                )
+                db_session.query(Coeff).add_column(home_coeff)
+                db_session.query(Coeff).add_column(away_coeff)
+                return True
+            # update home team
+            db_session.query(Coeff).filter(and_(
+                Coeff.team == home_team,
+                Coeff.team_against == away_team,
+                Coeff.league == league_name
+            )).update({
+                Coeff.more_1_5: total_1_more_1_5,
+                Coeff.clean_sheet: total_2_less_0_5
+            })
+            # update away team
+            db_session.query(Coeff).filter(and_(
+                Coeff.team == away_team,
+                Coeff.team_against == home_team,
+                Coeff.league == league_name
+            )).update({
+                Coeff.more_1_5: total_2_more_1_5,
+                Coeff.clean_sheet: total_1_less_0_5
+            })
+            return True
         except Exception as ex:
             # logs here
             print(ex)
             return False
-        else:
-            return True
 
-    def update_league(self, league_name: str) -> bool:
+    def update_league(self, league_name: str, new_round: bool) -> bool:
 
         if league_name not in self._leagues:
             return False
@@ -79,10 +114,25 @@ class XBet:
 
             all_matches = json.loads("".join(soup.find("script", {"type": "application/ld+json"}).contents))
 
-            # здесь надо получать матчи в туре, чтобы отмечать в бд, относится ли матч к текуущему туру
+            if len(all_matches) == 0:
+                return False
 
+            cur_round_matches = self.sports.get_games_count(league_name)
+            updated_matches = 0
+            checked_matches = 0
+            # update cur round
+            while updated_matches < cur_round_matches:
+                if self.__update_match(league_name, all_matches[updated_matches],
+                                       True, new_round):
+                    updated_matches += 1
+                checked_matches += 1
+            # update next round
+            while checked_matches < len(all_matches):
+                self.__update_match(league_name, all_matches[checked_matches],
+                                    False, new_round)
+                checked_matches += 1
 
-            return all(list(map(lambda x: self._update_match(league_name, x), all_matches)))
+            return True
         except:
             # logs here
             print("Caught it!")

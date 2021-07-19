@@ -12,7 +12,7 @@ class Coeff(Base):
     team_against = Column(String, nullable=False)
     league = Column(String, nullable=False)
     more_1_5 = Column(Float, nullable=False)
-    less_0_5 = Column(Float, nullable=False)
+    clean_sheet = Column(Float, nullable=False)
     is_home = Column(Boolean, nullable=False)
     is_cur_round = Column(Boolean, nullable=False)
 
