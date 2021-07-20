@@ -13,11 +13,11 @@ def create_country_keyboard(callback: CallbackData):
     for league in cm.get_leagues():
         country_keyboard.insert(InlineKeyboardButton(
             text=str(cm.emojize_league(league) + ' ' + cm.translate_league(league)),
-            callback_data=callback.new(legue_name=league)
+            callback_data=callback.new(league_name=league)
         ))
     country_keyboard.insert(InlineKeyboardButton(
         text=emojize(":leftwards_arrow_with_hook: Назад"), 
-        callback_data=callback.new(legue_name="cancel")
+        callback_data=callback.new(league_name="cancel")
     ))
     return country_keyboard
 
@@ -26,6 +26,6 @@ def create_country_back_keyboard(callback: CallbackData):
     country_back_keyboard = InlineKeyboardMarkup()
     country_back_keyboard.insert(InlineKeyboardButton(
         text=emojize(":leftwards_arrow_with_hook: Назад"),
-        callback_data=callback.new(legue_name="back_to_list")
+        callback_data=callback.new(league_name="back_to_list")
     ))
     return country_back_keyboard

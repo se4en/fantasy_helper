@@ -9,7 +9,7 @@ def create_menu_keyboard(tg_id):
     menu_keyboard = InlineKeyboardMarkup(row_width=1)
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F4CA Коэффициенты"), 
-        callback_data=menu_callback.new(choice_name="coefs")
+        callback_data=menu_callback.new(choice_name="coeffs")
     ))
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F51D Популярные игроки"), 

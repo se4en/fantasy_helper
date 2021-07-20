@@ -4,18 +4,18 @@ from aiogram.types import CallbackQuery, ParseMode
 
 from loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
-from keyboards.inline.callback_datas import menu_callback, coefs_callback, players_callback
+from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback
 from keyboards.inline.country_buttons import create_country_keyboard
 from keyboards.inline.admin_buttons import admin_keyboard
 from keyboards.inline.sourses_buttons import create_sourses_keyboard
 from states.checking import Check
 
 
-@dp.callback_query_handler(menu_callback.filter(choice_name="coefs"), state=Check.no_checking)
-async def to_coefs(call: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(menu_callback.filter(choice_name="coeffs"), state=Check.no_checking)
+async def to_coeffs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
-                              reply_markup=create_country_keyboard(coefs_callback),
+                              reply_markup=create_country_keyboard(coeffs_callback),
                               parse_mode=ParseMode.MARKDOWN
                               )
 

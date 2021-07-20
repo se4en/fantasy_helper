@@ -26,7 +26,7 @@ class CoeffManager(Manager):
 
         TEAM1_MAX_LEN = 8
         if len(coeff.team) <= TEAM1_MAX_LEN + 4:
-            team1 = f"<b>{coeff.team} </b>"
+            team1 = f"<b>{coeff.team} {match_label} </b>"
         else:
             team1 = f"<b>{coeff.team[:TEAM1_MAX_LEN]} {match_label} </b>"
 

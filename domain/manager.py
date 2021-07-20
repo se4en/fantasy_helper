@@ -24,7 +24,7 @@ class Manager:
             "Spain": "🇪🇸",
             "Germany": "🇩🇪"
         }
-        return emoji_dict.get(league_name, default="🏁")
+        return emoji_dict.get(league_name, "🏁")
 
     @staticmethod
     def emojize_number(number: int) -> str:
@@ -43,7 +43,7 @@ class Manager:
             9: ":nine:",
             10: "\U0001F51F"
         }
-        return emoji_dict.get(number, default=":1234:")
+        return emoji_dict.get(number, ":1234:")
 
     @staticmethod
     def emojize_coeff(coeff: float) -> str:
@@ -75,4 +75,4 @@ class Manager:
             'UEFA_1': 'Лига Чемпионов',
             'UEFA_2': 'Лига Европы'
         }
-        return translate_dict.get(league_name, default='')
+        return translate_dict.get(league_name, '')
