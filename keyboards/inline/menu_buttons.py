@@ -1,8 +1,9 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.emoji import emojize
 
-from data.config import admins
 from keyboards.inline.callback_datas import menu_callback
+from domain.users import UserManager
+
 
 def create_menu_keyboard(tg_id):
     menu_keyboard = InlineKeyboardMarkup(row_width=1)
@@ -30,12 +31,14 @@ def create_menu_keyboard(tg_id):
         text=emojize("\U0001F527 Помощь"), 
         callback_data=menu_callback.new(choice_name="help")
     ))
-    if tg_id in admins:
+    um = UserManager()
+    if um.is_admin(tg_id):
         menu_keyboard.insert(InlineKeyboardButton(
             text=emojize("Админка"), 
             callback_data=menu_callback.new(choice_name="admin")
         ))
     return menu_keyboard
+
 
 back_to_menu_keyboard = InlineKeyboardMarkup()
 back_to_menu_keyboard.insert(InlineKeyboardButton(

@@ -6,7 +6,7 @@ class Manager:
         pass
 
     @staticmethod
-    def emojize_name(country_name: str) -> str:
+    def emojize_league(league_name: str) -> str:
         """
         Return emoji to country
         """
@@ -24,7 +24,7 @@ class Manager:
             "Spain": "🇪🇸",
             "Germany": "🇩🇪"
         }
-        return emoji_dict.get(country_name, default="🏁")
+        return emoji_dict.get(league_name, default="🏁")
 
     @staticmethod
     def emojize_number(number: int) -> str:
@@ -58,3 +58,21 @@ class Manager:
             return "🟧"
         else:
             return "🟥"
+
+    @staticmethod
+    def translate_league(league_name: str) -> str:
+        translate_dict = {
+            'Russia': 'РПЛ',
+            'England': 'АПЛ',
+            'France': 'Лига 1',
+            'Germany': 'Бундеслига',
+            'Spain': 'Ла Лига',
+            'Netherlands': 'Эредевизи',
+            'Championship': 'Чемпионшип',
+            'Turkey': 'Суперлига',
+            'Italy': 'Серия А',
+            'Portugal': 'Премьер-лига',
+            'UEFA_1': 'Лига Чемпионов',
+            'UEFA_2': 'Лига Европы'
+        }
+        return translate_dict.get(league_name, default='')

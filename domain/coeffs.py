@@ -1,4 +1,3 @@
-import functools
 from typing import List
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
@@ -14,6 +13,7 @@ from db.database import Session
 class CoeffManager(Manager):
 
     def __init__(self, xbet: XBet):
+        super().__init__()
         self.xbet = xbet
 
     def __transform_coeff(self, coeff: Coeff, attack: bool = True):
@@ -62,8 +62,14 @@ class CoeffManager(Manager):
         if new_round:
             db_session: SQLSession = Session()
             db_session.query(Coeff).filter(Coeff.league == league_name).delete()
+            db_session.commit()
 
         return self.xbet.update_league(league_name, new_round)
+
+    @staticmethod
+    def get_leagues():
+        xbet = XBet()
+        return list(xbet.leagues.keys())
 
 
 if __name__ == "__main__":

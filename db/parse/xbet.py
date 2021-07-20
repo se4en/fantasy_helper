@@ -17,10 +17,10 @@ class XBet:
         self.sports = Sports()
 
         if leagues:
-            self._leagues = leagues
+            self.leagues = leagues
             return
 
-        self._leagues = {
+        self.leagues = {
             'Russia': 'https://1xstavka.ru/line/Football/225733-Russia-Premier-League/',
             'England': 'https://1xstavka.ru/line/Football/88637-England-Premier-League/',
             'France': 'https://1xstavka.ru/line/Football/12821-France-Ligue-1/',

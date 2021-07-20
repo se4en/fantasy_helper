@@ -29,7 +29,7 @@ class Sports:
             self._leagues_teams = leagues_teams
             return
         self._leagues_teams = {
-            'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html', # ok
+            'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html',  # ok
             'England': 'https://www.sports.ru/fantasy/football/team/points/2243551.html',
             'France': 'https://www.sports.ru/fantasy/football/team/points/2232514.html',
             'Germany': 'https://www.sports.ru/fantasy/football/team/points/2243555.html',
