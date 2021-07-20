@@ -1,3 +1,4 @@
+import sys, os
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -41,7 +42,10 @@ class XBet:
             away_team = match_info['awayTeam']['name']
             match_url = match_info['url']
 
-            if "голы" in home_team or "специальное" in home_team:  # not match
+            print(f"Update match {home_team} vs {away_team}")
+
+            # not match
+            if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
                 return False
 
             html_session = HTMLSession()
@@ -76,8 +80,8 @@ class XBet:
                     away_team, home_team, league_name,
                     total_2_more_1_5, total_1_less_0_5, False, cur_tour
                 )
-                db_session.query(Coeff).add_column(home_coeff)
-                db_session.query(Coeff).add_column(away_coeff)
+                db_session.add_all([home_coeff, away_coeff])
+                db_session.commit()
                 return True
             # update home team
             db_session.query(Coeff).filter(and_(
@@ -97,10 +101,14 @@ class XBet:
                 Coeff.more_1_5: total_2_more_1_5,
                 Coeff.clean_sheet: total_1_less_0_5
             })
+            db_session.commit()
             return True
         except Exception as ex:
             # logs here
             print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             return False
 
     def update_league(self, league_name: str, new_round: bool) -> bool:
@@ -122,7 +130,7 @@ class XBet:
             checked_matches = 0
             # update cur round
             while updated_matches < cur_round_matches:
-                if self.__update_match(league_name, all_matches[updated_matches],
+                if self.__update_match(league_name, all_matches[checked_matches],
                                        True, new_round):
                     updated_matches += 1
                 checked_matches += 1
@@ -133,9 +141,12 @@ class XBet:
                 checked_matches += 1
 
             return True
-        except:
+        except Exception as ex:
             # logs here
-            print("Caught it!")
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             return False
 
     def update_all(self) -> bool:
@@ -144,44 +155,45 @@ class XBet:
 
 
 if __name__ == "__main__":
-
-    #_1x = XBet()
-    #_1x.update_all()
-    _url = "https://1xstavka.ru/line/Football/127733-Spain-La-Liga/106480371-Celta-Atletico-Madrid/"
-
-    """
-    response = requests.get(_url)
-    print(response.text)
-    soup = BeautifulSoup(response.text, 'lxml')
-    """
-
-
-    session = HTMLSession()
-    r = session.get(_url)
-
-    r.html.render(retries=1, wait=0.1, timeout=20)
-
-
-    game_html = r.html.find("#allBetsTable", first=True)
-
-
-
-    # 4 - list index of block with only needed coefs
-    total_1_all = game_html.find(containing="Индивидуальный тотал 1-го")[4]
-    total_1_more_1_5 = float(total_1_all.find("div", containing="1.5 Б", first=True)
-                           .find("i", first=True).text)
-    total_1_less_0_5 = float(total_1_all.find("div", containing="0.5 М", first=True)
-                           .find("i", first=True).text)
-
-    total_2_all = game_html.find(containing="Индивидуальный тотал 2-го")[4]
-    total_2_more_1_5 = float(total_2_all.find("div", containing="1.5 Б", first=True)
-                           .find("i", first=True).text)
-    total_2_less_0_5 = float(total_2_all.find("div", containing="0.5 М", first=True)
-                           .find("i", first=True).text)
-
-
-    print(game_html.html)
-
-    print("AFter:")
-
-    print(total_1_more_1_5, total_1_less_0_5, total_2_more_1_5, total_2_less_0_5)
+    xbet = XBet()
+    xbet.update_league("Russia", new_round=True)
+    # #_1x = XBet()
+    # #_1x.update_all()
+    # _url = "https://1xstavka.ru/line/Football/127733-Spain-La-Liga/106480371-Celta-Atletico-Madrid/"
+    #
+    # """
+    # response = requests.get(_url)
+    # print(response.text)
+    # soup = BeautifulSoup(response.text, 'lxml')
+    # """
+    #
+    #
+    # session = HTMLSession()
+    # r = session.get(_url)
+    #
+    # r.html.render(retries=1, wait=0.1, timeout=20)
+    #
+    #
+    # game_html = r.html.find("#allBetsTable", first=True)
+    #
+    #
+    #
+    # # 4 - list index of block with only needed coefs
+    # total_1_all = game_html.find(containing="Индивидуальный тотал 1-го")[4]
+    # total_1_more_1_5 = float(total_1_all.find("div", containing="1.5 Б", first=True)
+    #                        .find("i", first=True).text)
+    # total_1_less_0_5 = float(total_1_all.find("div", containing="0.5 М", first=True)
+    #                        .find("i", first=True).text)
+    #
+    # total_2_all = game_html.find(containing="Индивидуальный тотал 2-го")[4]
+    # total_2_more_1_5 = float(total_2_all.find("div", containing="1.5 Б", first=True)
+    #                        .find("i", first=True).text)
+    # total_2_less_0_5 = float(total_2_all.find("div", containing="0.5 М", first=True)
+    #                        .find("i", first=True).text)
+    #
+    #
+    # print(game_html.html)
+    #
+    # print("AFter:")
+    #
+    # print(total_1_more_1_5, total_1_less_0_5, total_2_more_1_5, total_2_less_0_5)

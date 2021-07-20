@@ -46,7 +46,7 @@ class Manager:
         return emoji_dict.get(number, default=":1234:")
 
     @staticmethod
-    def emojize_coeff(self, coeff: float) -> str:
+    def emojize_coeff(coeff: float) -> str:
         """
         Return emoji to coeff
         """
