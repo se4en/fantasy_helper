@@ -21,7 +21,7 @@ def create_menu_keyboard(tg_id):
     ))
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F4DA Источники"), 
-        callback_data=menu_callback.new(choice_name="sourses")
+        callback_data=menu_callback.new(choice_name="sources")
     ))
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F3AE Привязать профиль"), 

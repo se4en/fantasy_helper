@@ -24,21 +24,25 @@ class CoeffManager(Manager):
                                 (str(coeff_value) + "0")[:4] + "  ")
         match_label = "[д]" if coeff.is_home else "[г]"
 
-        TEAM1_MAX_LEN = 8
-        if len(coeff.team) <= TEAM1_MAX_LEN + 4:
+        TEAM1_MAX_LEN = 9
+        if len(coeff.team) <= TEAM1_MAX_LEN:
             team1 = f"<b>{coeff.team} {match_label} </b>"
         else:
             team1 = f"<b>{coeff.team[:TEAM1_MAX_LEN]} {match_label} </b>"
 
-        TEAM2_MAX_LEN = 8
+        TEAM2_MAX_LEN = 9
         if len(coeff.team_against) <= TEAM2_MAX_LEN:
             team2 = f"<i>vs {coeff.team_against}</i>"
         else:
             team2 = f"<i>vs {coeff.team_against[:TEAM2_MAX_LEN]}</i>"
         return text(em_coeff, team1, team2, sep="")
 
-    def __transform_coeffs(self, coeffs: List[Coeff]) -> str:
-        result: List[str] = ["\U0001F5E1 Атакующий потенциал:\n", ]
+    def __transform_coeffs(self, coeffs: List[Coeff], cur_round: bool) -> str:
+        if cur_round:
+            result: List[str] = [emojize(":one: Текущий тур:\n"), ]
+        else:
+            result: List[str] = [emojize(":two: Следующий тур:\n"), ]
+        result += ["\U0001F5E1 Атакующий потенциал:\n", ]
         coeffs.sort(key=lambda cf: cf.more_1_5)
         result += [self.__transform_coeff(cf, attack=True) for cf in coeffs]
 
@@ -55,7 +59,7 @@ class CoeffManager(Manager):
         if not coeffs:
             return ""
         coeffs_list: List[Coeff] = [cf for cf in coeffs]
-        return self.__transform_coeffs(coeffs_list)
+        return self.__transform_coeffs(coeffs_list, cur_round)
 
     def update_coeffs(self, league_name: str, new_round: bool = True):
         # delete last round

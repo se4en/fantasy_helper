@@ -5,9 +5,9 @@ from aiogram.types import CallbackQuery, ParseMode
 from loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
 from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback
-from keyboards.inline.country_buttons import create_country_keyboard
+from keyboards.inline.country_buttons import create_coeff_keyboard
 from keyboards.inline.admin_buttons import admin_keyboard
-from keyboards.inline.sourses_buttons import create_sourses_keyboard
+from keyboards.inline.sources_buttons import create_sources_keyboard
 from states.checking import Check
 
 
@@ -15,7 +15,7 @@ from states.checking import Check
 async def to_coeffs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
-                              reply_markup=create_country_keyboard(coeffs_callback),
+                              reply_markup=create_coeff_keyboard(coeffs_callback),
                               parse_mode=ParseMode.MARKDOWN
                               )
 
@@ -24,7 +24,7 @@ async def to_coeffs(call: CallbackQuery, callback_data: dict):
 # async def to_players(call: CallbackQuery, callback_data: dict):
 #     await call.answer(cache_time=10)
 #     await call.message.answer("Доступные чемпионаты:",
-#         reply_markup=create_country_keyboard(players, players_callback),
+#         reply_markup=create_coeff_keyboard(players, players_callback),
 #         parse_mode=ParseMode.MARKDOWN
 #     )
 
@@ -37,11 +37,11 @@ async def to_top(call: CallbackQuery, callback_data: dict):
                               )
 
 
-@dp.callback_query_handler(menu_callback.filter(choice_name="sourses"), state=Check.no_checking)
-async def to_sourses(call: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(menu_callback.filter(choice_name="sources"), state=Check.no_checking)
+async def to_sources(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
-                              reply_markup=create_sourses_keyboard(),
+                              reply_markup=create_sources_keyboard(),
                               parse_mode=ParseMode.MARKDOWN
                               )
 

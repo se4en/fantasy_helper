@@ -6,7 +6,7 @@ from loader import dp
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, players_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
-from keyboards.inline.country_buttons import create_country_keyboard, create_country_back_keyboard
+from keyboards.inline.country_buttons import create_coeff_keyboard, create_coeff_back_keyboard
 
 
 @dp.callback_query_handler(players_callback.filter(league_name="cancel", ),
@@ -22,7 +22,7 @@ async def to_menu_from_coeffs(call: CallbackQuery, callback_data: dict):
 async def back_to_coeffs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:",
-                              reply_markup=create_country_keyboard(players_callback),
+                              reply_markup=create_coeff_keyboard(players_callback),
                               parse_mode=ParseMode.MARKDOWN)
 
 
@@ -33,5 +33,5 @@ async def back_to_coeffs(call: CallbackQuery, callback_data: dict):
 #     for players_legue in players:
 #         if players_legue.get_name() == legue_name:
 #             await call.message.answer(text=players_legue.get_popular(),
-#                                       reply_markup=create_country_back_keyboard(players_callback),
+#                                       reply_markup=create_coeff_back_keyboard(players_callback),
 #                                       parse_mode=ParseMode.MARKDOWN)
