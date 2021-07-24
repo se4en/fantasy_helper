@@ -5,7 +5,7 @@ from keyboards.inline.callback_datas import menu_callback
 from loader import user_manager
 
 
-def create_menu_keyboard(tg_id):
+def create_menu_keyboard(tg_id: int):
     menu_keyboard = InlineKeyboardMarkup(row_width=1)
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F4CA Коэффициенты"), 
