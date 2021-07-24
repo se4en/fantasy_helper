@@ -42,6 +42,7 @@ class CoeffManager(Manager):
             result: List[str] = [emojize(":one: Текущий тур:\n"), ]
         else:
             result: List[str] = [emojize(":two: Следующий тур:\n"), ]
+
         result += ["\U0001F5E1 Атакующий потенциал:\n", ]
         coeffs.sort(key=lambda cf: cf.more_1_5)
         result += [self.__transform_coeff(cf, attack=True) for cf in coeffs]
@@ -61,7 +62,7 @@ class CoeffManager(Manager):
         coeffs_list: List[Coeff] = [cf for cf in coeffs]
         return self.__transform_coeffs(coeffs_list, cur_round)
 
-    def update_coeffs(self, league_name: str, new_round: bool = True):
+    def update_coeffs(self, league_name: str, new_round: bool = True) -> bool:
         # delete last round
         if new_round:
             db_session: SQLSession = Session()
@@ -69,6 +70,9 @@ class CoeffManager(Manager):
             db_session.commit()
 
         return self.xbet.update_league(league_name, new_round)
+
+    def update_all_coeffs(self) -> bool:
+        return self.xbet.update_all()
 
     @staticmethod
     def get_leagues():
@@ -79,8 +83,4 @@ class CoeffManager(Manager):
 if __name__ == "__main__":
     xbet = XBet()
     coeff_manager = CoeffManager(xbet)
-    # coeff_manager.update_coeffs("Russia", new_round=True)
-    print("Cur round:")
-    print(coeff_manager.get_coeffs("Russia", cur_round=True))
-    print("Next round:")
-    print(coeff_manager.get_coeffs("Russia", cur_round=False))
+    coeff_manager.update_all_coeffs()

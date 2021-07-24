@@ -2,17 +2,14 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.emoji import emojize
 from aiogram.utils.callback_data import CallbackData
 
-from db.parse.xbet import XBet
-from domain.coeffs import CoeffManager
+from loader import coeff_manager
 
 
-def create_coeff_keyboard(callback: CallbackData):
+def create_coeff_leagues_keyboard(callback: CallbackData):
     country_keyboard = InlineKeyboardMarkup(row_width=1)
-    xbet = XBet()
-    cm = CoeffManager(xbet)
-    for league in cm.get_leagues():
+    for league in coeff_manager.get_leagues():
         country_keyboard.insert(InlineKeyboardButton(
-            text=str(cm.emojize_league(league) + ' ' + cm.translate_league(league)),
+            text=str(coeff_manager.emojize_league(league) + ' ' + coeff_manager.translate_league(league)),
             callback_data=callback.new(league_name=league, round="cur")
         ))
     country_keyboard.insert(InlineKeyboardButton(

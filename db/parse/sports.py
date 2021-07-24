@@ -1,4 +1,7 @@
+from typing import Tuple, List, Dict
 import requests
+import os
+import sys
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -7,22 +10,22 @@ class Sports:
 
     def __init__(self, leagues: dict = None, leagues_teams: dict = None):
         if leagues:
-            self._leagues = leagues
+            self.leagues = leagues
             return
         else:
-            self._leagues = {
-                'Russia', 'https://www.sports.ru/fantasy/football/tournament/31.html',
-                'France', 'https://www.sports.ru/fantasy/football/tournament/51.html',
-                'England', 'https://www.sports.ru/fantasy/football/tournament/52.html',
-                'Germany', 'https://www.sports.ru/fantasy/football/tournament/50.html',
-                'Spain', 'https://www.sports.ru/fantasy/football/tournament/49.html',
-                'Netherlands', 'https://www.sports.ru/fantasy/football/tournament/54.html',
-                'Championship', 'https://www.sports.ru/fantasy/football/tournament/205.html',
-                'Turkey', 'https://www.sports.ru/fantasy/football/tournament/246.html',
-                'Italy', 'https://www.sports.ru/fantasy/football/tournament/48.html',
-                'Portugal', 'https://www.sports.ru/fantasy/football/tournament/207.html',
-                'UEFA_1', 'https://www.sports.ru/fantasy/football/tournament/57.html',
-                'UEFA_2', 'https://www.sports.ru/fantasy/football/tournament/56.html',
+            self.leagues = {
+                'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
+                'France': 'https://www.sports.ru/fantasy/football/tournament/51.html',
+                'England': 'https://www.sports.ru/fantasy/football/tournament/52.html',
+                'Germany': 'https://www.sports.ru/fantasy/football/tournament/50.html',
+                'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
+                'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',
+                'Championship': 'https://www.sports.ru/fantasy/football/tournament/205.html',
+                'Turkey': 'https://www.sports.ru/fantasy/football/tournament/246.html',
+                'Italy': 'https://www.sports.ru/fantasy/football/tournament/48.html',
+                'Portugal': 'https://www.sports.ru/fantasy/football/tournament/207.html',
+                'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/57.html',
+                'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/56.html',
             }
 
         if leagues_teams is not None:
@@ -74,15 +77,18 @@ class Sports:
 
             deadline = soup.find("div", {"class": "team-info-block"}).find_all("tr")[1] \
                 .find("td").text
-            return self._transform_deadline(deadline)
+            return self.__transform_deadline(deadline)
         except Exception as ex:
-            # logs here
-            print("Caught it!", ex)
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             return None
 
     def get_games_count(self, league_name: str) -> int:
         if league_name not in self._leagues_teams:
-            return None
+            return 0
         try:
             response = requests.get(self._leagues_teams[league_name])
             soup = BeautifulSoup(response.text, 'lxml')
@@ -90,12 +96,56 @@ class Sports:
             buf = soup.find("div", {"class": "mainPart points-page"}).find("div", {"class": "stat mB20"})
             return len(buf.find("table").find("tbody").find_all("tr"))
         except Exception as ex:
-            # logs here
-            print("Caught it!", ex)
-            return None
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return 0
+
+    def __get_players_from_page(self, league_name: str, page_num: int) -> List[Dict]:
+        result = []
+        try:
+            page_url = self.leagues[league_name] + f"?p={page_num + 1}"
+            response = requests.get(page_url)
+            soup = BeautifulSoup(response.text, 'lxml')
+            players = soup.find_all("tr")
+
+            for i in range(len(players) - 1):
+                player_population = int(players[i+1].find_all("td")[-1].text)
+                player_info = players[i+1].find("div", {"class": "overBox"}).text.split("\n")
+                player_name = player_info[1]
+                player_amplua = player_info[2]
+                player_team = player_info[3]
+                result.append({
+                    "name": player_name, "league": league_name, "team": player_team,
+                    "amplua": player_amplua, "popularity": player_population
+                })
+            return result
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return result
+
+    def get_league_players(self, league_name: str) -> List[Dict]:
+        result = []
+        if league_name not in self.leagues:
+            return result
+        i = 0
+        page_result = self.__get_players_from_page(league_name, i)
+        while page_result:
+            result += page_result
+            i += 1
+            page_result = self.__get_players_from_page(league_name, i)
+        return result
 
 
 if __name__ == "__main__":
     sports = Sports()
-    print(sports.get_deadline("Russia"))
-    print(sports.get_games_count("Russia"))
+    #print(sports.get_deadline("Russia"))
+    #print(sports.get_games_count("Russia"))
+    for player in sports.get_league_players("Russia"):
+        print(player)
