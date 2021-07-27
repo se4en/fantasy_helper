@@ -1,0 +1,66 @@
+from typing import Tuple, List, Dict
+import requests
+import os
+import sys
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+
+class FbrefParser:
+
+    def __init__(self, leagues: dict = None):
+        if leagues:
+            self.leagues = leagues
+            return
+        else:
+            self.leagues = {
+                'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
+                'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
+                'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
+                'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
+                'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
+                'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
+                'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
+                'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
+                'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
+                'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
+                'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
+            }
+
+    def get_shooting_stats(self, league_name: str) -> List[Dict]:
+        result = []
+        try:
+            if league_name not in self.leagues:
+                return result
+            response = requests.get(self.leagues[league_name])
+            soup = BeautifulSoup(response.text, 'lxml')
+            table = soup.find("table")
+            players = table.find_all("tr")[2:]
+
+            for cur_player in players:
+                if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    result.append({
+                        "name": cur_player.find("td", {"data-stat": "player"}).text,
+                        "team": cur_player.find("td", {"data-stat": "squad"}).text,
+                        "position": cur_player.find("td", {"data-stat": "position"}).text,
+                        "goals": cur_player.find("td", {"data-stat": "goals"}).text,
+                        "minutes": cur_player.find("td", {"data-stat": "minutes_90s"}).text,
+                        "shots_total": cur_player.find("td", {"data-stat": "shots_total"}).text,
+                        "shots_on_target": cur_player.find("td", {"data-stat": "shots_on_target"}).text
+                    })
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+        finally:
+            return result
+
+
+# if __name__ == "__main__":
+#     fbref = FbrefParser()
+#     res = fbref.get_shooting_stats("Russia")
+#     for _ in res:
+#         print(_)
+#     print(len(res))
