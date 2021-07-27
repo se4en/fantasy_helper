@@ -69,6 +69,7 @@ class PlayerManager(Manager):
         """
         session: SQLSession = Session()
         try:
+            # TODO delete this
             league_info = session.query(League_info).filter(League_info.league == league_name).first()
             if not league_info:
                 return False

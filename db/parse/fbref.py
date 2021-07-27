@@ -8,31 +8,35 @@ from datetime import datetime
 
 class FbrefParser:
 
-    def __init__(self, leagues: dict = None):
-        if leagues:
-            self.leagues = leagues
-            return
-        else:
-            self.leagues = {
-                'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
-                'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
-                'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
-                'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
-                'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
-                'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
-                'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
-                'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
-                'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
-                'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
-                'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
-            }
+    def __init__(self):
+        self.shoots_leagues = {
+            'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
+            'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
+            'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
+            'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
+            'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
+            'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
+            'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
+            'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
+            'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
+            'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
+        }
+
+        self.xg_leagues = {
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
+        }
+
+        self.shoots_creation_leagues = {
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
+        }
 
     def get_shooting_stats(self, league_name: str) -> List[Dict]:
         result = []
         try:
-            if league_name not in self.leagues:
+            if league_name not in self.shoots_leagues:
                 return result
-            response = requests.get(self.leagues[league_name])
+            response = requests.get(self.shoots_leagues[league_name])
             soup = BeautifulSoup(response.text, 'lxml')
             table = soup.find("table")
             players = table.find_all("tr")[2:]
@@ -40,13 +44,73 @@ class FbrefParser:
             for cur_player in players:
                 if cur_player.find("td", {"data-stat": "player"}) is not None:
                     result.append({
+                        "league": league_name,
                         "name": cur_player.find("td", {"data-stat": "player"}).text,
                         "team": cur_player.find("td", {"data-stat": "squad"}).text,
                         "position": cur_player.find("td", {"data-stat": "position"}).text,
-                        "goals": cur_player.find("td", {"data-stat": "goals"}).text,
-                        "minutes": cur_player.find("td", {"data-stat": "minutes_90s"}).text,
-                        "shots_total": cur_player.find("td", {"data-stat": "shots_total"}).text,
-                        "shots_on_target": cur_player.find("td", {"data-stat": "shots_on_target"}).text
+                        "goals": int(cur_player.find("td", {"data-stat": "goals"}).text),
+                        "minutes": float(cur_player.find("td", {"data-stat": "minutes_90s"}).text),
+                        "shots_total": int(cur_player.find("td", {"data-stat": "shots_total"}).text),
+                        "shots_on_target": int(cur_player.find("td", {"data-stat": "shots_on_target"}).text)
+                    })
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+        finally:
+            return result
+
+    def get_xg_stats(self, league_name: str) -> List[Dict]:
+        result = []
+        try:
+            if league_name not in self.xg_leagues:
+                return result
+            response = requests.get(self.xg_leagues[league_name])
+            soup = BeautifulSoup(response.text, 'lxml')
+            table = soup.find("table")
+            players = table.find_all("tr")[2:]
+
+            for cur_player in players:
+                if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    result.append({
+                        "league": league_name,
+                        "name": cur_player.find("td", {"data-stat": "player"}).text,
+                        "team": cur_player.find("td", {"data-stat": "squad"}).text,
+                        "position": cur_player.find("td", {"data-stat": "position"}).text,
+                        "xg": float(cur_player.find("td", {"data-stat": "xg"}).text),
+                        "npxg": float(cur_player.find("td", {"data-stat": "npxg"}).text),
+                        "xa": float(cur_player.find("td", {"data-stat": "xa"}).text),
+                    })
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+        finally:
+            return result
+
+    def get_shoot_creation_stats(self, league_name: str) -> List[Dict]:
+        result = []
+        try:
+            if league_name not in self.shoots_creation_leagues:
+                return result
+            response = requests.get(self.shoots_creation_leagues[league_name])
+            soup = BeautifulSoup(response.text, 'lxml')
+            table = soup.find("table")
+            players = table.find_all("tr")[2:]
+
+            for cur_player in players:
+                if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    result.append({
+                        "league": league_name,
+                        "name": cur_player.find("td", {"data-stat": "player"}).text,
+                        "team": cur_player.find("td", {"data-stat": "squad"}).text,
+                        "position": cur_player.find("td", {"data-stat": "position"}).text,
+                        "sca": int(cur_player.find("td", {"data-stat": "sca"}).text),
+                        "gca": int(cur_player.find("td", {"data-stat": "gca"}).text),
                     })
         except Exception as ex:
             # TODO logging
@@ -58,9 +122,8 @@ class FbrefParser:
             return result
 
 
-# if __name__ == "__main__":
-#     fbref = FbrefParser()
-#     res = fbref.get_shooting_stats("Russia")
-#     for _ in res:
-#         print(_)
-#     print(len(res))
+if __name__ == "__main__":
+    fbref = FbrefParser()
+    res = fbref.get_shoot_creation_stats("France")
+    for _ in res:
+        print(_)

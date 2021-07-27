@@ -27,22 +27,48 @@ class Manager:
         return emoji_dict.get(league_name, "🏁")
 
     @staticmethod
-    def emojize_number(number: int) -> str:
+    def emojize_number(number: int, more_10: bool = False) -> str:
         """
         Return emoji to number
         """
-        emoji_dict = {
-            1: ":one:",
-            2: ":two:",
-            3: ":three:",
-            4: ":four:",
-            5: ":five:",
-            6: ":six:",
-            7: ":seven:",
-            8: ":eight:",
-            9: ":nine:",
-            10: "\U0001F51F"
-        }
+        if not more_10:
+            emoji_dict = {
+                1: ":one:",
+                2: ":two:",
+                3: ":three:",
+                4: ":four:",
+                5: ":five:",
+                6: ":six:",
+                7: ":seven:",
+                8: ":eight:",
+                9: ":nine:",
+                10: "\U0001F51F"
+            }
+        else:
+            emoji_dict = {
+                0: ":zero::zero:",
+                1: ":zero::one:",
+                2: ":zero::two:",
+                3: ":zero::three:",
+                4: ":zero::four:",
+                5: ":zero::five:",
+                6: ":zero::six:",
+                7: ":zero::seven:",
+                8: ":zero::eight:",
+                9: ":zero::nine:",
+                10: ":one::zero:",
+                11: ":one::one:",
+                12: ":one::two:",
+                13: ":one::three:",
+                14: ":one::four:",
+                15: ":one::five:",
+                16: ":one::six:",
+                17: ":one::seven:",
+                18: ":one::eight:",
+                19: ":one::nine:",
+                20: ":two::zero:"
+            }
+
         return emoji_dict.get(number, ":1234:")
 
     @staticmethod
