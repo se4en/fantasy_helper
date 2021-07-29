@@ -44,32 +44,9 @@ class Manager:
                 9: ":nine:",
                 10: "\U0001F51F"
             }
-        else:
-            emoji_dict = {
-                0: ":zero::zero:",
-                1: ":zero::one:",
-                2: ":zero::two:",
-                3: ":zero::three:",
-                4: ":zero::four:",
-                5: ":zero::five:",
-                6: ":zero::six:",
-                7: ":zero::seven:",
-                8: ":zero::eight:",
-                9: ":zero::nine:",
-                10: ":one::zero:",
-                11: ":one::one:",
-                12: ":one::two:",
-                13: ":one::three:",
-                14: ":one::four:",
-                15: ":one::five:",
-                16: ":one::six:",
-                17: ":one::seven:",
-                18: ":one::eight:",
-                19: ":one::nine:",
-                20: ":two::zero:"
-            }
+            return emoji_dict.get(number, ":1234:")
+        return (1 * (2 - len(str(number)))) * " " + str(number)
 
-        return emoji_dict.get(number, ":1234:")
 
     @staticmethod
     def emojize_coeff(coeff: float) -> str:

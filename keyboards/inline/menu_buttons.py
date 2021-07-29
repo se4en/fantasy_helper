@@ -16,8 +16,8 @@ def create_menu_keyboard(tg_id: int):
         callback_data=menu_callback.new(choice_name="players")
     ))
     menu_keyboard.insert(InlineKeyboardButton(
-        text=emojize("\U0001F3AF Лучшие игроки"), 
-        callback_data=menu_callback.new(choice_name="top")
+        text=emojize("\U0001F3AF Статистика игроков"),
+        callback_data=menu_callback.new(choice_name="stats")
     ))
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F4DA Источники"), 

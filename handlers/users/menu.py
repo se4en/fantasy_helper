@@ -5,10 +5,11 @@ from aiogram.types import CallbackQuery, ParseMode
 from keyboards.inline.player_buttons import create_player_leagues_keyboard
 from loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
-from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback
+from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback, stats_callback
 from keyboards.inline.coeff_buttons import create_coeff_leagues_keyboard
 from keyboards.inline.admin_buttons import admin_keyboard
 from keyboards.inline.sources_buttons import create_sources_keyboard
+from keyboards.inline.stats_buttons import create_stats_leagues_keyboard
 from states.checking import Check
 
 
@@ -28,11 +29,11 @@ async def to_players(call: CallbackQuery, callback_data: dict):
                               parse_mode=ParseMode.MARKDOWN)
 
 
-@dp.callback_query_handler(menu_callback.filter(choice_name="top"), state=Check.no_checking)
+@dp.callback_query_handler(menu_callback.filter(choice_name="stats"), state=Check.no_checking)
 async def to_top(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer("Эта функция скоро станет доступна\nМеню:",
-                              reply_markup=create_menu_keyboard(call.message.from_user.id),
+    await call.message.answer("Доступные чемпионаты:",
+                              reply_markup=create_stats_leagues_keyboard(stats_callback),
                               parse_mode=ParseMode.MARKDOWN)
 
 

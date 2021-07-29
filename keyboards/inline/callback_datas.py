@@ -6,6 +6,8 @@ coeffs_callback = CallbackData("coeffs", "league_name", "round")
 
 players_callback = CallbackData("players", "league_name")
 
+stats_callback = CallbackData("stats", "league_name", "type", "last_5")
+
 sources_callback = CallbackData("sources", "league_name")
 
 admin_callback = CallbackData("admin", "tool_name")

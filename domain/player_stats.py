@@ -16,11 +16,13 @@ from db.models.leagues_info import League_info
 
 class PlayerStatsManager(Manager):
 
-    def __init__(self, last3_minutes_min=1.0, last5_minutes_min=2.0):
+    def __init__(self, last3_minutes_min=1.0, last5_minutes_min=2.0, max_name_len=10, max_team_len=7):
         super().__init__()
         self.fbref = FbrefParser()
         self.LAST3_MIN = last3_minutes_min
         self.LAST5_MIN = last5_minutes_min
+        self.MAX_NAME_LEN = max_name_len
+        self.MAX_TEAM_LEN = max_team_len
 
     def get_player(self, player_info: dict) -> PlayerStats:
         session: SQLSession = Session()
@@ -313,24 +315,40 @@ class PlayerStatsManager(Manager):
                 .limit(20).all()
         session.close()
 
-        result = ["\U0001F4C8 Популярные игроки:\n"]
+        result = [" №  У/И   УC/У       Игрок[клуб]\n"]
         result += self.__transform_players_shoots(best_players, last_5)
         return '\n'.join(result)
+
+    @staticmethod
+    def __transform_name(player_name: str) -> str:
+        after_split = player_name.split(' ')
+        if len(after_split) == 1:
+            return after_split[0]
+        elif len(after_split) == 2:
+            return after_split[0][0] + ". " + after_split[1]
+        elif len(after_split) == 3:
+            return after_split[0][0] + ". " + after_split[1][0] + ". " + after_split[2]
+        else:
+            return player_name
 
     def __transform_players_shoots(self, players_list: List[PlayerStats], last_5: bool = False) -> List[str]:
         result = []
         if last_5:
             for i, player in enumerate(players_list):
-                result += [emojize(f"{self.emojize_number(i + 1, True)} " +
-                                   bold(f"{player.last5_shoots_per_game:.2f}") +
-                                   italic(f" ({int(player.last5_on_target_per_shoot*100):3}%)") +
-                                   f" {player.name}")]
+                percent = int(player.last5_on_target_per_shoot * 100)
+                result += [emojize(f"<code>{self.emojize_number(i + 1, True)}</code>|") +
+                           f" <b>{player.last5_shoots_per_game:.2f}</b> |" +
+                           (2 * (3 - len(str(percent)))) * " " + f"<i>{percent}%</i> |" +
+                           f" {self.__transform_name(player.name)[:self.MAX_NAME_LEN]} " +
+                           f"[{player.team[:self.MAX_TEAM_LEN]}]"]
         else:
             for i, player in enumerate(players_list):
-                result += [emojize(f"{self.emojize_number(i + 1, True)} " +
-                                   bold(f"{player.last3_shoots_per_game:.2f}") +
-                                   italic(f" ({int(player.last3_on_target_per_shoot*100):3}%)") +
-                                   f" {player.name}")]
+                percent = int(player.last3_on_target_per_shoot * 100)
+                result += [emojize(f"<code>{self.emojize_number(i + 1, True)}</code>|") +
+                           f" <b>{player.last3_shoots_per_game:.2f}</b> |" +
+                           (2 * (3 - len(str(percent)))) * " " + f"<i>{percent}%</i> |" +
+                           f" {self.__transform_name(player.name)[:self.MAX_NAME_LEN]} " +
+                           f"[{player.team[:self.MAX_TEAM_LEN]}]"]
         return result
 
 
