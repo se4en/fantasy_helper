@@ -15,8 +15,8 @@ class Sports:
         else:
             self.leagues = {
                 'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
-                'France': 'https://www.sports.ru/fantasy/football/tournament/51.html',
-                'England': 'https://www.sports.ru/fantasy/football/tournament/52.html',
+                'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
+                'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
                 'Germany': 'https://www.sports.ru/fantasy/football/tournament/50.html',
                 'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
                 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',
@@ -34,8 +34,8 @@ class Sports:
         self._leagues_teams = {
             'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html',  # ok
             'England': 'https://www.sports.ru/fantasy/football/team/points/2243551.html',
-            'France': 'https://www.sports.ru/fantasy/football/team/points/2232514.html',
-            'Germany': 'https://www.sports.ru/fantasy/football/team/points/2243555.html',
+            'France': 'https://www.sports.ru/fantasy/football/team/points/2311561.html',  # ok
+            'Germany': 'https://www.sports.ru/fantasy/football/team/points/2312024.html',  # ok
             'Spain': 'https://www.sports.ru/fantasy/football/team/points/2243562.html',
             'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2243575.html',
             'Championship': 'https://www.sports.ru/fantasy/football/team/points/2243558.html',

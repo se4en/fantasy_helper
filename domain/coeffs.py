@@ -62,17 +62,17 @@ class CoeffManager(Manager):
         coeffs_list: List[Coeff] = [cf for cf in coeffs]
         return self.__transform_coeffs(coeffs_list, cur_round)
 
-    def update_coeffs(self, league_name: str, new_round: bool = True) -> bool:
+    def update_coeffs(self, league_name: str) -> bool:
         # delete last round
-        if new_round:
-            db_session: SQLSession = Session()
-            db_session.query(Coeff).filter(Coeff.league == league_name).delete()
-            db_session.commit()
+        db_session: SQLSession = Session()
+        db_session.query(Coeff).filter(Coeff.league == league_name).delete()
+        db_session.commit()
+        db_session.close()
 
-        return self.xbet.update_league(league_name, new_round)
+        return self.xbet.update_league(league_name)
 
     def update_all_coeffs(self) -> bool:
-        return self.xbet.update_all()
+        return all([self.update_coeffs(league) for league in self.xbet.leagues])
 
     @staticmethod
     def get_leagues():
@@ -83,4 +83,5 @@ class CoeffManager(Manager):
 if __name__ == "__main__":
     xbet = XBet()
     coeff_manager = CoeffManager(xbet)
-    coeff_manager.update_all_coeffs()
+    #coeff_manager.update_all_coeffs()
+    coeff_manager.update_coeffs("Russia")

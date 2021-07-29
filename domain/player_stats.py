@@ -315,7 +315,7 @@ class PlayerStatsManager(Manager):
                 .limit(20).all()
         session.close()
 
-        result = [" №  У/И   УC/У       Игрок[клуб]\n"]
+        result = [" №   У/И   УC/У        Игрок[клуб]\n"]
         result += self.__transform_players_shoots(best_players, last_5)
         return '\n'.join(result)
 

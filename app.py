@@ -2,7 +2,7 @@ from aiogram import executor
 import asyncio
 
 from handlers import dp
-from updates import on_startup
+from utils.updates import on_startup
 from db.utils.create_db import create_database
 
 if __name__ == '__main__':

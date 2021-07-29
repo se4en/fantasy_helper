@@ -35,15 +35,14 @@ class XBet:
             'UEFA_2': 'https://www.fonbet.ru/bets/football/15290',
         }
 
-    def __update_match(self, league_name: str, match_info: dict,
-                       cur_tour: bool = False, new_round: bool = True) -> bool:
+    def __update_match(self, league_name: str, match_info: dict, cur_round: bool = False) -> bool:
         try:
             home_team = match_info['homeTeam']['name']
             away_team = match_info['awayTeam']['name']
             match_url = match_info['url']
 
             # TODO logging
-            print(f"Update match {home_team} vs {away_team}")
+            # print(f"Update match {home_team} vs {away_team}")
 
             # not match
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
@@ -53,7 +52,7 @@ class XBet:
             r = html_session.get(match_url)
 
             # render JS
-            r.html.render(retries=2, wait=0.1, timeout=20)
+            r.html.render(retries=2, wait=0.3, timeout=30)
 
             game_html = r.html.find("#allBetsTable", first=True)
 
@@ -72,36 +71,15 @@ class XBet:
 
             # update db
             db_session: SQLSession = Session()
-            if new_round:
-                home_coeff = Coeff(
-                    home_team, away_team, league_name,
-                    total_1_more_1_5, total_2_less_0_5, True, cur_tour
-                )
-                away_coeff = Coeff(
-                    away_team, home_team, league_name,
-                    total_2_more_1_5, total_1_less_0_5, False, cur_tour
-                )
-                db_session.add_all([home_coeff, away_coeff])
-                db_session.commit()
-                return True
-            # update home team
-            db_session.query(Coeff).filter(and_(
-                Coeff.team == home_team,
-                Coeff.team_against == away_team,
-                Coeff.league == league_name
-            )).update({
-                Coeff.more_1_5: total_1_more_1_5,
-                Coeff.clean_sheet: total_2_less_0_5
-            })
-            # update away team
-            db_session.query(Coeff).filter(and_(
-                Coeff.team == away_team,
-                Coeff.team_against == home_team,
-                Coeff.league == league_name
-            )).update({
-                Coeff.more_1_5: total_2_more_1_5,
-                Coeff.clean_sheet: total_1_less_0_5
-            })
+            home_coeff = Coeff(
+                home_team, away_team, league_name,
+                total_1_more_1_5, total_2_less_0_5, True, cur_round
+            )
+            away_coeff = Coeff(
+                away_team, home_team, league_name,
+                total_2_more_1_5, total_1_less_0_5, False, cur_round
+            )
+            db_session.add_all([home_coeff, away_coeff])
             db_session.commit()
             return True
         except Exception as ex:
@@ -112,8 +90,8 @@ class XBet:
             print(exc_type, fname, exc_tb.tb_lineno)
             return False
 
-    def update_league(self, league_name: str, new_round: bool) -> bool:
-        print("Update league=", league_name)
+    def update_league(self, league_name: str) -> bool:
+        #print("Update league=", league_name)
 
         if league_name not in self.leagues:
             return False
@@ -132,14 +110,12 @@ class XBet:
             checked_matches = 0
             # update cur round
             while updated_matches < cur_round_matches:
-                if self.__update_match(league_name, all_matches[checked_matches],
-                                       True, new_round):
+                if self.__update_match(league_name, all_matches[checked_matches], True):
                     updated_matches += 1
                 checked_matches += 1
             # update next round
             while checked_matches < len(all_matches):
-                self.__update_match(league_name, all_matches[checked_matches],
-                                    False, new_round)
+                self.__update_match(league_name, all_matches[checked_matches], False)
                 checked_matches += 1
 
             return True
@@ -152,7 +128,7 @@ class XBet:
             return False
 
     def update_all(self) -> bool:
-        return all(list(map(lambda x: self.update_league(x, False), self.leagues)))
+        return all(list(map(lambda x: self.update_league(x), self.leagues)))
 
 
 if __name__ == "__main__":
