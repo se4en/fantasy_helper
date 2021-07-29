@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, ParseMode
 
 from keyboards.inline.stats_buttons import create_stats_leagues_keyboard, create_stats_league_back_keyboard, \
     create_stats_league_menu_keyboard
-from loader import dp, player_stats_manager
+from manager_loader import dp, player_stats_manager
 from states.checking import Check
 from keyboards.inline.callback_datas import stats_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard

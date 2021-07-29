@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.emoji import emojize
 from aiogram.utils.callback_data import CallbackData
 
-from loader import coeff_manager
+from manager_loader import coeff_manager
 
 
 def create_coeff_leagues_keyboard(callback: CallbackData):

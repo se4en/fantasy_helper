@@ -2,8 +2,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.emoji import emojize
 from aiogram.utils.callback_data import CallbackData
 
-from loader import player_stats_manager
-from loader import fbref
+from manager_loader import player_stats_manager
+from manager_loader import fbref
 
 
 def create_stats_leagues_keyboard(callback: CallbackData):

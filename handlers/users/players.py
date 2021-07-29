@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery, ParseMode
 
-from loader import dp, player_manager
+from manager_loader import dp, player_manager
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, players_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard

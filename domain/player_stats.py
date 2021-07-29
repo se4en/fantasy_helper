@@ -1,16 +1,23 @@
+import asyncio
 import os
 import sys
 from datetime import datetime, timedelta
 from typing import List
+import pandas as pd
+import numpy as np
+import dataframe_image as dfi
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import bold, italic
+from pandas.io.formats.style import Styler
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
+from sqlalchemy.sql import label
 
 from db.database import Session
 from db.parse.fbref import FbrefParser
 from domain.manager import Manager
 from db.models.player_stats import PlayerStats
+from db.utils.uploding_files import upload_files
 from db.models.leagues_info import League_info
 
 
@@ -292,67 +299,193 @@ class PlayerStatsManager(Manager):
         result: bool = True
         if league_name in self.fbref.shoots_leagues:
             result *= self.__update_shoots(league_name, new_round)
+            result *= self.__update_shoots_files(league_name)
 
         if league_name in self.fbref.xg_leagues:
             result *= self.__update_xg(league_name)
+            result *= self.__update_xg_files(league_name)
 
         if league_name in self.fbref.shoots_creation_leagues:
             result *= self.__update_shoots_creation(league_name)
+            result *= self.__update_shoots_creation_files(league_name)
         return result
 
-    def get_players_shoots(self, league_name: str, last_5: bool = False) -> str:
+    def __update_files(self, league_name: str, stats_type: str, last_3_df, last_5_df) -> bool:
+        try:
+            cur_path = os.getcwd()
+            # create paths
+            league_path = os.path.join(cur_path, league_name)
+            if not os.path.exists(league_path):
+                os.mkdir(league_path)
+            stat_path = os.path.join(league_path, stats_type)
+            if not os.path.exists(stat_path):
+                os.mkdir(stat_path)
+            # save images
+            dfi.export(last_3_df, os.path.join(stat_path, "last_3.png"))
+            dfi.export(last_5_df, os.path.join(stat_path, "last_5.png"))
+            return True
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return False
+
+    def __update_shoots_files(self, league_name: str) -> bool:
+        try:
+            # get best players
+            session: SQLSession = Session()
+            best_players_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last3_shoots_per_game.desc(), PlayerStats.last3_on_target_per_shoot.desc()) \
+                .limit(20).all()
+            best_players_last_5 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last5_shoots_per_game.desc(), PlayerStats.last5_on_target_per_shoot.desc()) \
+                .limit(20).all()
+            # create pd pataframes
+            last_3_info = [[player.last3_shoots_per_game, int(player.last3_on_target_per_shoot * 100),
+                            player.name, player.team] for player in best_players_last_3]
+            last_5_info = [[player.last5_shoots_per_game, int(player.last5_on_target_per_shoot * 100),
+                            player.name, player.team] for player in best_players_last_5]
+
+            last_3_df = pd.DataFrame(last_3_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда'])
+            last_3_df_styled = last_3_df.style.background_gradient()
+            last_5_df = pd.DataFrame(last_5_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда'])
+            last_5_df_styled = last_5_df.style.background_gradient()
+
+            result = self.__update_files(league_name, 'shoots', last_3_df_styled, last_5_df_styled)
+            result *= asyncio.run(upload_files(os.getcwd(), league_name, 'shoots'))
+
+            return result
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return False
+        finally:
+            session.close()
+
+    def __update_xg_files(self, league_name: str) -> bool:
+        try:
+            # get best players
+            session: SQLSession = Session()
+            best_xg_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last3_xg_per_game.desc(), PlayerStats.last3_npxg_per_game.desc()) \
+                .limit(20).all()
+            best_xg_last_5 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last5_xg_per_game.desc(), PlayerStats.last5_npxg_per_game.desc()) \
+                .limit(20).all()
+
+            best_xg_xa_last_3 = session.query(PlayerStats, (PlayerStats.last3_xg_per_game +
+                                                            PlayerStats.last3_xa_per_game).label('xg_xa')) \
+                .filter(PlayerStats.league == league_name).order_by(xg_xa.desc()).limit(20).all()
+            best_xg_xa_last_5 = session.query(PlayerStats, (PlayerStats.last5_xg_per_game +
+                                                            PlayerStats.last5_xa_per_game).label('xg_xa')) \
+                .filter(PlayerStats.league == league_name).order_by(xg_xa.desc()).limit(20).all()
+
+            # create pd pataframes
+            last_3_xg = [[player.last3_xg_per_game, player.last3_npxg_per_game, player.last3_xa_per_game,
+                          player.name, player.team] for player in best_xg_last_3]
+            last_5_xg = [[player.last5_xg_per_game, player.last5_npxg_per_game, player.last5_xa_per_game,
+                          player.name, player.team] for player in best_xg_last_5]
+            last_3_xg_xa = [[player.last3_xg_per_game + player.last3_xa_per_game, player.last3_npxg_per_game,
+                             player.name, player.team] for player in best_xg_xa_last_3]
+            last_5_xg_xa = [[player.last5_xg_per_game + player.last5_xa_per_game, player.last5_npxg_per_game,
+                             player.name, player.team] for player in best_xg_xa_last_5]
+
+            last_3_xg_df = pd.DataFrame(last_3_xg, columns=['xG', 'npxG', 'xA', 'Игрок', 'Команда'])
+            last_3_xg_df_styled = last_3_xg_df.style.background_gradient()
+            last_5_xg_df = pd.DataFrame(last_5_xg, columns=['xG', 'npxG', 'xA', 'Игрок', 'Команда'])
+            last_5_xg_df_styled = last_5_xg_df.style.background_gradient()
+
+            last_3_xg_xa_df = pd.DataFrame(last_3_xg_xa, columns=['xG+xA', 'npxG', 'Игрок', 'Команда'])
+            last_3_xg_xa_df_styled = last_3_xg_xa_df.style.background_gradient()
+            last_5_xg_xa_df = pd.DataFrame(last_5_xg_xa, columns=['xG+xA', 'npxG', 'Игрок', 'Команда'])
+            last_5_xg_xa_df_styled = last_5_xg_xa_df.style.background_gradient()
+
+            result = all([self.__update_files(league_name, 'xg', last_3_xg_df_styled, last_5_xg_df_styled),
+                          self.__update_files(league_name, 'xg_xa', last_3_xg_xa_df_styled, last_5_xg_xa_df_styled)])
+
+            result *= asyncio.run(upload_files(os.getcwd(), league_name, 'xg'))
+            result *= asyncio.run(upload_files(os.getcwd(), league_name, 'xg_xa'))
+
+            return result
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return False
+        finally:
+            session.close()
+
+    def __update_shoots_creation_files(self, league_name: str) -> bool:
+        try:
+            # get best players
+            session: SQLSession = Session()
+            best_sca_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last3_sca_per_game.desc(), PlayerStats.last3_gca_per_game.desc()) \
+                .limit(20).all()
+            best_sca_last_5 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last5_sca_per_game.desc(), PlayerStats.last5_gca_per_game.desc()) \
+                .limit(20).all()
+
+            best_gca_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last3_gca_per_game.desc(), PlayerStats.last3_cca_per_game.desc()) \
+                .limit(20).all()
+            best_gca_last_5 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
+                .order_by(PlayerStats.last5_gca_per_game.desc(), PlayerStats.last5_cca_per_game.desc()) \
+                .limit(20).all()
+
+            # create pd pataframes
+            last_3_sca = [[player.last3_sca_per_game, player.last3_gca_per_game,
+                           player.name, player.team] for player in best_sca_last_3]
+            last_5_sca = [[player.last5_sca_per_game, player.last5_gca_per_game,
+                           player.name, player.team] for player in best_sca_last_5]
+            last_3_gca = [[player.last3_gca_per_game, player.last3_sca_per_game,
+                           player.name, player.team] for player in best_gca_last_3]
+            last_5_gca = [[player.last5_gca_per_game, player.last5_sca_per_game,
+                           player.name, player.team] for player in best_gca_last_5]
+
+            last_3_sca_df = pd.DataFrame(last_3_sca, columns=['sca', 'gca', 'Игрок', 'Команда'])
+            last_3_sca_styled = last_3_sca_df.style.background_gradient()
+            last_5_sca_df = pd.DataFrame(last_5_sca, columns=['sca', 'gca', 'Игрок', 'Команда'])
+            last_5_sca_df_styled = last_5_sca_df.style.background_gradient()
+
+            last_3_gca_df = pd.DataFrame(last_3_gca, columns=['gca', 'sca', 'Игрок', 'Команда'])
+            last_3_gca_df_styled = last_3_gca_df.style.background_gradient()
+            last_5_gca_df = pd.DataFrame(last_5_gca, columns=['gca', 'sca', 'Игрок', 'Команда'])
+            last_5_gca_df_styled = last_5_gca_df.style.background_gradient()
+
+            result = all([self.__update_files(league_name, 'sca', last_3_sca_styled, last_5_sca_df_styled),
+                          self.__update_files(league_name, 'gca', last_3_gca_df_styled, last_5_gca_df_styled)])
+
+            result *= asyncio.run(upload_files(os.getcwd(), league_name, 'sca'))
+            result *= asyncio.run(upload_files(os.getcwd(), league_name, 'gca'))
+
+            return result
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return False
+        finally:
+            session.close()
+
+    def get_players_shoots_id(self, league_name: str, last_5: bool = False) -> str:
         if league_name not in self.fbref.shoots_leagues:
             return "Для данной лиги нет данных"
 
-        session: SQLSession = Session()
-        if last_5:
-            best_players = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
-                .order_by(PlayerStats.last5_shoots_per_game.desc(), PlayerStats.last5_on_target_per_shoot.desc()) \
-                .limit(20).all()
-        else:
-            best_players = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
-                .order_by(PlayerStats.last3_shoots_per_game.desc(), PlayerStats.last3_on_target_per_shoot.desc()) \
-                .limit(20).all()
-        session.close()
-
-        result = [" №   У/И   УC/У        Игрок[клуб]\n"]
-        result += self.__transform_players_shoots(best_players, last_5)
-        return '\n'.join(result)
-
-    @staticmethod
-    def __transform_name(player_name: str) -> str:
-        after_split = player_name.split(' ')
-        if len(after_split) == 1:
-            return after_split[0]
-        elif len(after_split) == 2:
-            return after_split[0][0] + ". " + after_split[1]
-        elif len(after_split) == 3:
-            return after_split[0][0] + ". " + after_split[1][0] + ". " + after_split[2]
-        else:
-            return player_name
-
-    def __transform_players_shoots(self, players_list: List[PlayerStats], last_5: bool = False) -> List[str]:
-        result = []
-        if last_5:
-            for i, player in enumerate(players_list):
-                percent = int(player.last5_on_target_per_shoot * 100)
-                result += [emojize(f"<code>{self.emojize_number(i + 1, True)}</code>|") +
-                           f" <b>{player.last5_shoots_per_game:.2f}</b> |" +
-                           (2 * (3 - len(str(percent)))) * " " + f"<i>{percent}%</i> |" +
-                           f" {self.__transform_name(player.name)[:self.MAX_NAME_LEN]} " +
-                           f"[{player.team[:self.MAX_TEAM_LEN]}]"]
-        else:
-            for i, player in enumerate(players_list):
-                percent = int(player.last3_on_target_per_shoot * 100)
-                result += [emojize(f"<code>{self.emojize_number(i + 1, True)}</code>|") +
-                           f" <b>{player.last3_shoots_per_game:.2f}</b> |" +
-                           (2 * (3 - len(str(percent)))) * " " + f"<i>{percent}%</i> |" +
-                           f" {self.__transform_name(player.name)[:self.MAX_NAME_LEN]} " +
-                           f"[{player.team[:self.MAX_TEAM_LEN]}]"]
-        return result
+        # session: = ...
+        # TODO
 
 
 if __name__ == "__main__":
     psm = PlayerStatsManager()
     # print(psm.update_league("Russia", new_round=False))
-    print(psm.get_players_shoots("Russia", last_5=False))
+    psm.update_league("Russia", False)
