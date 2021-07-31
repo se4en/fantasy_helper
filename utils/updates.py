@@ -2,7 +2,7 @@ import asyncio
 
 from handlers import dp
 from utils.notify_admins import notify_admin
-from loader import league_info_manager, coeff_manager, player_manager, player_stats_manager, xbet
+from manager_loader import league_info_manager, coeff_manager, player_manager, player_stats_manager, xbet
 
 
 async def update_coeffs(league_name: str):

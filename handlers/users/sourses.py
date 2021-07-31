@@ -14,7 +14,7 @@ from keyboards.inline.sources_buttons import create_sources_keyboard, sources_ba
 async def to_menu_from_coeffs(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ",
-                              reply_markup=create_menu_keyboard(call.message.from_user.id))
+                              reply_markup=create_menu_keyboard(call.from_user.id))
 
 
 @dp.callback_query_handler(sources_callback.filter(league_name="back_to_list", ),

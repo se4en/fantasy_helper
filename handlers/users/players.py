@@ -2,7 +2,8 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery, ParseMode
 
-from manager_loader import dp, player_manager
+from loader import dp
+from manager_loader import player_manager
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, players_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
@@ -14,7 +15,7 @@ from keyboards.inline.player_buttons import create_player_leagues_keyboard, crea
 async def to_menu_from_players(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ",
-                              reply_markup=create_menu_keyboard(call.message.from_user.id))
+                              reply_markup=create_menu_keyboard(call.from_user.id))
 
 
 @dp.callback_query_handler(players_callback.filter(league_name="back_to_list", ),

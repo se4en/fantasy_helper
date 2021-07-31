@@ -55,4 +55,4 @@ async def delete_sourse_start(call: CallbackQuery, callback_data: dict):
 async def to_menu_from_admin(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ",
-                              reply_markup=create_menu_keyboard(call.message.from_user.id))
+                              reply_markup=create_menu_keyboard(call.from_user.id))

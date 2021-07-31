@@ -7,3 +7,5 @@ requests_html==0.10.0
 lxml==4.6.3
 sqlalchemy==1.4.2
 psycopg2==2.9.1
+gitpython
+dataframe_image

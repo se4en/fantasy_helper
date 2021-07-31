@@ -42,7 +42,7 @@ class XBet:
             match_url = match_info['url']
 
             # TODO logging
-            # print(f"Update match {home_team} vs {away_team}")
+            print(f"Update match {home_team} vs {away_team}")
 
             # not match
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
@@ -52,7 +52,11 @@ class XBet:
             r = html_session.get(match_url)
 
             # render JS
-            r.html.render(retries=2, wait=0.3, timeout=30)
+            try:
+                r.html.render(retries=1, wait=0.1, timeout=10)
+            except:
+                r.html.render(retries=1, wait=0.2, timeout=40)
+
 
             game_html = r.html.find("#allBetsTable", first=True)
 

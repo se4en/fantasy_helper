@@ -10,7 +10,7 @@ def create_player_leagues_keyboard(callback: CallbackData):
     for league in coeff_manager.get_leagues():
         leagues_keyboard.insert(InlineKeyboardButton(
             text=str(coeff_manager.emojize_league(league) + ' ' + coeff_manager.translate_league(league)),
-            callback_data=callback.new(league_name=league)
+            callback_data=callback.new(league_name=league, )
         ))
     leagues_keyboard.insert(InlineKeyboardButton(
         text=emojize(":leftwards_arrow_with_hook: Назад"),
