@@ -349,9 +349,9 @@ class PlayerStatsManager(Manager):
             last_5_info = [[round(player.last5_shoots_per_game, 2), int(player.last5_on_target_per_shoot * 100),
                             player.name, player.team] for player in best_players_last_5]
 
-            last_3_df = pd.DataFrame(last_3_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда']).round(decimals=2)
+            last_3_df = pd.DataFrame(last_3_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда'])
             last_3_df_styled = last_3_df.style.background_gradient()
-            last_5_df = pd.DataFrame(last_5_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда']).round(decimals=2)
+            last_5_df = pd.DataFrame(last_5_info, columns=['Уд/И', 'УдС/Уд(%)', 'Игрок', 'Команда'])
             last_5_df_styled = last_5_df.style.background_gradient()
 
             result = self.__update_files(league_name, 'shoots', last_3_df_styled, last_5_df_styled)
@@ -400,14 +400,14 @@ class PlayerStatsManager(Manager):
                              round(player.last5_npxg_per_game, 2), player.name, player.team]
                             for player in best_xg_xa_last_5]
 
-            last_3_xg_df = pd.DataFrame(last_3_xg, columns=['xG', 'npxG', 'xA', 'Игрок', 'Команда']).round(decimals=2)
+            last_3_xg_df = pd.DataFrame(last_3_xg, columns=['xG/И', 'npxG/И', 'xA/И', 'Игрок', 'Команда'])
             last_3_xg_df_styled = last_3_xg_df.style.background_gradient()
-            last_5_xg_df = pd.DataFrame(last_5_xg, columns=['xG', 'npxG', 'xA', 'Игрок', 'Команда']).round(decimals=2)
+            last_5_xg_df = pd.DataFrame(last_5_xg, columns=['xG/И', 'npxG/И', 'xA/И', 'Игрок', 'Команда'])
             last_5_xg_df_styled = last_5_xg_df.style.background_gradient()
 
-            last_3_xg_xa_df = pd.DataFrame(last_3_xg_xa, columns=['xG+xA', 'npxG', 'Игрок', 'Команда']).round(decimals=2)
+            last_3_xg_xa_df = pd.DataFrame(last_3_xg_xa, columns=['xG+xA/И', 'npxG/И', 'Игрок', 'Команда'])
             last_3_xg_xa_df_styled = last_3_xg_xa_df.style.background_gradient()
-            last_5_xg_xa_df = pd.DataFrame(last_5_xg_xa, columns=['xG+xA', 'npxG', 'Игрок', 'Команда']).round(decimals=2)
+            last_5_xg_xa_df = pd.DataFrame(last_5_xg_xa, columns=['xG+xA/И', 'npxG/И', 'Игрок', 'Команда'])
             last_5_xg_xa_df_styled = last_5_xg_xa_df.style.background_gradient()
 
             result = all([self.__update_files(league_name, 'xg', last_3_xg_df_styled, last_5_xg_df_styled),
@@ -455,14 +455,14 @@ class PlayerStatsManager(Manager):
             last_5_gca = [[player.last5_gca_per_game, player.last5_sca_per_game,
                            player.name, player.team] for player in best_gca_last_5]
 
-            last_3_sca_df = pd.DataFrame(last_3_sca, columns=['sca', 'gca', 'Игрок', 'Команда']).round(decimals=2)
+            last_3_sca_df = pd.DataFrame(last_3_sca, columns=['sca/И', 'gca/И', 'Игрок', 'Команда'])
             last_3_sca_styled = last_3_sca_df.style.background_gradient()
-            last_5_sca_df = pd.DataFrame(last_5_sca, columns=['sca', 'gca', 'Игрок', 'Команда']).round(decimals=2)
+            last_5_sca_df = pd.DataFrame(last_5_sca, columns=['sca/И', 'gca/И', 'Игрок', 'Команда'])
             last_5_sca_df_styled = last_5_sca_df.style.background_gradient()
 
-            last_3_gca_df = pd.DataFrame(last_3_gca, columns=['gca', 'sca', 'Игрок', 'Команда']).round(decimals=2)
+            last_3_gca_df = pd.DataFrame(last_3_gca, columns=['gca/И', 'sca/И', 'Игрок', 'Команда'])
             last_3_gca_df_styled = last_3_gca_df.style.background_gradient()
-            last_5_gca_df = pd.DataFrame(last_5_gca, columns=['gca', 'sca', 'Игрок', 'Команда']).round(decimals=2)
+            last_5_gca_df = pd.DataFrame(last_5_gca, columns=['gca/И', 'sca/И', 'Игрок', 'Команда'])
             last_5_gca_df_styled = last_5_gca_df.style.background_gradient()
 
             result = all([self.__update_files(league_name, 'sca', last_3_sca_styled, last_5_sca_df_styled),
@@ -490,6 +490,98 @@ class PlayerStatsManager(Manager):
             session: SQLSession = Session()
             image = session.query(MediaIds).filter(and_(MediaIds.league == league_name,
                                                         MediaIds.stat_type == 'shoots',
+                                                        MediaIds.last_5 == last_5)).first()
+            if image is not None:
+                return image.file_id
+            else:
+                return ""
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return ""
+        finally:
+            session.close()
+
+    def get_xg_id(self, league_name: str, last_5: bool = False) -> str:
+        if league_name not in self.fbref.xg_leagues:
+            return "Для данной лиги нет данных"
+
+        try:
+            session: SQLSession = Session()
+            image = session.query(MediaIds).filter(and_(MediaIds.league == league_name,
+                                                        MediaIds.stat_type == 'xg',
+                                                        MediaIds.last_5 == last_5)).first()
+            if image is not None:
+                return image.file_id
+            else:
+                return ""
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return ""
+        finally:
+            session.close()
+
+    def get_xg_xa_id(self, league_name: str, last_5: bool = False) -> str:
+        if league_name not in self.fbref.xg_leagues:
+            return "Для данной лиги нет данных"
+
+        try:
+            session: SQLSession = Session()
+            image = session.query(MediaIds).filter(and_(MediaIds.league == league_name,
+                                                        MediaIds.stat_type == 'xg_xa',
+                                                        MediaIds.last_5 == last_5)).first()
+            if image is not None:
+                return image.file_id
+            else:
+                return ""
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return ""
+        finally:
+            session.close()
+
+    def get_sca_id(self, league_name: str, last_5: bool = False) -> str:
+        if league_name not in self.fbref.shoots_creation_leagues:
+            return "Для данной лиги нет данных"
+
+        try:
+            session: SQLSession = Session()
+            image = session.query(MediaIds).filter(and_(MediaIds.league == league_name,
+                                                        MediaIds.stat_type == 'sca',
+                                                        MediaIds.last_5 == last_5)).first()
+            if image is not None:
+                return image.file_id
+            else:
+                return ""
+        except Exception as ex:
+            # TODO logging
+            print(ex)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            return ""
+        finally:
+            session.close()
+
+    def get_gca_id(self, league_name: str, last_5: bool = False) -> str:
+        if league_name not in self.fbref.shoots_creation_leagues:
+            return "Для данной лиги нет данных"
+
+        try:
+            session: SQLSession = Session()
+            image = session.query(MediaIds).filter(and_(MediaIds.league == league_name,
+                                                        MediaIds.stat_type == 'gca',
                                                         MediaIds.last_5 == last_5)).first()
             if image is not None:
                 return image.file_id

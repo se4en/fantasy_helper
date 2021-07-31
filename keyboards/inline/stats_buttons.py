@@ -43,7 +43,7 @@ def create_stats_league_menu_keyboard(callback: CallbackData, league_name: str):
         )
         last_3_xg_xa_button = InlineKeyboardButton(
             text=emojize("XG+XA (3 тура)"),
-            callback_data=callback.new(league_name=league_name, type="xg+xa", last_5=False)
+            callback_data=callback.new(league_name=league_name, type="xg_xa", last_5=False)
         )
         league_menu_keyboard.add([last_3_xg_button, last_3_xg_xa_button])
 
@@ -53,7 +53,7 @@ def create_stats_league_menu_keyboard(callback: CallbackData, league_name: str):
         )
         last_5_xg_xa_button = InlineKeyboardButton(
             text=emojize("XG+XA (5 туров)"),
-            callback_data=callback.new(league_name=league_name, type="xg+xa", last_5=True)
+            callback_data=callback.new(league_name=league_name, type="xg_xa", last_5=True)
         )
         league_menu_keyboard.add([last_5_xg_button, last_5_xg_xa_button])
 
