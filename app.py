@@ -10,6 +10,6 @@ if __name__ == '__main__':
     create_database()
     # run bot
     loop = asyncio.get_event_loop()
-    loop.create_task(on_startup(at_start=False, timeout=3*60*60))
+    loop.create_task(on_startup())
     loop.create_task(executor.start_polling(dp))
     loop.run_forever()

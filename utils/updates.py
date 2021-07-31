@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 
 from handlers import dp
 from utils.notify_admins import notify_admin
@@ -17,32 +18,37 @@ async def update_players_stats(league_name: str, new_round: bool):
     player_stats_manager.update_league(league_name, new_round)
 
 
-async def update_league(league_name: str, upd_cnt: int):
-    new_round = league_info_manager.is_new_round(league_name)
-    if new_round:
-        league_info_manager.update_deadline(league_name)
-    if upd_cnt % 12 == 0:
-        await update_coeffs(league_name)
+async def update_all():
+    await notify_admin(dp, "[INFO] start update all")
+    for league_name in xbet.leagues:
+        new_round = league_info_manager.is_new_round(league_name)
+        if new_round:
+            league_info_manager.update_deadline(league_name)
+
+        await update_players(league_name, new_round)
         await update_players_stats(league_name, new_round)
-    await update_players(league_name, new_round)
+        await update_coeffs(league_name)
+    await notify_admin(dp, "[INFO] finish update all")
 
 
-async def update(upd_cnt: int):
+async def update_players_leagues():
+    await notify_admin(dp, "[INFO] start update players")
     for league in xbet.leagues:
-        await update_league(league, upd_cnt)
+        await update_players(league, False)
+    await notify_admin(dp, "[INFO] finish update players")
 
 
-async def on_startup(at_start=False, timeout=1*60*60):
-    # timeout for players == 1 hour, for coeffs & stats == 12*timeout
-    upd_cnt = 1
-    await notify_admin(dp, "### bot started")
-    if at_start:
-        await update(upd_cnt)
-        upd_cnt += 1
+async def on_startup(upd_at_start=True, timeout: int = 1 * 60 * 60,
+                     upd_time: datetime.datetime = datetime.datetime.strptime("03:00:00", "%H:%M:%S")):
+    upd_today = upd_at_start
+    await notify_admin(dp, "[INFO] bot started")
     while True:
-        await notify_admin(dp, "### start sleeping")
         await asyncio.sleep(timeout)
-        await update(upd_cnt)
-        if upd_cnt == 12:
-            upd_cnt = 1
-
+        # restart upd_today
+        if upd_today and datetime.datetime.now().time() < upd_time.time():
+            upd_today = False
+        if (not upd_today) and datetime.datetime.now().time() > upd_time.time():
+            await update_all()
+            upd_today = True
+        # else:
+        #     await update_players_leagues()

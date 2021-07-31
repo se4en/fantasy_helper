@@ -38,7 +38,7 @@ class PlayerStatsManager(Manager):
         session.close()
         return result
 
-    def __update_player(self, cur_player: PlayerStats) -> PlayerStats:
+    def __update_player(self, cur_player: PlayerStats) -> bool:
         """
         Update player stats for next round
         """
@@ -46,60 +46,60 @@ class PlayerStatsManager(Manager):
         try:
             session.query(PlayerStats).filter(PlayerStats.id == cur_player.id).update({
                 # round 0
-                'r0_minutes': cur_player["r1_minutes"],
-                'r0_shoots': cur_player["r1_shoots"],
-                'r0_shoots_on_target': cur_player["r1_shoots_on_target"],
-                'r0_xg': cur_player["r1_xg"],
-                'r0_npxg': cur_player["r1_npxg"],
-                'r0_xa': cur_player["r1_xa"],
-                'r0_sca': cur_player["r1_sca"],
-                'r0_gca': cur_player["r1_gca"],
+                'r0_minutes': cur_player.r1_minutes,
+                'r0_shoots': cur_player.r1_shoots,
+                'r0_shoots_on_target': cur_player.r1_shoots_on_target,
+                'r0_xg': cur_player.r1_xg,
+                'r0_npxg': cur_player.r1_npxg,
+                'r0_xa': cur_player.r1_xa,
+                'r0_sca': cur_player.r1_sca,
+                'r0_gca': cur_player.r1_gca,
                 # round 1
-                'r1_minutes': cur_player["r2_minutes"],
-                'r1_shoots': cur_player["r2_shoots"],
-                'r1_shoots_on_target': cur_player["r2_shoots_on_target"],
-                'r1_xg': cur_player["r2_xg"],
-                'r1_npxg': cur_player["r2_npxg"],
-                'r1_xa': cur_player["r2_xa"],
-                'r1_sca': cur_player["r2_sca"],
-                'r1_gca': cur_player["r2_gca"],
+                'r1_minutes': cur_player.r2_minutes,
+                'r1_shoots': cur_player.r2_shoots,
+                'r1_shoots_on_target': cur_player.r2_shoots_on_target,
+                'r1_xg': cur_player.r2_xg,
+                'r1_npxg': cur_player.r2_npxg,
+                'r1_xa': cur_player.r2_xa,
+                'r1_sca': cur_player.r2_sca,
+                'r1_gca': cur_player.r2_gca,
                 # round 2
-                'r2_minutes': cur_player["r3_minutes"],
-                'r2_shoots': cur_player["r3_shoots"],
-                'r2_shoots_on_target': cur_player["r3_shoots_on_target"],
-                'r2_xg': cur_player["r3_xg"],
-                'r2_npxg': cur_player["r3_npxg"],
-                'r2_xa': cur_player["r3_xa"],
-                'r2_sca': cur_player["r3_sca"],
-                'r2_gca': cur_player["r3_gca"],
+                'r2_minutes': cur_player.r3_minutes,
+                'r2_shoots': cur_player.r3_shoots,
+                'r2_shoots_on_target': cur_player.r3_shoots_on_target,
+                'r2_xg': cur_player.r3_xg,
+                'r2_npxg': cur_player.r3_npxg,
+                'r2_xa': cur_player.r3_xa,
+                'r2_sca': cur_player.r3_sca,
+                'r2_gca': cur_player.r3_gca,
                 # round 3
-                'r3_minutes': cur_player["r4_minutes"],
-                'r3_shoots': cur_player["r4_shoots"],
-                'r3_shoots_on_target': cur_player["r4_shoots_on_target"],
-                'r3_xg': cur_player["r4_xg"],
-                'r3_npxg': cur_player["r4_npxg"],
-                'r3_xa': cur_player["r4_xa"],
-                'r3_sca': cur_player["r4_sca"],
-                'r3_gca': cur_player["r4_gca"],
+                'r3_minutes': cur_player.r4_minutes,
+                'r3_shoots': cur_player.r4_shoots,
+                'r3_shoots_on_target': cur_player.r4_shoots_on_target,
+                'r3_xg': cur_player.r4_xg,
+                'r3_npxg': cur_player.r4_npxg,
+                'r3_xa': cur_player.r4_xa,
+                'r3_sca': cur_player.r4_sca,
+                'r3_gca': cur_player.r4_gca,
                 # round 4
-                'r4_minutes': cur_player["r5_minutes"],
-                'r4_shoots': cur_player["r5_shoots"],
-                'r4_shoots_on_target': cur_player["r5_shoots_on_target"],
-                'r4_xg': cur_player["r5_xg"],
-                'r4_npxg': cur_player["r5_npxg"],
-                'r4_xa': cur_player["r5_xa"],
-                'r4_sca': cur_player["r5_sca"],
-                'r4_gca': cur_player["r5_gca"],
+                'r4_minutes': cur_player.r5_minutes,
+                'r4_shoots': cur_player.r5_shoots,
+                'r4_shoots_on_target': cur_player.r5_shoots_on_target,
+                'r4_xg': cur_player.r5_xg,
+                'r4_npxg': cur_player.r5_npxg,
+                'r4_xa': cur_player.r5_xa,
+                'r4_sca': cur_player.r5_sca,
+                'r4_gca': cur_player.r5_gca,
             })
-            upd_player = session.query(PlayerStats).filter(PlayerStats.id == cur_player.id).first()
-            return upd_player
+            session.commit()
+            return True
         except Exception as ex:
             # TODO logging
             print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            return None
+            return False
         finally:
             session.commit()
             session.close()
@@ -110,7 +110,11 @@ class PlayerStatsManager(Manager):
         if last3_minutes < self.LAST3_MIN:
             last3_minutes = 0
             last3_shoots = 0
-        last3_shoots_per_game = last3_shoots * last3_minutes
+
+        if last3_minutes > 0:
+            last3_shoots_per_game = last3_shoots / last3_minutes
+        else:
+            last3_shoots_per_game = 0
         if last3_shoots == 0:
             last3_on_target_per_shoot = 0
         else:
@@ -122,7 +126,11 @@ class PlayerStatsManager(Manager):
         if last5_minutes < self.LAST5_MIN:
             last5_minutes = 0
             last5_shoots = 0
-        last5_shoots_per_game = last5_shoots * last5_minutes
+
+        if last5_minutes > 0:
+            last5_shoots_per_game = last5_shoots / last5_minutes
+        else:
+            last5_shoots_per_game = 0
         if last5_shoots == 0:
             last5_on_target_per_shoot = 0
         else:
@@ -139,7 +147,13 @@ class PlayerStatsManager(Manager):
                 cur_player: PlayerStats = self.get_player(player_stat)
                 if cur_player:
                     if new_round:
-                        cur_player = self.__update_player(cur_player)
+                        if self.__update_player(cur_player):
+                            # session.refresh(cur_player)
+                            cur_player: PlayerStats = self.get_player(player_stat)
+                        else:
+                            # TODO logging!!!
+                            print("Error")
+                            pass
                     last3_shoots_per_game, last3_on_target_per_shoot, last5_shoots_per_game, \
                     last5_on_target_per_shoot = self.__compute_shoots(player_stat, cur_player)
 
@@ -153,6 +167,7 @@ class PlayerStatsManager(Manager):
                         'last5_shoots_per_game': last5_shoots_per_game,
                         'last5_on_target_per_shoot': last5_on_target_per_shoot
                     })
+                    session.commit()
                 else:  # if new player
                     session.add(PlayerStats(player_stat['name'], league_name, player_stat['team'],
                                             player_stat['position']))
@@ -180,16 +195,22 @@ class PlayerStatsManager(Manager):
         last3_minutes = player_info["minutes"] - player_stat.r2_minutes
         if last3_minutes < self.LAST3_MIN:
             last3_minutes = 0
-        last3_xg_per_game = last3_minutes * (player_info["xg"] - player_stat.r2_xg)
-        last3_npxg_per_game = last3_minutes * (player_info["npxg"] - player_stat.r2_npxg)
-        last3_xa_per_game = last3_minutes * (player_info["xa"] - player_stat.r2_xa)
+        if last3_minutes > 0:
+            last3_xg_per_game = (player_info["xg"] - player_stat.r2_xg) / last3_minutes
+            last3_npxg_per_game = (player_info["npxg"] - player_stat.r2_npxg) / last3_minutes
+            last3_xa_per_game = (player_info["xa"] - player_stat.r2_xa) / last3_minutes
+        else:
+            last3_xg_per_game, last3_npxg_per_game, last3_xa_per_game = 0, 0, 0
 
         last5_minutes = player_info["minutes"] - player_stat.r0_minutes
         if last5_minutes < self.LAST5_MIN:
             last5_minutes = 0
-        last5_xg_per_game = last5_minutes * (player_info["xg"] - player_stat.r0_xg)
-        last5_npxg_per_game = last5_minutes * (player_info["npxg"] - player_stat.r0_npxg)
-        last5_xa_per_game = last5_minutes * (player_info["xa"] - player_stat.r0_xa)
+        if last5_minutes > 0:
+            last5_xg_per_game = (player_info["xg"] - player_stat.r0_xg) / last5_minutes
+            last5_npxg_per_game = (player_info["npxg"] - player_stat.r0_npxg) / last5_minutes
+            last5_xa_per_game = (player_info["xa"] - player_stat.r0_xa) / last5_minutes
+        else:
+            last5_xg_per_game, last5_npxg_per_game, last5_xa_per_game = 0, 0, 0
 
         return (last3_xg_per_game, last3_npxg_per_game, last3_xa_per_game,
                 last5_xg_per_game, last5_npxg_per_game, last5_xa_per_game)
@@ -214,6 +235,7 @@ class PlayerStatsManager(Manager):
                         'last5_npxg_per_game': last5_npxg_per_game,
                         'last5_xa_per_game': last5_xa_per_game
                     })
+                    session.commit()
                 else:  # if new player
                     session.add(PlayerStats(player_stat['name'], league_name, player_stat['team'],
                                             player_stat['position']))
@@ -225,6 +247,7 @@ class PlayerStatsManager(Manager):
                             'r5_npxg': player_stat["npxg"],
                             'r5_xa': player_stat["xa"]
                         })
+                        session.commit()
             return True
         except Exception as ex:
             # TODO logging
@@ -241,14 +264,20 @@ class PlayerStatsManager(Manager):
         last3_minutes = player_info["minutes"] - player_stat.r2_minutes
         if last3_minutes < self.LAST3_MIN:
             last3_minutes = 0
-        last3_sca_per_game = last3_minutes * (player_info["sca"] - player_stat.r2_sca)
-        last3_gca_per_game = last3_minutes * (player_info["gca"] - player_stat.r2_gca)
+        if last3_minutes > 0:
+            last3_sca_per_game = (player_info["sca"] - player_stat.r2_sca) / last3_minutes
+            last3_gca_per_game = (player_info["gca"] - player_stat.r2_gca) / last3_minutes
+        else:
+            last3_sca_per_game, last3_gca_per_game = 0, 0
 
         last5_minutes = player_info["minutes"] - player_stat.r0_minutes
         if last5_minutes < self.LAST5_MIN:
             last5_minutes = 0
-        last5_sca_per_game = last5_minutes * (player_info["sca"] - player_stat.r0_sca)
-        last5_gca_per_game = last5_minutes * (player_info["gca"] - player_stat.r0_gca)
+        if last5_minutes > 0:
+            last5_sca_per_game = (player_info["sca"] - player_stat.r0_sca) / last5_minutes
+            last5_gca_per_game = (player_info["gca"] - player_stat.r0_gca) / last5_minutes
+        else:
+            last5_sca_per_game, last5_gca_per_game = 0, 0
 
         return last3_sca_per_game, last3_gca_per_game, last5_sca_per_game, last5_gca_per_game
 

@@ -24,11 +24,11 @@ class FbrefParser:
         }
 
         self.xg_leagues = {
-            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
+            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
         }
 
         self.shoots_creation_leagues = {
-            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
+            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
         }
 
     def get_shooting_stats(self, league_name: str) -> List[Dict]:
