@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
@@ -34,17 +35,10 @@ class PlayerManager(Manager):
         """
         Updates players popularity for league
         """
+        logging.info(f"Start update players for league={league_name}, new_round={new_round}")
         session: SQLSession = Session()
         try:
-            # TODO delete this
-            # league_info = session.query(League_info).filter(League_info.league == league_name).first()
-            # if not league_info:
-            #     return False
-
             for player in self.sports.get_league_players(league_name):
-
-                print(player)
-
                 cur_player = self.get_player(player)
                 if cur_player:
                     if new_round:
@@ -58,11 +52,9 @@ class PlayerManager(Manager):
                                        player['amplua'], player['popularity'], 0))
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.commit()
@@ -98,7 +90,7 @@ class PlayerManager(Manager):
         return result
 
 
-if __name__ == "__main__":
-    pm = PlayerManager()
-    # print(pm.get_players("Russia"))
-    print(pm.update_league("Russia", True))
+# if __name__ == "__main__":
+#     pm = PlayerManager()
+#     # print(pm.get_players("Russia"))
+#     print(pm.update_league("Russia", True))

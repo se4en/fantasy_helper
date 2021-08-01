@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from sqlalchemy.orm import Session as SQLSession
 
@@ -17,6 +18,7 @@ class LeagueInfoManager(Manager):
         """
         Update deadline for league
         """
+        logging.info(f"Update deadline for league={league_name}")
         new_deadline = self.sports.get_deadline(league_name)
         if not new_deadline:
             return False

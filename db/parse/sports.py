@@ -4,6 +4,7 @@ import os
 import sys
 from bs4 import BeautifulSoup
 from datetime import datetime
+import logging
 
 
 class Sports:
@@ -16,16 +17,16 @@ class Sports:
             self.leagues = {
                 'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
                 'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
-                'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
-                'Germany': 'https://www.sports.ru/fantasy/football/tournament/50.html',
-                'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
-                'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',
-                'Championship': 'https://www.sports.ru/fantasy/football/tournament/205.html',
-                'Turkey': 'https://www.sports.ru/fantasy/football/tournament/246.html',
-                'Italy': 'https://www.sports.ru/fantasy/football/tournament/48.html',
-                'Portugal': 'https://www.sports.ru/fantasy/football/tournament/207.html',
-                'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/57.html',
-                'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/56.html',
+                # 'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
+                'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
+                # 'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
+                # 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',
+                'Championship': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/205.html',
+                # 'Turkey': 'https://www.sports.ru/fantasy/football/tournament/246.html',
+                # 'Italy': 'https://www.sports.ru/fantasy/football/tournament/48.html',
+                'Portugal': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/207.html',
+                # 'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/57.html',
+                # 'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/56.html',
             }
 
         if leagues_teams is not None:
@@ -33,17 +34,17 @@ class Sports:
             return
         self._leagues_teams = {
             'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html',  # ok
-            'England': 'https://www.sports.ru/fantasy/football/team/points/2243551.html',
+            # 'England': 'https://www.sports.ru/fantasy/football/team/points/2243551.html',
             'France': 'https://www.sports.ru/fantasy/football/team/points/2311561.html',  # ok
             'Germany': 'https://www.sports.ru/fantasy/football/team/points/2312024.html',  # ok
-            'Spain': 'https://www.sports.ru/fantasy/football/team/points/2243562.html',
-            'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2243575.html',
+            # 'Spain': 'https://www.sports.ru/fantasy/football/team/points/2243562.html',
+            # 'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2243575.html',
             'Championship': 'https://www.sports.ru/fantasy/football/team/points/2314647.html',  # ok
-            'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2243571.html',
-            'Italy': 'https://www.sports.ru/fantasy/football/team/points/2258596.html',
+            # 'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2243571.html',
+            # 'Italy': 'https://www.sports.ru/fantasy/football/team/points/2258596.html',
             'Portugal': 'https://www.sports.ru/fantasy/football/team/points/2314643.html',  # ok
-            'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2283074.html',
-            'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2284228.html',
+            # 'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2283074.html',
+            # 'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2284228.html',
         }
 
     def __transform_deadline(self, deadline: str) -> datetime:
@@ -70,6 +71,7 @@ class Sports:
 
     def get_deadline(self, league_name: str) -> datetime:
         if league_name not in self._leagues_teams:
+            logging.info(f"Wrong league_name={league_name} in get_deadline")
             return None
         try:
             response = requests.get(self._leagues_teams[league_name])
@@ -79,11 +81,9 @@ class Sports:
                 .find("td").text
             return self.__transform_deadline(deadline)
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return None
 
     def get_games_count(self, league_name: str) -> int:
@@ -96,11 +96,9 @@ class Sports:
             buf = soup.find("div", {"class": "mainPart points-page"}).find("div", {"class": "stat mB20"})
             return len(buf.find("table").find("tbody").find_all("tr"))
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return 0
 
     def __get_players_from_page(self, league_name: str, page_num: int) -> List[Dict]:
@@ -123,11 +121,9 @@ class Sports:
                 })
             return result
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return result
 
     def get_league_players(self, league_name: str) -> List[Dict]:
@@ -143,9 +139,9 @@ class Sports:
         return result
 
 
-if __name__ == "__main__":
-    sports = Sports()
-    #print(sports.get_deadline("Russia"))
-    #print(sports.get_games_count("Russia"))
-    for player in sports.get_league_players("Russia"):
-        print(player)
+# if __name__ == "__main__":
+#     sports = Sports()
+#     #print(sports.get_deadline("Russia"))
+#     #print(sports.get_games_count("Russia"))
+#     for player in sports.get_league_players("Russia"):
+#         print(player)

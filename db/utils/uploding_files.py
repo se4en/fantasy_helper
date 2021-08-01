@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import git
@@ -42,23 +43,21 @@ async def upload_files(league_name: str, stat_type: str) -> bool:
 
 
 async def upload_file(file_path: str, league_name: str, stat_type: str, last_5: bool) -> bool:
+    session: SQLSession = Session()
     try:
         with open(file_path, 'rb') as file:
             msg = await bot.send_photo(admins[0], file, disable_notification=True)
             file_id = msg.photo[-1].file_id
 
-            session: SQLSession = Session()
             session.query(MediaIds).filter(and_(MediaIds.league == league_name,
                                                 MediaIds.stat_type == stat_type,
                                                 MediaIds.last_5 == last_5)).delete()
             session.add(MediaIds(league_name, stat_type, last_5, file_id, file_path))
             return True
     except Exception as ex:
-        # TODO logging
-        print(ex)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
+        logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         return False
     finally:
         session.commit()

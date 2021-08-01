@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple, List, Dict
 import requests
 import os
@@ -11,16 +12,16 @@ class FbrefParser:
     def __init__(self):
         self.shoots_leagues = {
             'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
-            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
-            'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
-            'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
-            'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
-            'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
-            'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
-            'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
-            'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
-            'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
-            'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
+            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
+            # 'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
+            # 'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
+            # 'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
+            # 'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
+            # 'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
+            # 'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
+            # 'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
+            # 'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
+            # 'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
         }
 
         self.xg_leagues = {
@@ -32,6 +33,7 @@ class FbrefParser:
         }
 
     def get_shooting_stats(self, league_name: str) -> List[Dict]:
+        logging.info(f"Get shoots stats in league={league_name}")
         result = []
         try:
             if league_name not in self.shoots_leagues:
@@ -54,15 +56,14 @@ class FbrefParser:
                         "shots_on_target": int(cur_player.find("td", {"data-stat": "shots_on_target"}).text)
                     })
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         finally:
             return result
 
     def get_xg_stats(self, league_name: str) -> List[Dict]:
+        logging.info(f"Get xg stats in league={league_name}")
         result = []
         try:
             if league_name not in self.xg_leagues:
@@ -84,15 +85,14 @@ class FbrefParser:
                         "xa": float(cur_player.find("td", {"data-stat": "xa"}).text),
                     })
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         finally:
             return result
 
     def get_shoot_creation_stats(self, league_name: str) -> List[Dict]:
+        logging.info(f"Get shoot creation stats in league={league_name}")
         result = []
         try:
             if league_name not in self.shoots_creation_leagues:
@@ -113,17 +113,15 @@ class FbrefParser:
                         "gca": int(cur_player.find("td", {"data-stat": "gca"}).text),
                     })
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         finally:
             return result
 
 
-if __name__ == "__main__":
-    fbref = FbrefParser()
-    res = fbref.get_shoot_creation_stats("France")
-    for _ in res:
-        print(_)
+# if __name__ == "__main__":
+#     fbref = FbrefParser()
+#     res = fbref.get_shoot_creation_stats("France")
+#     for _ in res:
+#         print(_)

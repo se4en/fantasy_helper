@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
@@ -94,11 +95,9 @@ class PlayerStatsManager(Manager):
             session.commit()
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.commit()
@@ -141,6 +140,7 @@ class PlayerStatsManager(Manager):
                 last5_shoots_per_game, last5_on_target_per_shoot)
 
     def __update_shoots(self, league_name: str, new_round: bool = False) -> bool:
+        logging.info(f"Start update shoots for league={league_name}")
         session: SQLSession = Session()
         try:
             for player_stat in self.fbref.get_shooting_stats(league_name):
@@ -151,9 +151,7 @@ class PlayerStatsManager(Manager):
                             # session.refresh(cur_player)
                             cur_player: PlayerStats = self.get_player(player_stat)
                         else:
-                            # TODO logging!!!
-                            print("Error")
-                            pass
+                            logging.warning(f"Something wrong when updating palyer {cur_player}")
                     last3_shoots_per_game, last3_on_target_per_shoot, last5_shoots_per_game, \
                     last5_on_target_per_shoot = self.__compute_shoots(player_stat, cur_player)
 
@@ -181,11 +179,9 @@ class PlayerStatsManager(Manager):
                         })
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.commit()
@@ -216,6 +212,7 @@ class PlayerStatsManager(Manager):
                 last5_xg_per_game, last5_npxg_per_game, last5_xa_per_game)
 
     def __update_xg(self, league_name: str) -> bool:
+        logging.info(f"Start update xg for league={league_name}")
         session: SQLSession = Session()
         try:
             for player_stat in self.fbref.get_xg_stats(league_name):
@@ -250,11 +247,9 @@ class PlayerStatsManager(Manager):
                         session.commit()
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.commit()
@@ -282,6 +277,7 @@ class PlayerStatsManager(Manager):
         return last3_sca_per_game, last3_gca_per_game, last5_sca_per_game, last5_gca_per_game
 
     def __update_shoots_creation(self, league_name: str) -> bool:
+        logging.info(f"Start update shoot creation for league={league_name}")
         session: SQLSession = Session()
         try:
             for player_stat in self.fbref.get_shoot_creation_stats(league_name):
@@ -310,11 +306,9 @@ class PlayerStatsManager(Manager):
                         })
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.commit()
@@ -324,6 +318,7 @@ class PlayerStatsManager(Manager):
         """
         Updates players stats for league
         """
+        logging.info(f"Start update all stats for league={league_name}, new_round={new_round}")
         result: bool = True
         if league_name in self.fbref.shoots_leagues:
             result *= self.__update_shoots(league_name, new_round)
@@ -355,15 +350,14 @@ class PlayerStatsManager(Manager):
             dfi.export(last_5_df, os.path.join(stat_path, "last_5.png"))
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
 
     async def __update_shoots_files(self, league_name: str) -> bool:
         try:
+            logging.info(f"Start update shoots files for league={league_name}")
             # get best players
             session: SQLSession = Session()
             best_players_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
@@ -388,17 +382,16 @@ class PlayerStatsManager(Manager):
 
             return result
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.close()
 
     async def __update_xg_files(self, league_name: str) -> bool:
         try:
+            logging.info(f"Start update xg files for league={league_name}")
             # get best players
             session: SQLSession = Session()
             best_xg_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
@@ -447,17 +440,16 @@ class PlayerStatsManager(Manager):
 
             return result
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.close()
 
     async def __update_shoots_creation_files(self, league_name: str) -> bool:
         try:
+            logging.info(f"Start update shoot creation files for league={league_name}")
             # get best players
             session: SQLSession = Session()
             best_sca_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
@@ -502,11 +494,9 @@ class PlayerStatsManager(Manager):
 
             return result
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
             session.close()
@@ -525,11 +515,9 @@ class PlayerStatsManager(Manager):
             else:
                 return ""
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
             session.close()
@@ -548,11 +536,9 @@ class PlayerStatsManager(Manager):
             else:
                 return ""
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
             session.close()
@@ -571,11 +557,9 @@ class PlayerStatsManager(Manager):
             else:
                 return ""
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
             session.close()
@@ -594,11 +578,9 @@ class PlayerStatsManager(Manager):
             else:
                 return ""
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
             session.close()
@@ -617,11 +599,9 @@ class PlayerStatsManager(Manager):
             else:
                 return ""
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
             session.close()

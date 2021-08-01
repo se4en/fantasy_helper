@@ -1,3 +1,4 @@
+import logging
 import sys, os
 import requests
 import json
@@ -28,21 +29,21 @@ class XBet:
             'Spain': 'https://1xstavka.ru/line/Football/127733-Spain-La-Liga/',
             'Netherlands': 'https://1xstavka.ru/line/Football/2018750-Netherlands-Eredivisie/',
             'Championship': 'https://1xstavka.ru/line/Football/105759-England-Championship/',
-            'Turkey': 'https://www.fonbet.ru/bets/football/12973/',
-            'Italy': 'https://www.fonbet.ru/bets/football/11924/',
-            'Portugal': 'https://www.fonbet.ru/bets/football/11939',
-            'UEFA_1': 'https://www.fonbet.ru/bets/football/15290',
-            'UEFA_2': 'https://www.fonbet.ru/bets/football/15290',
+            'Turkey': 'https://1xstavka.ru/line/Football/11113-Turkey-SuperLiga/',
+            'Italy': 'https://1xstavka.ru/line/Football/110163-Italy-Serie-A/',
+            'Portugal': 'https://1xstavka.ru/line/Football/118663-Portugal-Primeira-Liga/',
+            'UEFA_1': 'https://1xstavka.ru/line/Football/118587-UEFA-Champions-League/',
+            'UEFA_2': 'https://1xstavka.ru/line/Football/118593-UEFA-Europa-League/',
         }
 
     async def __update_match(self, league_name: str, match_info: dict, cur_round: bool = False) -> bool:
+        db_session: SQLSession = Session()
         try:
             home_team = match_info['homeTeam']['name']
             away_team = match_info['awayTeam']['name']
             match_url = match_info['url']
 
-            # TODO logging
-            print(f"Update match {home_team} vs {away_team}")
+            logging.info(f"Update coeffs in match {home_team} vs {away_team}")
 
             # not match
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
@@ -56,7 +57,6 @@ class XBet:
                 await r.html.arender(retries=1, wait=0.1, timeout=10)
             except:
                 await r.html.arender(retries=1, wait=0.2, timeout=40)
-
 
             game_html = r.html.find("#allBetsTable", first=True)
 
@@ -74,7 +74,6 @@ class XBet:
                                      .find("i", first=True).text)
 
             # update db
-            db_session: SQLSession = Session()
             home_coeff = Coeff(
                 home_team, away_team, league_name,
                 total_1_more_1_5, total_2_less_0_5, True, cur_round
@@ -84,18 +83,18 @@ class XBet:
                 total_2_more_1_5, total_1_less_0_5, False, cur_round
             )
             db_session.add_all([home_coeff, away_coeff])
-            db_session.commit()
             return True
         except Exception as ex:
-            # TODO logging
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
+        finally:
+            db_session.commit()
+            db_session.close()
 
     async def update_league(self, league_name: str) -> bool:
-        #print("Update league=", league_name)
+        logging.info(f"Update coeffs in league={league_name}")
 
         if league_name not in self.leagues:
             return False
@@ -124,11 +123,9 @@ class XBet:
 
             return True
         except Exception as ex:
-            # logs here
-            print(ex)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
 
     def update_all(self) -> bool:

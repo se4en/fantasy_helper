@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from sqlalchemy.orm import Session as SQLSession
 
@@ -19,6 +20,7 @@ class UserManager(Manager):
             User.tg_id == tg_id
         ).first()
         if not cur_user:
+            logging.info(f"Add user with name={name}")
             new_user: User = User(
                 tg_id, name, registration_date, valid, profile_url
             )
@@ -26,6 +28,7 @@ class UserManager(Manager):
         db_session.commit()
 
     def make_valid(self, tg_id: int) -> None:
+        logging.info(f"Make user with tg_id={tg_id} valid")
         db_session: SQLSession = Session()
         db_session.query(User).filter(
             User.tg_id == tg_id
