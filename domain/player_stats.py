@@ -320,22 +320,22 @@ class PlayerStatsManager(Manager):
             session.commit()
             session.close()
 
-    def update_league(self, league_name: str, new_round: bool = False) -> bool:
+    async def update_league(self, league_name: str, new_round: bool = False) -> bool:
         """
         Updates players stats for league
         """
         result: bool = True
         if league_name in self.fbref.shoots_leagues:
             result *= self.__update_shoots(league_name, new_round)
-            result *= self.__update_shoots_files(league_name)
+            result *= await self.__update_shoots_files(league_name)
 
         if league_name in self.fbref.xg_leagues:
             result *= self.__update_xg(league_name)
-            result *= self.__update_xg_files(league_name)
+            result *= await self.__update_xg_files(league_name)
 
         if league_name in self.fbref.shoots_creation_leagues:
             result *= self.__update_shoots_creation(league_name)
-            result *= self.__update_shoots_creation_files(league_name)
+            result *= await self.__update_shoots_creation_files(league_name)
         return result
 
     def __update_files(self, league_name: str, stats_type: str, last_3_df, last_5_df) -> bool:
@@ -362,7 +362,7 @@ class PlayerStatsManager(Manager):
             print(exc_type, fname, exc_tb.tb_lineno)
             return False
 
-    def __update_shoots_files(self, league_name: str) -> bool:
+    async def __update_shoots_files(self, league_name: str) -> bool:
         try:
             # get best players
             session: SQLSession = Session()
@@ -384,7 +384,7 @@ class PlayerStatsManager(Manager):
             last_5_df_styled = last_5_df.style.background_gradient()
 
             result = self.__update_files(league_name, 'shoots', last_3_df_styled, last_5_df_styled)
-            result *= asyncio.run(upload_files(league_name, 'shoots'))
+            result *= await upload_files(league_name, 'shoots')
 
             return result
         except Exception as ex:
@@ -397,7 +397,7 @@ class PlayerStatsManager(Manager):
         finally:
             session.close()
 
-    def __update_xg_files(self, league_name: str) -> bool:
+    async def __update_xg_files(self, league_name: str) -> bool:
         try:
             # get best players
             session: SQLSession = Session()
@@ -442,8 +442,8 @@ class PlayerStatsManager(Manager):
             result = all([self.__update_files(league_name, 'xg', last_3_xg_df_styled, last_5_xg_df_styled),
                           self.__update_files(league_name, 'xg_xa', last_3_xg_xa_df_styled, last_5_xg_xa_df_styled)])
 
-            result *= asyncio.run(upload_files(league_name, 'xg'))
-            result *= asyncio.run(upload_files(league_name, 'xg_xa'))
+            result *= await upload_files(league_name, 'xg')
+            result *= await upload_files(league_name, 'xg_xa')
 
             return result
         except Exception as ex:
@@ -456,7 +456,7 @@ class PlayerStatsManager(Manager):
         finally:
             session.close()
 
-    def __update_shoots_creation_files(self, league_name: str) -> bool:
+    async def __update_shoots_creation_files(self, league_name: str) -> bool:
         try:
             # get best players
             session: SQLSession = Session()
@@ -497,8 +497,8 @@ class PlayerStatsManager(Manager):
             result = all([self.__update_files(league_name, 'sca', last_3_sca_styled, last_5_sca_df_styled),
                           self.__update_files(league_name, 'gca', last_3_gca_df_styled, last_5_gca_df_styled)])
 
-            result *= asyncio.run(upload_files(league_name, 'sca'))
-            result *= asyncio.run(upload_files(league_name, 'gca'))
+            result *= await upload_files(league_name, 'sca')
+            result *= await upload_files(league_name, 'gca')
 
             return result
         except Exception as ex:
@@ -628,6 +628,7 @@ class PlayerStatsManager(Manager):
 
 
 if __name__ == "__main__":
-    psm = PlayerStatsManager()
-    # print(psm.update_league("Russia", new_round=False))
-    psm.update_league("Russia", False)
+    # psm = PlayerStatsManager()
+    # # print(psm.update_league("Russia", new_round=False))
+    # await psm.update_league("Russia", False)
+    pass

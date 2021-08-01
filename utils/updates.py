@@ -7,15 +7,15 @@ from manager_loader import league_info_manager, coeff_manager, player_manager, p
 
 
 async def update_coeffs(league_name: str):
-    coeff_manager.update_coeffs(league_name)
+    await coeff_manager.update_coeffs(league_name)
 
 
-async def update_players(league_name: str, new_round: bool):
+def update_players(league_name: str, new_round: bool):
     player_manager.update_league(league_name, new_round)
 
 
 async def update_players_stats(league_name: str, new_round: bool):
-    player_stats_manager.update_league(league_name, new_round)
+    await player_stats_manager.update_league(league_name, new_round)
 
 
 async def update_all():
@@ -25,7 +25,7 @@ async def update_all():
         if new_round:
             league_info_manager.update_deadline(league_name)
 
-        await update_players(league_name, new_round)
+        update_players(league_name, new_round)
         await update_players_stats(league_name, new_round)
         await update_coeffs(league_name)
     await notify_admin(dp, "[INFO] finish update all")
@@ -38,7 +38,7 @@ async def update_players_leagues():
     await notify_admin(dp, "[INFO] finish update players")
 
 
-async def on_startup(upd_at_start=True, timeout: int = 1 * 60 * 60,
+async def on_startup(upd_at_start=True, timeout: int = 0.5 * 60 * 60,
                      upd_time: datetime.datetime = datetime.datetime.strptime("03:00:00", "%H:%M:%S")):
     upd_today = upd_at_start
     await notify_admin(dp, "[INFO] bot started")

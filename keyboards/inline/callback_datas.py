@@ -10,4 +10,4 @@ stats_callback = CallbackData("stats", "league_name", "type", "last_5")
 
 sources_callback = CallbackData("sources", "league_name")
 
-admin_callback = CallbackData("admin", "tool_name")
+admin_callback = CallbackData("admin", "tool_name", "league_name")

@@ -2,7 +2,7 @@ import sys, os
 import requests
 import json
 from bs4 import BeautifulSoup
-from requests_html import HTMLSession
+from requests_html import HTMLSession, AsyncHTMLSession
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 
@@ -35,7 +35,7 @@ class XBet:
             'UEFA_2': 'https://www.fonbet.ru/bets/football/15290',
         }
 
-    def __update_match(self, league_name: str, match_info: dict, cur_round: bool = False) -> bool:
+    async def __update_match(self, league_name: str, match_info: dict, cur_round: bool = False) -> bool:
         try:
             home_team = match_info['homeTeam']['name']
             away_team = match_info['awayTeam']['name']
@@ -48,14 +48,14 @@ class XBet:
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
                 return False
 
-            html_session = HTMLSession()
-            r = html_session.get(match_url)
+            html_session = AsyncHTMLSession()
+            r = await html_session.get(match_url)
 
             # render JS
             try:
-                r.html.render(retries=1, wait=0.1, timeout=10)
+                await r.html.arender(retries=1, wait=0.1, timeout=10)
             except:
-                r.html.render(retries=1, wait=0.2, timeout=40)
+                await r.html.arender(retries=1, wait=0.2, timeout=40)
 
 
             game_html = r.html.find("#allBetsTable", first=True)
@@ -94,7 +94,7 @@ class XBet:
             print(exc_type, fname, exc_tb.tb_lineno)
             return False
 
-    def update_league(self, league_name: str) -> bool:
+    async def update_league(self, league_name: str) -> bool:
         #print("Update league=", league_name)
 
         if league_name not in self.leagues:
@@ -114,12 +114,12 @@ class XBet:
             checked_matches = 0
             # update cur round
             while updated_matches < cur_round_matches:
-                if self.__update_match(league_name, all_matches[checked_matches], True):
+                if await self.__update_match(league_name, all_matches[checked_matches], True):
                     updated_matches += 1
                 checked_matches += 1
             # update next round
             while checked_matches < len(all_matches):
-                self.__update_match(league_name, all_matches[checked_matches], False)
+                await self.__update_match(league_name, all_matches[checked_matches], False)
                 checked_matches += 1
 
             return True

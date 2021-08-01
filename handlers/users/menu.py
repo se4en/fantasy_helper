@@ -7,7 +7,7 @@ from loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
 from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback, stats_callback
 from keyboards.inline.coeff_buttons import create_coeff_leagues_keyboard
-from keyboards.inline.admin_buttons import admin_keyboard
+from keyboards.inline.admin_buttons import create_admin_keyboard
 from keyboards.inline.sources_buttons import create_sources_keyboard
 from keyboards.inline.stats_buttons import create_stats_leagues_keyboard
 from states.checking import Check
@@ -63,7 +63,7 @@ async def to_help(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(menu_callback.filter(choice_name="admin"), state=Check.no_checking)
 async def to_admin(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await call.message.answer(text="Доступные инструменты:", reply_markup=admin_keyboard)
+    await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 
 @dp.callback_query_handler(menu_callback.filter(choice_name="back_to_menu"), state=Check.no_checking)

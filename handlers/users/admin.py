@@ -6,49 +6,48 @@ from loader import dp
 from states.checking import Check
 from keyboards.inline.callback_datas import admin_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
+from keyboards.inline.admin_buttons import create_leagues_keyboard, create_admin_keyboard
+from utils.updates import update_players, update_coeffs, update_players_stats
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name="add_sourse", ), state=Check.no_checking)
-async def add_sourse_start(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=10)
-    await Check.add_sourse.set()
-    answer = ["Чтобы добавить источник, отправь в одном сообщении:",
-              " - название чемпионата как в списке(!),",
-              " - затем на новой строке ссылку,",
-              " - затем на новой строке описание."
-              ]
-    await call.message.answer(text='\n'.join(answer))
-
-
-# @dp.message_handler(state=Check.add_sourse)
-# async def add_sourse_finish(message: types.Message):
-#     await Check.no_checking.set()
-#     user_message = message.text.split('\n')
-#     if len(user_message) == 3:
-#         sourses.add_sourse(sourses.unrepresent_name(user_message[0]),
-#                            user_message[0], user_message[1], user_message[2])
-#     elif len(user_message) == 2:
-#         sourses.add_sourse(sourses.unrepresent_name(user_message[0]),
-#                            user_message[0], user_message[1], "")
-#     else:
-#         pass
-#     await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
-
-
-@dp.callback_query_handler(admin_callback.filter(tool_name="delete_sourse", ),
+@dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats"],
+                                                 league_name="None"),
                            state=Check.no_checking)
-async def delete_sourse_start(call: CallbackQuery, callback_data: dict):
+async def get_update_players_leagues(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
-    await Check.add_sourse.set()
-    await call.message.answer(text="Чтобы удалить источник, отправь ссылку на него.")
+    await call.message.answer(text="Выберите чемпионат: ",
+                              reply_markup=create_leagues_keyboard(callback_data['tool_name']))
 
 
-# @dp.message_handler(state=Check.delete_sourse)
-# async def delete_sourse_finish(message: types.Message):
-#     await Check.no_checking.set()
-#     user_message = message.text.split('\n')
-#     sourses.delete_sourse(user_message[1])
-#     await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
+@dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats"], ),
+                           state=Check.no_checking)
+async def admin_update_resource(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    if callback_data["tool_name"] == "update_players":
+        update_players(callback_data["league_name"], new_round=False)
+    elif callback_data["tool_name"] == "update_coeffs":
+        await update_coeffs(callback_data["league_name"])
+    elif callback_data["tool_name"] == "update_stats":
+        await update_players_stats(callback_data["league_name"], new_round=False)
+    await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
+
+
+# @dp.callback_query_handler(admin_callback.filter(tool_name="manage_source", ), state=Check.no_checking)
+# async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
+#     await call.answer(cache_time=10)
+#     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_source_keyboard())
+#
+#
+# @dp.callback_query_handler(admin_callback.filter(tool_name="manage_twitter", ), state=Check.no_checking)
+# async def admin_manage_twitter_menu(call: CallbackQuery, callback_data: dict):
+#     await call.answer(cache_time=10)
+#     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_twitter_keyboard())
+
+
+@dp.callback_query_handler(admin_callback.filter(tool_name="back_to_list", ), state=Check.no_checking)
+async def back_to_admin_menu(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name="cancel", ), state=Check.no_checking)

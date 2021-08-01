@@ -62,14 +62,14 @@ class CoeffManager(Manager):
         coeffs_list: List[Coeff] = [cf for cf in coeffs]
         return self.__transform_coeffs(coeffs_list, cur_round)
 
-    def update_coeffs(self, league_name: str) -> bool:
+    async def update_coeffs(self, league_name: str) -> bool:
         # delete last round
         db_session: SQLSession = Session()
         db_session.query(Coeff).filter(Coeff.league == league_name).delete()
         db_session.commit()
         db_session.close()
 
-        return self.xbet.update_league(league_name)
+        return await self.xbet.update_league(league_name)
 
     def update_all_coeffs(self) -> bool:
         return all([self.update_coeffs(league) for league in self.xbet.leagues])

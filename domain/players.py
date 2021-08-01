@@ -42,6 +42,9 @@ class PlayerManager(Manager):
             #     return False
 
             for player in self.sports.get_league_players(league_name):
+
+                print(player)
+
                 cur_player = self.get_player(player)
                 if cur_player:
                     if new_round:
