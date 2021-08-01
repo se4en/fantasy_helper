@@ -17,8 +17,6 @@ def get_git_root(path: str) -> str:
     git_root = git_repo.git.rev_parse("--show-toplevel")
     return git_root
 
-if __name__ == "__main__":
-    get_git_root("/path/to/your/file")
 
 async def upload_files(league_name: str, stat_type: str) -> bool:
     # method = bot.send_photo,
