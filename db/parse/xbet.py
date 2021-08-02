@@ -57,8 +57,6 @@ class XBet:
                 await r.html.arender(retries=2, wait=0.1, timeout=10)
             except:
                 await r.html.arender(retries=1, wait=0.2, timeout=40)
-                
-            await html_session.close()
 
             game_html = r.html.find("#allBetsTable", first=True)
 
@@ -91,7 +89,8 @@ class XBet:
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
-        finally:
+        finally:           
+            await html_session.close()
             db_session.commit()
             db_session.close()
 
