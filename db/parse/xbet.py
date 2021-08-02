@@ -38,6 +38,7 @@ class XBet:
 
     async def __update_match(self, league_name: str, match_info: dict, cur_round: bool = False) -> bool:
         db_session: SQLSession = Session()
+        html_session = AsyncHTMLSession()
         try:
             home_team = match_info['homeTeam']['name']
             away_team = match_info['awayTeam']['name']
@@ -49,7 +50,6 @@ class XBet:
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
                 return False
 
-            html_session = AsyncHTMLSession()
             r = await html_session.get(match_url)
 
             # render JS
