@@ -7,7 +7,7 @@ from states.checking import Check
 from keyboards.inline.callback_datas import admin_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
 from keyboards.inline.admin_buttons import create_leagues_keyboard, create_admin_keyboard
-from utils.updates import update_players, update_coeffs, update_players_stats
+from utils.updates import update_players, update_coeffs, update_players_stats, update_all
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats"],
@@ -19,7 +19,8 @@ async def get_update_players_leagues(call: CallbackQuery, callback_data: dict):
                               reply_markup=create_leagues_keyboard(callback_data['tool_name']))
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats"], ),
+@dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats",
+                                                            "update_all"], ),
                            state=Check.no_checking)
 async def admin_update_resource(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
@@ -29,6 +30,8 @@ async def admin_update_resource(call: CallbackQuery, callback_data: dict):
         await update_coeffs(callback_data["league_name"])
     elif callback_data["tool_name"] == "update_stats":
         await update_players_stats(callback_data["league_name"], new_round=False)
+    elif callback_data["tool_name"] == "update_all":
+        await update_all()
     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 

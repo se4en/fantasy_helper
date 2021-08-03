@@ -17,7 +17,7 @@ class Sports:
             self.leagues = {
                 'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
                 'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
-                'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
+                'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/52.html',
                 'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
                 # 'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
                 # 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',

@@ -19,6 +19,10 @@ def create_admin_keyboard():
         text="Обновить статистику",
         callback_data=admin_callback.new(tool_name="update_stats", league_name="None")
     ))
+    admin_keyboard.insert(InlineKeyboardButton(
+        text="Обновить все!",
+        callback_data=admin_callback.new(tool_name="update_all", league_name="None")
+    ))
     # admin_keyboard.insert(InlineKeyboardButton(
     #     text="Управление источниками",
     #     callback_data=admin_callback.new(tool_name="manage_source", league_name="None")
