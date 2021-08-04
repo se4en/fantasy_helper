@@ -5,7 +5,7 @@ from .coeffs import dp
 from .check import dp
 from .players import dp
 from .admin import dp
-from .sourses import dp
+from .sources import dp
 from .stats import dp
 
 __all__ = ["dp"]

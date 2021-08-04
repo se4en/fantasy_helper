@@ -6,6 +6,7 @@ from domain.leagues_info import LeagueInfoManager
 from domain.player_stats import PlayerStatsManager
 from domain.players import PlayerManager
 from domain.users import UserManager
+from domain.sources import SourcesManager
 
 
 xbet = XBet()
@@ -16,3 +17,4 @@ user_manager = UserManager()
 player_manager = PlayerManager()
 player_stats_manager = PlayerStatsManager()
 league_info_manager = LeagueInfoManager()
+sources_manager = SourcesManager()

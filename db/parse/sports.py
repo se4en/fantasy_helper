@@ -20,7 +20,7 @@ class Sports:
                 'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/52.html',
                 'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
                 # 'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
-                # 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/54.html',
+                'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/54.html',
                 'Championship': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/205.html',
                 # 'Turkey': 'https://www.sports.ru/fantasy/football/tournament/246.html',
                 # 'Italy': 'https://www.sports.ru/fantasy/football/tournament/48.html',
@@ -38,7 +38,7 @@ class Sports:
             'France': 'https://www.sports.ru/fantasy/football/team/points/2311561.html',  # ok
             'Germany': 'https://www.sports.ru/fantasy/football/team/points/2312024.html',  # ok
             # 'Spain': 'https://www.sports.ru/fantasy/football/team/points/2243562.html',
-            # 'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2243575.html',
+            'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2318596.html',  # ok
             'Championship': 'https://www.sports.ru/fantasy/football/team/points/2314647.html',  # ok
             # 'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2243571.html',
             # 'Italy': 'https://www.sports.ru/fantasy/football/team/points/2258596.html',

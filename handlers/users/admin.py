@@ -7,6 +7,7 @@ from states.checking import Check
 from keyboards.inline.callback_datas import admin_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
 from keyboards.inline.admin_buttons import create_leagues_keyboard, create_admin_keyboard
+from keyboards.inline.sources_buttons import create_sources_keyboard
 from utils.updates import update_players, update_coeffs, update_players_stats, update_all
 
 
@@ -35,16 +36,16 @@ async def admin_update_resource(call: CallbackQuery, callback_data: dict):
     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 
-# @dp.callback_query_handler(admin_callback.filter(tool_name="manage_source", ), state=Check.no_checking)
-# async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
-#     await call.answer(cache_time=10)
-#     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_source_keyboard())
-#
-#
-# @dp.callback_query_handler(admin_callback.filter(tool_name="manage_twitter", ), state=Check.no_checking)
-# async def admin_manage_twitter_menu(call: CallbackQuery, callback_data: dict):
-#     await call.answer(cache_time=10)
-#     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_twitter_keyboard())
+@dp.callback_query_handler(admin_callback.filter(tool_name="add_source", ), state=Check.no_checking)
+async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer(text="Выберите чемпионат:", reply_markup=create_sources_keyboard("add"))
+
+
+@dp.callback_query_handler(admin_callback.filter(tool_name="delete_source", ), state=Check.no_checking)
+async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
+    await call.answer(cache_time=10)
+    await call.message.answer(text="Выберите чемпионат:", reply_markup=create_sources_keyboard("delete"))
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name="back_to_list", ), state=Check.no_checking)

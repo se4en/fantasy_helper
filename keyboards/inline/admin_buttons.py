@@ -8,6 +8,14 @@ from manager_loader import coeff_manager
 def create_admin_keyboard():
     admin_keyboard = InlineKeyboardMarkup(row_width=1)
     admin_keyboard.insert(InlineKeyboardButton(
+        text="Добавить источник:",
+        callback_data=admin_callback.new(tool_name="add_source", league_name="None")
+    ))
+    admin_keyboard.insert(InlineKeyboardButton(
+        text="Удалить источник:",
+        callback_data=admin_callback.new(tool_name="delete_source", league_name="None")
+    ))
+    admin_keyboard.insert(InlineKeyboardButton(
         text="Обновить популярность",
         callback_data=admin_callback.new(tool_name="update_players", league_name="None")
     ))
@@ -23,14 +31,6 @@ def create_admin_keyboard():
         text="Обновить все!",
         callback_data=admin_callback.new(tool_name="update_all", league_name="None")
     ))
-    # admin_keyboard.insert(InlineKeyboardButton(
-    #     text="Управление источниками",
-    #     callback_data=admin_callback.new(tool_name="manage_source", league_name="None")
-    # ))
-    # admin_keyboard.insert(InlineKeyboardButton(
-    #     text="Управление твиттером",
-    #     callback_data=admin_callback.new(tool_name="manage_twitter", league_name="None")
-    # ))
     admin_keyboard.insert(InlineKeyboardButton(
         text="Назад",
         callback_data=admin_callback.new(tool_name="cancel", league_name="None")

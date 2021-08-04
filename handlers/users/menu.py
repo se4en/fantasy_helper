@@ -5,7 +5,8 @@ from aiogram.types import CallbackQuery, ParseMode
 from keyboards.inline.player_buttons import create_player_leagues_keyboard
 from loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
-from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback, stats_callback
+from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback, stats_callback, \
+    sources_callback
 from keyboards.inline.coeff_buttons import create_coeff_leagues_keyboard
 from keyboards.inline.admin_buttons import create_admin_keyboard
 from keyboards.inline.sources_buttons import create_sources_keyboard

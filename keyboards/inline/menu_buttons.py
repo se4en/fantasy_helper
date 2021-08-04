@@ -19,10 +19,10 @@ def create_menu_keyboard(tg_id: int):
         text=emojize("\U0001F3AF Статистика игроков"),
         callback_data=menu_callback.new(choice_name="stats")
     ))
-    # menu_keyboard.insert(InlineKeyboardButton(
-    #     text=emojize("\U0001F4DA Источники"),
-    #     callback_data=menu_callback.new(choice_name="sources")
-    # ))
+    menu_keyboard.insert(InlineKeyboardButton(
+        text=emojize("\U0001F4DA Источники"),
+        callback_data=menu_callback.new(choice_name="sources")
+    ))
     menu_keyboard.insert(InlineKeyboardButton(
         text=emojize("\U0001F3AE Привязать профиль"), 
         callback_data=menu_callback.new(choice_name="profile")
