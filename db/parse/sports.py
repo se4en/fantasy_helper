@@ -19,14 +19,14 @@ class Sports:
                 'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
                 'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/52.html',
                 'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
-                # 'Spain': 'https://www.sports.ru/fantasy/football/tournament/49.html',
+                'Spain': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/49.html',
                 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/54.html',
                 'Championship': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/205.html',
-                # 'Turkey': 'https://www.sports.ru/fantasy/football/tournament/246.html',
-                # 'Italy': 'https://www.sports.ru/fantasy/football/tournament/48.html',
+                'Turkey': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/246.html',
+                'Italy': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/48.html',
                 'Portugal': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/207.html',
-                # 'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/57.html',
-                # 'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/56.html',
+                # 'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/57.html',
+                # 'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/56.html',
             }
 
         if leagues_teams is not None:

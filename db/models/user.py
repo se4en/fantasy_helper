@@ -10,7 +10,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     tg_id = Column(Integer, nullable=False, unique=True)
-    name = Column(String, nullable=False)
+    name = Column(String)
     registration_date = Column(DateTime, nullable=False)
     valid = Column(Boolean, nullable=False)
     profile_url = Column(String)

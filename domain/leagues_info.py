@@ -47,3 +47,8 @@ class LeagueInfoManager(Manager):
         if not league_info:
             return False
         return datetime.now() > league_info.deadline
+
+
+if __name__ == "__main__":
+    lm = LeagueInfoManager()
+    lm.update_deadlines()

@@ -12,24 +12,24 @@ class FbrefParser:
     def __init__(self):
         self.shoots_leagues = {
             'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
-            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
             # 'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
             # 'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
             # 'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
             # 'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
             # 'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
             # 'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
-            # 'Portugal': 'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
+            'Portugal': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F32%2Fshooting%2FPrimeira-Liga-Stats&div=div_stats_shooting',
             # 'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
             # 'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
         }
 
         self.xg_leagues = {
-            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
         }
 
         self.shoots_creation_leagues = {
-            # 'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
+            'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
         }
 
     def get_shooting_stats(self, league_name: str) -> List[Dict]:

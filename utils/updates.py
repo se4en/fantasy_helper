@@ -38,14 +38,17 @@ async def update_players_leagues():
     await notify_admin(dp, "[INFO] finish update players")
 
 
-async def on_startup(upd_at_start=True, timeout: int = 0.5 * 60 * 60,
+async def on_startup(upd_at_start=False, timeout: int = 0.5 * 60 * 60,
                      upd_time: datetime.datetime = datetime.datetime.strptime("03:00:00", "%H:%M:%S")):
-    upd_today = upd_at_start
     await notify_admin(dp, "[INFO] bot started")
+    upd_today = True
+    if upd_at_start:
+        await update_all()
     while True:
         await asyncio.sleep(timeout)
         # restart upd_today
         if upd_today and datetime.datetime.now().time() < upd_time.time():
+            await notify_admin(dp, "[INFO] restart update today")
             upd_today = False
         if (not upd_today) and datetime.datetime.now().time() > upd_time.time():
             await update_all()

@@ -7,7 +7,7 @@ from typing import List
 import pandas as pd
 import numpy as np
 import dataframe_image as dfi
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy.sql import label
 
@@ -188,7 +188,7 @@ class PlayerStatsManager(Manager):
             session.close()
 
     def __compute_xg(self, player_info: dict, player_stat: PlayerStats):
-        last3_minutes = player_info["minutes"] - player_stat.r2_minutes
+        last3_minutes = player_stat.r5_minutes - player_stat.r2_minutes
         if last3_minutes < self.LAST3_MIN:
             last3_minutes = 0
         if last3_minutes > 0:
@@ -198,7 +198,7 @@ class PlayerStatsManager(Manager):
         else:
             last3_xg_per_game, last3_npxg_per_game, last3_xa_per_game = 0, 0, 0
 
-        last5_minutes = player_info["minutes"] - player_stat.r0_minutes
+        last5_minutes = player_stat.r5_minutes - player_stat.r0_minutes
         if last5_minutes < self.LAST5_MIN:
             last5_minutes = 0
         if last5_minutes > 0:
@@ -256,7 +256,7 @@ class PlayerStatsManager(Manager):
             session.close()
 
     def __compute_shoots_creation(self, player_info: dict, player_stat: PlayerStats):
-        last3_minutes = player_info["minutes"] - player_stat.r2_minutes
+        last3_minutes = player_stat.r5_minutes - player_stat.r2_minutes
         if last3_minutes < self.LAST3_MIN:
             last3_minutes = 0
         if last3_minutes > 0:
@@ -265,7 +265,7 @@ class PlayerStatsManager(Manager):
         else:
             last3_sca_per_game, last3_gca_per_game = 0, 0
 
-        last5_minutes = player_info["minutes"] - player_stat.r0_minutes
+        last5_minutes = player_stat.r5_minutes - player_stat.r0_minutes
         if last5_minutes < self.LAST5_MIN:
             last5_minutes = 0
         if last5_minutes > 0:
@@ -403,10 +403,10 @@ class PlayerStatsManager(Manager):
 
             best_xg_xa_last_3 = session.query(PlayerStats, (PlayerStats.last3_xg_per_game +
                                                             PlayerStats.last3_xa_per_game).label('xg_xa')) \
-                .filter(PlayerStats.league == league_name).order_by(xg_xa.desc()).limit(20).all()
+                .filter(PlayerStats.league == league_name).order_by(desc('xg_xa')).limit(20).all()
             best_xg_xa_last_5 = session.query(PlayerStats, (PlayerStats.last5_xg_per_game +
                                                             PlayerStats.last5_xa_per_game).label('xg_xa')) \
-                .filter(PlayerStats.league == league_name).order_by(xg_xa.desc()).limit(20).all()
+                .filter(PlayerStats.league == league_name).order_by(desc('xg_xa')).limit(20).all()
 
             # create pd pataframes
             last_3_xg = [[round(player.last3_xg_per_game, 2), round(player.last3_npxg_per_game, 2),
@@ -415,11 +415,12 @@ class PlayerStatsManager(Manager):
             last_5_xg = [[round(player.last5_xg_per_game, 2), round(player.last5_npxg_per_game, 2),
                           round(player.last5_xa_per_game, 2), player.name, player.team]
                          for player in best_xg_last_5]
-            last_3_xg_xa = [[round(player.last3_xg_per_game + player.last3_xa_per_game, 2),
-                             round(player.last3_npxg_per_game, 2), player.name, player.team]
+
+            last_3_xg_xa = [[round(player[1], 2),
+                             round(player[0].last3_npxg_per_game, 2), player[0].name, player[0].team]
                             for player in best_xg_xa_last_3]
-            last_5_xg_xa = [[round(player.last5_xg_per_game + player.last5_xa_per_game, 2),
-                             round(player.last5_npxg_per_game, 2), player.name, player.team]
+            last_5_xg_xa = [[round(player[1], 2),
+                             round(player[0].last5_npxg_per_game, 2), player[0].name, player[0].team]
                             for player in best_xg_xa_last_5]
 
             last_3_xg_df = pd.DataFrame(last_3_xg, columns=['xG/И', 'npxG/И', 'xA/И', 'Игрок', 'Команда'])
@@ -460,10 +461,10 @@ class PlayerStatsManager(Manager):
                 .limit(20).all()
 
             best_gca_last_3 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
-                .order_by(PlayerStats.last3_gca_per_game.desc(), PlayerStats.last3_cca_per_game.desc()) \
+                .order_by(PlayerStats.last3_gca_per_game.desc(), PlayerStats.last3_sca_per_game.desc()) \
                 .limit(20).all()
             best_gca_last_5 = session.query(PlayerStats).filter(PlayerStats.league == league_name) \
-                .order_by(PlayerStats.last5_gca_per_game.desc(), PlayerStats.last5_cca_per_game.desc()) \
+                .order_by(PlayerStats.last5_gca_per_game.desc(), PlayerStats.last5_sca_per_game.desc()) \
                 .limit(20).all()
 
             # create pd pataframes
@@ -608,7 +609,30 @@ class PlayerStatsManager(Manager):
 
 
 if __name__ == "__main__":
+    pass
     # psm = PlayerStatsManager()
     # # print(psm.update_league("Russia", new_round=False))
     # await psm.update_league("Russia", False)
-    pass
+    # session: SQLSession = Session()
+    # session.query(PlayerStats).update({
+    #     # round 0
+    #     PlayerStats.r3_minutes: PlayerStats.r2_minutes,
+    #     PlayerStats.r3_shoots: PlayerStats.r2_shoots,
+    #     PlayerStats.r3_shoots_on_target: PlayerStats.r2_shoots_on_target,
+    #     PlayerStats.r3_xg: PlayerStats.r2_xg,
+    #     PlayerStats.r3_npxg: PlayerStats.r2_npxg,
+    #     PlayerStats.r3_xa: PlayerStats.r2_xa,
+    #     PlayerStats.r3_sca: PlayerStats.r2_sca,
+    #     PlayerStats.r3_gca: PlayerStats.r2_gca,
+
+    #     PlayerStats.r2_minutes: 0,
+    #     PlayerStats.r2_shoots: 0,
+    #     PlayerStats.r2_shoots_on_target: 0,
+    #     PlayerStats.r2_xg: 0,
+    #     PlayerStats.r2_npxg: 0,
+    #     PlayerStats.r2_xa: 0,
+    #     PlayerStats.r2_sca: 0,
+    #     PlayerStats.r2_gca: 0,
+    # })
+    # session.commit()
+    # session.close()
