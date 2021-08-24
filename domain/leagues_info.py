@@ -51,4 +51,4 @@ class LeagueInfoManager(Manager):
 
 if __name__ == "__main__":
     lm = LeagueInfoManager()
-    lm.update_deadlines()
+    lm.update_deadline('Spain')

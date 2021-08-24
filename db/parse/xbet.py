@@ -54,9 +54,9 @@ class XBet:
 
             # render JS
             try:
-                await r.html.arender(retries=2, wait=0.1, timeout=10)
+                await r.html.arender(retries=2, wait=0.5, timeout=10)
             except:
-                await r.html.arender(retries=1, wait=0.2, timeout=40)
+                await r.html.arender(retries=1, wait=1.5, timeout=40)
 
             game_html = r.html.find("#allBetsTable", first=True)
 

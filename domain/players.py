@@ -90,7 +90,7 @@ class PlayerManager(Manager):
         return result
 
 
-# if __name__ == "__main__":
-#     pm = PlayerManager()
-#     # print(pm.get_players("Russia"))
-#     print(pm.update_league("Russia", True))
+if __name__ == "__main__":
+    pm = PlayerManager()
+    # print(pm.get_players("Russia"))
+    print(pm.update_league("Netherlands", True))

@@ -41,7 +41,7 @@ class Sports:
             'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2318596.html',  # ok
             'Championship': 'https://www.sports.ru/fantasy/football/team/points/2314647.html',  # ok
             'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2321340.html',  # ok
-            # 'Italy': 'https://www.sports.ru/fantasy/football/team/points/2258596.html',
+            'Italy': 'https://www.sports.ru/fantasy/football/team/points/2335856.html',  # ok
             'Portugal': 'https://www.sports.ru/fantasy/football/team/points/2314643.html',  # ok
             # 'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2283074.html',
             # 'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2284228.html',

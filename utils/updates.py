@@ -51,7 +51,7 @@ async def on_startup(upd_at_start=False, timeout: int = 0.5 * 60 * 60,
             await notify_admin(dp, "[INFO] restart update today")
             upd_today = False
         if (not upd_today) and datetime.datetime.now().time() > upd_time.time():
-            await update_all()
+            # await update_all()
             upd_today = True
         # else:
         #     await update_players_leagues()
