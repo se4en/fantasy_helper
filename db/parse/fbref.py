@@ -13,12 +13,12 @@ class FbrefParser:
         self.shoots_leagues = {
             'Russia': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting',
             'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting',
-            # 'England': 'https://fbref.com/en/comps/9/Premier-League-Stats',
-            # 'Germany': 'https://fbref.com/en/comps/20/Bundesliga-Stats',
-            # 'Spain': 'https://fbref.com/en/comps/12/La-Liga-Stats',
-            # 'Netherlands': 'https://fbref.com/en/comps/23/Dutch-Eredivisie-Stats',
-            # 'Turkey': 'https://fbref.com/en/comps/26/Super-Lig-Stats',
-            # 'Italy': 'https://fbref.com/en/comps/11/Serie-A-Stats',
+            'England': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fshooting%2FPremier-League-Stats&div=div_stats_shooting',
+            'Germany': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fshooting%2FBundesliga-Stats&div=div_stats_shooting',
+            'Spain': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fshooting%2FLa-Liga-Stats&div=div_stats_shooting',
+            'Netherlands': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F23%2Fshooting%2FEredivisie-Stats&div=div_stats_shooting',
+            'Turkey': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F26%2Fshooting%2FSuper-Lig-Stats&div=div_stats_shooting',
+            'Italy': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fshooting%2FSerie-A-Stats&div=div_stats_shooting',
             'Portugal': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F32%2Fshooting%2FPrimeira-Liga-Stats&div=div_stats_shooting',
             # 'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
             # 'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
@@ -26,10 +26,18 @@ class FbrefParser:
 
         self.xg_leagues = {
             'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard',
+            'England': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fstats%2FPremier-League-Stats&div=div_stats_standard',
+            'Germany': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fstats%2FBundesliga-Stats&div=div_stats_standard',
+            'Spain': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fstats%2FLa-Liga-Stats&div=div_stats_standard',
+            'Italy': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fstats%2FSerie-A-Stats&div=div_stats_standard',
         }
 
         self.shoots_creation_leagues = {
             'France': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca',
+            'England': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fgca%2FPremier-League-Stats&div=div_stats_gca',
+            'Germany': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fgca%2FBundesliga-Stats&div=div_stats_gca',
+            'Spain': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fgca%2FLa-Liga-Stats&div=div_stats_gca',
+            'Italy': 'https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fgca%2FSerie-A-Stats&div=div_stats_gca',
         }
 
     def get_shooting_stats(self, league_name: str) -> List[Dict]:
