@@ -38,12 +38,14 @@ class PlayerManager(Manager):
         logging.info(f"Start update players for league={league_name}, new_round={new_round}")
         session: SQLSession = Session()
         try:
+            if new_round:
+                session.query(Player).filter(Player.league == league_name).update({'dif_popularity': 0})
             for player in self.sports.get_league_players(league_name):
                 cur_player = self.get_player(player)
                 if cur_player:
                     if new_round:
                         session.query(Player).filter(Player.id == cur_player.id).update(
-                            {'old_popularity': player['popularity'], 'dif_popularity': 0})
+                            {'old_popularity': player['popularity']})
                     else:
                         session.query(Player).filter(Player.id == cur_player.id).update(
                             {'dif_popularity': player['popularity'] - Player.old_popularity})

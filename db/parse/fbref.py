@@ -53,15 +53,19 @@ class FbrefParser:
 
             for cur_player in players:
                 if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    _goals = cur_player.find("td", {"data-stat": "goals"}).text
+                    _minutes = cur_player.find("td", {"data-stat": "minutes_90s"}).text
+                    _shots_total = cur_player.find("td", {"data-stat": "shots_total"}).text
+                    _shots_target = cur_player.find("td", {"data-stat": "shots_total"}).text
                     result.append({
                         "league": league_name,
                         "name": cur_player.find("td", {"data-stat": "player"}).text,
                         "team": cur_player.find("td", {"data-stat": "squad"}).text,
                         "position": cur_player.find("td", {"data-stat": "position"}).text,
-                        "goals": int(cur_player.find("td", {"data-stat": "goals"}).text),
-                        "minutes": float(cur_player.find("td", {"data-stat": "minutes_90s"}).text),
-                        "shots_total": int(cur_player.find("td", {"data-stat": "shots_total"}).text),
-                        "shots_on_target": int(cur_player.find("td", {"data-stat": "shots_on_target"}).text)
+                        "goals": int(_goals) if _goals else 0,
+                        "minutes": float(_minutes) if _minutes else 0.0,
+                        "shots_total": int(_shots_total) if _shots_total else 0.0,
+                        "shots_on_target": int(_shots_target) if _shots_target else 0.0
                     })
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -83,14 +87,17 @@ class FbrefParser:
 
             for cur_player in players:
                 if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    _xg = cur_player.find("td", {"data-stat": "xg"}).text
+                    _npxg = cur_player.find("td", {"data-stat": "npxg"}).text
+                    _xa = cur_player.find("td", {"data-stat": "xa"}).text
                     result.append({
                         "league": league_name,
                         "name": cur_player.find("td", {"data-stat": "player"}).text,
                         "team": cur_player.find("td", {"data-stat": "squad"}).text,
                         "position": cur_player.find("td", {"data-stat": "position"}).text,
-                        "xg": float(cur_player.find("td", {"data-stat": "xg"}).text),
-                        "npxg": float(cur_player.find("td", {"data-stat": "npxg"}).text),
-                        "xa": float(cur_player.find("td", {"data-stat": "xa"}).text),
+                        "xg": float(_xg) if _xg else 0.0,
+                        "npxg": float(_npxg) if _npxg else 0.0,
+                        "xa": float(_xa) if _xa else 0.0,
                     })
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -112,13 +119,15 @@ class FbrefParser:
 
             for cur_player in players:
                 if cur_player.find("td", {"data-stat": "player"}) is not None:
+                    _sca = cur_player.find("td", {"data-stat": "sca"}).text
+                    _gca = cur_player.find("td", {"data-stat": "gca"}).text
                     result.append({
                         "league": league_name,
                         "name": cur_player.find("td", {"data-stat": "player"}).text,
                         "team": cur_player.find("td", {"data-stat": "squad"}).text,
                         "position": cur_player.find("td", {"data-stat": "position"}).text,
-                        "sca": int(cur_player.find("td", {"data-stat": "sca"}).text),
-                        "gca": int(cur_player.find("td", {"data-stat": "gca"}).text),
+                        "sca": int(_sca) if _sca else 0,
+                        "gca": int(_gca) if _gca else 0,
                     })
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()

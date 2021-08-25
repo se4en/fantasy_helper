@@ -609,9 +609,9 @@ class PlayerStatsManager(Manager):
 
 
 if __name__ == "__main__":
-    pass
-    # psm = PlayerStatsManager()
-    # # print(psm.update_league("Russia", new_round=False))
+    psm = PlayerStatsManager()
+    asyncio.run(psm.update_league("Italy", new_round=False))
+    # print(psm.update_league("Russia", new_round=False))
     # await psm.update_league("Russia", False)
     # session: SQLSession = Session()
     # session.query(PlayerStats).update({
