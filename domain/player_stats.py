@@ -609,30 +609,28 @@ class PlayerStatsManager(Manager):
 
 
 if __name__ == "__main__":
-    psm = PlayerStatsManager()
-    asyncio.run(psm.update_league("Italy", new_round=False))
-    # print(psm.update_league("Russia", new_round=False))
-    # await psm.update_league("Russia", False)
+    pass
+    # psm = PlayerStatsManager()
+    # asyncio.run(psm.update_league("Turkey", new_round=True))
     # session: SQLSession = Session()
-    # session.query(PlayerStats).update({
-    #     # round 0
-    #     PlayerStats.r3_minutes: PlayerStats.r2_minutes,
-    #     PlayerStats.r3_shoots: PlayerStats.r2_shoots,
-    #     PlayerStats.r3_shoots_on_target: PlayerStats.r2_shoots_on_target,
-    #     PlayerStats.r3_xg: PlayerStats.r2_xg,
-    #     PlayerStats.r3_npxg: PlayerStats.r2_npxg,
-    #     PlayerStats.r3_xa: PlayerStats.r2_xa,
-    #     PlayerStats.r3_sca: PlayerStats.r2_sca,
-    #     PlayerStats.r3_gca: PlayerStats.r2_gca,
-
-    #     PlayerStats.r2_minutes: 0,
-    #     PlayerStats.r2_shoots: 0,
-    #     PlayerStats.r2_shoots_on_target: 0,
-    #     PlayerStats.r2_xg: 0,
-    #     PlayerStats.r2_npxg: 0,
-    #     PlayerStats.r2_xa: 0,
-    #     PlayerStats.r2_sca: 0,
-    #     PlayerStats.r2_gca: 0,
+    # session.query(PlayerStats).filter(PlayerStats.league == 'Turkey').update({
+    #     PlayerStats.r4_minutes: (PlayerStats.r5_minutes /2),
+    #     PlayerStats.r4_shoots: (PlayerStats.r5_shoots / 2),
+    #     PlayerStats.r4_shoots_on_target: (PlayerStats.r5_shoots_on_target / 2),
+    #     PlayerStats.r4_xg: (PlayerStats.r5_xg / 2),
+    #     PlayerStats.r4_npxg: (PlayerStats.r5_npxg / 2),
+    #     PlayerStats.r4_xa: (PlayerStats.r5_xa / 2),
+    #     PlayerStats.r4_sca: (PlayerStats.r5_sca / 2),
+    #     PlayerStats.r4_gca: (PlayerStats.r5_gca / 2),
+    #
+    #     PlayerStats.r3_minutes: 0,
+    #     PlayerStats.r3_shoots: 0,
+    #     PlayerStats.r3_shoots_on_target: 0,
+    #     PlayerStats.r3_xg: 0,
+    #     PlayerStats.r3_npxg: 0,
+    #     PlayerStats.r3_xa: 0,
+    #     PlayerStats.r3_sca: 0,
+    #     PlayerStats.r3_gca: 0,
     # })
     # session.commit()
     # session.close()
