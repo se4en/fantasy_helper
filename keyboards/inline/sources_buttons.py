@@ -6,24 +6,45 @@ from keyboards.inline.callback_datas import sources_callback
 from manager_loader import coeff_manager
 
 
-def create_sources_keyboard(action: str = "None"):
+def create_sources_keyboard():
     sources_keyboard = InlineKeyboardMarkup(row_width=1)
     sources_keyboard.insert(InlineKeyboardButton(
         text=emojize(":globe_with_meridians: Все чемпионаты"),
-        callback_data=sources_callback.new(league_name="all", name="None", url="None", action=action)
+        callback_data=sources_callback.new(league_name="all", action="None")
     ))
     leagues = coeff_manager.get_leagues()
     for league in leagues:
         sources_keyboard.insert(InlineKeyboardButton(
             text=str(coeff_manager.emojize_league(league) + ' ' + coeff_manager.translate_league(league)),
-            callback_data=sources_callback.new(league_name=league, name="None", url="None", action=action)
+            callback_data=sources_callback.new(league_name=league, action="None")
         ))
+
     sources_keyboard.insert(InlineKeyboardButton(
         text=emojize(":leftwards_arrow_with_hook: Назад"),
-        callback_data=sources_callback.new(league_name="cancel", name="None", url="None", action=action)
+        callback_data=sources_callback.new(league_name="cancel",  action="None")
     ))
     return sources_keyboard
 
+
+def create_sources_league_keyboard(callback: CallbackData, league_name: str):
+    league_keyboard = InlineKeyboardMarkup(row_width=1)
+
+    sources_add_button = InlineKeyboardButton(
+        text=emojize(":leftwards_arrow_with_hook: Добавить источник"),
+        callback_data=callback.new(league_name=league_name, action="add"))
+    league_keyboard.add(sources_add_button)
+
+    sources_delete_button = InlineKeyboardButton(
+        text=emojize(":leftwards_arrow_with_hook: Удалить источник"),
+        callback_data=callback.new(league_name=league_name, action="delete"))
+    league_keyboard.add(sources_delete_button)
+
+    sources_back_button = InlineKeyboardButton(
+        text=emojize(":leftwards_arrow_with_hook: Назад"),
+        callback_data=callback.new(league_name="back_to_list", action="None"))
+    league_keyboard.add(sources_back_button)
+
+    return league_keyboard
 
 # def create_sources_list_keyboard(action: str = "None"):
 #     sources_keyboard = InlineKeyboardMarkup(row_width=1)

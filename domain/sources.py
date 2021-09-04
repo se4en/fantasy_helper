@@ -18,12 +18,12 @@ class SourcesManager(Manager):
     def __init__(self):
         super().__init__()
 
-    def add_source(self, name: str, league_name: str, url: str, description: str, type_: str) -> bool:
+    def add_source(self, name: str, league_name: str, url: str, description: str) -> bool:
         logging.info(f"Add source {name} for league={league_name}")
 
         session: SQLSession = Session()
         try:
-            session.add(Source(name, league_name, url, description, type_))
+            session.add(Source(name, league_name, url, description))
             return True
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
