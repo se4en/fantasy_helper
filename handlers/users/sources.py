@@ -66,7 +66,7 @@ async def set_new_description(message: types.Message, state: FSMContext):
     await message.answer(sources_manager.get_sources_repr(data['league']),
                          reply_markup=create_sources_league_keyboard(sources_callback,
                                                                      data['league']),
-                         parse_mode=ParseMode.MARKDOWN)
+                         parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
 @dp.callback_query_handler(sources_callback.filter(action="delete"), state=Check.no_checking)
@@ -84,7 +84,7 @@ async def delete_source(call: CallbackQuery, state: FSMContext, callback_data: d
     league_name = sources_manager.delete_source_by_id(int(callback_data['league_name']))
     await call.message.answer(sources_manager.get_sources_repr(league_name),
                               reply_markup=create_sources_league_keyboard(sources_callback, league_name),
-                              parse_mode=ParseMode.MARKDOWN)
+                              parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
 # must be last
@@ -94,4 +94,4 @@ async def sources_list(call: CallbackQuery, callback_data: dict):
     await call.message.answer(sources_manager.get_sources_repr(callback_data["league_name"]),
                               reply_markup=create_sources_league_keyboard(sources_callback,
                                                                           callback_data["league_name"]),
-                              parse_mode=ParseMode.MARKDOWN)
+                              parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)

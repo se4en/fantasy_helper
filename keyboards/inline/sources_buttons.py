@@ -62,23 +62,6 @@ def create_delete_source_keyboard(callback: CallbackData, league_name: str):
     ))
 
     return sources_keyboard
-# def create_sources_list_keyboard(action: str = "None"):
-#     sources_keyboard = InlineKeyboardMarkup(row_width=1)
-#     sources_keyboard.insert(InlineKeyboardButton(
-#         text=emojize(":globe_with_meridians: Все чемпионаты"),
-#         callback_data=sources_callback.new(league_name="all", name="None", url="None", action=action)
-#     ))
-#     leagues = coeff_manager.get_leagues()
-#     for league in leagues:
-#         sources_keyboard.insert(InlineKeyboardButton(
-#             text=str(coeff_manager.emojize_league(league) + ' ' + coeff_manager.translate_league(league)),
-#             callback_data=sources_callback.new(league_name=league, name="None", url="None", action=action)
-#         ))
-#     sources_keyboard.insert(InlineKeyboardButton(
-#         text=emojize(":leftwards_arrow_with_hook: Назад"),
-#         callback_data=sources_callback.new(league_name="cancel", name="None", url="None", action=action)
-#     ))
-#     return sources_keyboard
 
 
 def create_sources_back_keyboard(callback: CallbackData):

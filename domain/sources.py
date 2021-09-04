@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from typing import List
 
+from aiogram.utils.emoji import emojize
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 
@@ -72,7 +73,7 @@ class SourcesManager(Manager):
         session: SQLSession = Session()
         try:
             sources = session.query(Source).filter(Source.league == league_name).all()
-            return self.__transform_sources(sources)
+            return emojize(self.__transform_sources(sources))
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -95,9 +96,9 @@ class SourcesManager(Manager):
             session.close()
 
     def __transform_sources(self, sources: List[Source]) -> str:
+        result = [":card_index_dividers: Доступные источники:\n"]
         if not sources:
             return "Источников нет("
-        result = []
-        for source in sources:
-            result.append(f"Name={source.name} url={source.url}")
+        result += [self.emojize_number(i + 1) + f" [{s.name}]({s.url})\n_{s.description}_\n"
+                   for i, s in enumerate(sources)]
         return '\n'.join(result)
