@@ -51,7 +51,24 @@ class SourcesManager(Manager):
             session.commit()
             session.close()
 
-    def get_sources(self, league_name: str) -> str:
+    def delete_source_by_id(self, source_id: int) -> str:
+        logging.info(f"Delete source with id={source_id}")
+
+        session: SQLSession = Session()
+        try:
+            league_name = session.query(Source).filter(and_(Source.id == source_id)).first().league
+            session.query(Source).filter(and_(Source.id == source_id)).delete()
+            return league_name
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            return ""
+        finally:
+            session.commit()
+            session.close()
+
+    def get_sources_repr(self, league_name: str) -> str:
         session: SQLSession = Session()
         try:
             sources = session.query(Source).filter(Source.league == league_name).all()
@@ -61,6 +78,19 @@ class SourcesManager(Manager):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
+        finally:
+            session.close()
+
+    def get_sources(self, league_name: str) -> List[Source]:
+        session: SQLSession = Session()
+        try:
+            sources = session.query(Source).filter(Source.league == league_name).all()
+            return sources
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            return []
         finally:
             session.close()
 
