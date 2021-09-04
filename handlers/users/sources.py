@@ -12,22 +12,20 @@ from keyboards.inline.sources_buttons import create_sources_keyboard, create_sou
 from manager_loader import sources_manager
 
 
-@dp.callback_query_handler(sources_callback.filter(league_name="cancel", ),
-                           state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter(league_name="cancel", ))
 async def to_menu_from_sources(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ", reply_markup=create_menu_keyboard(call.from_user.id))
 
 
-@dp.callback_query_handler(sources_callback.filter(league_name="back_to_list", ),
-                           state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter(league_name="back_to_list", ))
 async def back_to_sources(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Доступные чемпионаты:", reply_markup=create_sources_keyboard(),
                               parse_mode=ParseMode.MARKDOWN)
 
 
-@dp.callback_query_handler(sources_callback.filter(action="add"), state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter(action="add"))
 async def add_new_source(call: CallbackQuery, state: FSMContext, callback_data: dict):
     await call.answer(cache_time=10)
 
@@ -61,15 +59,14 @@ async def set_new_description(message: types.Message, state: FSMContext):
     # save source
     async with state.proxy() as data:
         sources_manager.add_source(data['name'], data['league'], data['url'], message.text)
-    await Check.no_checking.set()
-    # await state.finish()
+    await state.finish()
     await message.answer(sources_manager.get_sources_repr(data['league']),
                          reply_markup=create_sources_league_keyboard(sources_callback,
                                                                      data['league']),
                          parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-@dp.callback_query_handler(sources_callback.filter(action="delete"), state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter(action="delete"))
 async def delete_source(call: CallbackQuery, state: FSMContext, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer("Выберите источник для удаления:",
@@ -78,7 +75,7 @@ async def delete_source(call: CallbackQuery, state: FSMContext, callback_data: d
                               parse_mode=ParseMode.MARKDOWN)
 
 
-@dp.callback_query_handler(sources_callback.filter(action="to_delete"), state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter(action="to_delete"))
 async def delete_source(call: CallbackQuery, state: FSMContext, callback_data: dict):
     await call.answer(cache_time=10)
     league_name = sources_manager.delete_source_by_id(int(callback_data['league_name']))
@@ -88,7 +85,7 @@ async def delete_source(call: CallbackQuery, state: FSMContext, callback_data: d
 
 
 # must be last
-@dp.callback_query_handler(sources_callback.filter(), state=Check.no_checking)
+@dp.callback_query_handler(sources_callback.filter())
 async def sources_list(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(sources_manager.get_sources_repr(callback_data["league_name"]),
