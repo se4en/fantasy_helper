@@ -36,25 +36,25 @@ async def admin_update_resource(call: CallbackQuery, callback_data: dict):
     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name="add_source", ), state=Check.no_checking)
+@dp.callback_query_handler(admin_callback.filter(tool_name="add_source", ))
 async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Выберите чемпионат:", reply_markup=create_sources_keyboard("add"))
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name="delete_source", ), state=Check.no_checking)
+@dp.callback_query_handler(admin_callback.filter(tool_name="delete_source", ))
 async def admin_manage_source_menu(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Выберите чемпионат:", reply_markup=create_sources_keyboard("delete"))
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name="back_to_list", ), state=Check.no_checking)
+@dp.callback_query_handler(admin_callback.filter(tool_name="back_to_list", ))
 async def back_to_admin_menu(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Доступные инструменты:", reply_markup=create_admin_keyboard())
 
 
-@dp.callback_query_handler(admin_callback.filter(tool_name="cancel", ), state=Check.no_checking)
+@dp.callback_query_handler(admin_callback.filter(tool_name="cancel", ))
 async def to_menu_from_admin(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Меню: ",
