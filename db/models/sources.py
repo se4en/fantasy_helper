@@ -12,14 +12,12 @@ class Source(Base):
     league = Column(String, nullable=False)
     url = Column(String, nullable=False)
     description = Column(String)
-    type = Column(String, nullable=False)
 
-    def __init__(self, name: str, league: str, url: str, description: str, type_: str):
+    def __init__(self, name: str, league: str, url: str, description: str):
         self.name = name
         self.league = league
         self.url = url
         self.description = description
-        self.type = type_
 
     def __repr__(self):
         return f"Name={self.name} league={self.league} url={self.url}"
