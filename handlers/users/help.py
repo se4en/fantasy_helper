@@ -4,7 +4,8 @@ from aiogram.dispatcher.filters.builtin import CommandHelp
 from loader import dp
 from states.checking import Check
 
-@dp.message_handler(CommandHelp(), state=Check.no_checking)
+
+@dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
     text = [
         'Список команд: ',

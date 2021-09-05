@@ -1,4 +1,5 @@
 from aiogram import types
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.builtin import CommandStart
 from datetime import datetime
 
@@ -15,7 +16,6 @@ async def bot_start(message: types.Message):
                           datetime.now(), valid=False)
 
     if user_manager.is_valid(message.from_user.id):
-        await Check.no_checking.set()
         await message.answer(text=f"Привет, {message.from_user.full_name}!",
                              reply_markup=create_menu_keyboard(message.from_user.id))
     else:
@@ -25,8 +25,8 @@ async def bot_start(message: types.Message):
         await message.answer(text="\n".join(answer))
 
 
-@dp.message_handler(CommandStart(), state=Check.no_checking)
-async def bot_start_after_login(message: types.Message):
-    await Check.no_checking.set()
+@dp.message_handler(CommandStart())
+async def bot_start_after_login(message: types.Message, state: FSMContext):
+    await state.finish()
     await message.answer(text=f"Привет, {message.from_user.full_name}!",
                          reply_markup=create_menu_keyboard(message.from_user.id))
