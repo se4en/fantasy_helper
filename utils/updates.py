@@ -22,12 +22,14 @@ async def update_all():
     await notify_admin(dp, "[INFO] start update all")
     for league_name in xbet.leagues:
         new_round = league_info_manager.is_new_round(league_name)
-        if new_round:
-            league_info_manager.update_deadline(league_name)
+        await notify_admin(dp, f"[INFO] league={league_name} new_round={new_round}")
 
         update_players(league_name, new_round)
         await update_players_stats(league_name, new_round)
         await update_coeffs(league_name)
+
+        if new_round:
+            league_info_manager.update_deadline(league_name)
     await notify_admin(dp, "[INFO] finish update all")
 
 
