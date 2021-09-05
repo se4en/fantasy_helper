@@ -21,8 +21,7 @@ async def get_update_players_leagues(call: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats",
-                                                            "update_all"], ),
-                           state=Check.no_checking)
+                                                            "update_all"], ))
 async def admin_update_resource(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     if callback_data["tool_name"] == "update_players":
