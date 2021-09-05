@@ -12,8 +12,7 @@ from utils.updates import update_players, update_coeffs, update_players_stats, u
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats"],
-                                                 league_name="None"),
-                           state=Check.no_checking)
+                                                 league_name="None"))
 async def get_update_players_leagues(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     await call.message.answer(text="Выберите чемпионат: ",
@@ -21,7 +20,7 @@ async def get_update_players_leagues(call: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(admin_callback.filter(tool_name=["update_players", "update_coeffs", "update_stats",
-                                                            "update_all"], ))
+                                                            "update_all"]))
 async def admin_update_resource(call: CallbackQuery, callback_data: dict):
     await call.answer(cache_time=10)
     if callback_data["tool_name"] == "update_players":
