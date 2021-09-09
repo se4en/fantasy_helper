@@ -1,5 +1,7 @@
 import logging
 import sys, os
+from time import sleep
+
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -50,7 +52,16 @@ class XBet:
             if "голы" in home_team or "специальное" in home_team or "Хозяева" in home_team:
                 return False
 
-            r = await html_session.get(match_url)
+            n_att = 0
+            while n_att < 3:
+                try:
+                    r = await html_session.get(match_url)
+                except requests.exceptions.ConnectionError:
+                    n_att += 1
+                    sleep(5)
+                    continue
+            if n_att == 3:
+                return False
 
             # render JS
             try:
