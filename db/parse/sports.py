@@ -25,8 +25,8 @@ class Sports:
                 'Turkey': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/246.html',
                 'Italy': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/48.html',
                 'Portugal': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/207.html',
-                # 'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/57.html',
-                # 'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/56.html',
+                'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/57.html',
+                'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/56.html',
             }
 
         if leagues_teams is not None:
@@ -43,8 +43,8 @@ class Sports:
             'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2321340.html',  # ok
             'Italy': 'https://www.sports.ru/fantasy/football/team/points/2335856.html',  # ok
             'Portugal': 'https://www.sports.ru/fantasy/football/team/points/2314643.html',  # ok
-            # 'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2283074.html',
-            # 'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2284228.html',
+            'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2341584.html',  # ok
+            'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2344140.html',  # ok
         }
 
     def __transform_deadline(self, deadline: str) -> datetime:

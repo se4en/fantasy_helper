@@ -56,6 +56,7 @@ class XBet:
             while n_att < 3:
                 try:
                     r = await html_session.get(match_url)
+                    break
                 except requests.exceptions.ConnectionError:
                     n_att += 1
                     sleep(5)
@@ -64,10 +65,7 @@ class XBet:
                 return False
 
             # render JS
-            try:
-                await r.html.arender(retries=2, wait=0.5, timeout=10)
-            except:
-                await r.html.arender(retries=1, wait=1.5, timeout=40)
+            await r.html.arender(retries=3, wait=2.5, timeout=30)
 
             game_html = r.html.find("#allBetsTable", first=True)
 
