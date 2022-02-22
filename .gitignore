@@ -140,5 +140,5 @@ cython_debug/
 #idea
 .idea
 
-# users info
-users.db
+# data
+db/data/
