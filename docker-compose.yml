@@ -1,0 +1,18 @@
+version: '3'
+services:
+  bot:
+    build: /
+    command: python app.py
+    restart: always
+    depends_on:
+      - db
+    env_file: .env
+
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    env_file: .env
+    ports:
+      - 5433:5432
