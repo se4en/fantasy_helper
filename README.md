@@ -1,5 +1,9 @@
-#### Overview
-This telegram bot helps football fantasy players on [sports.ru](https://www.sports.ru/fantasy/?from=menu&e=main). You can find it by [@FantasyHelpBot](https://t.me/FantasyHelpBot) tag. Password for usage: **teslago**.
+# Telegram-bot for fantasy football players on [sports.ru](https://www.sports.ru/fantasy/#menu-sub)
+## Setup
+```bash
+cat env_temp > .env
+# change values in .env
 
-#### Usage examples
-![Examples](Example.png)
+docker-compose build
+docker-compose up -d
+```
