@@ -4,9 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# tg bot
 BOT_TOKEN = str(os.getenv("BOT_TOKEN"))
 PASSWORD = str(os.getenv("PASSWORD"))
 ADMINS = list(map(int, str(os.getenv("ADMINS")).split(' ')))
+
+# pg db
+POSTGRES_USER = str(os.getenv("POSTGRES_USER"))
+POSTGRES_PASSWORD = str(os.getenv("POSTGRES_PASSWORD"))
+POSTGRES_DB = str(os.getenv("POSTGRES_DB"))
+POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 admins = ADMINS
