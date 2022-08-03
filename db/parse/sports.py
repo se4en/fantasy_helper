@@ -15,36 +15,36 @@ class Sports:
             return
         else:
             self.leagues = {
-                'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
-                'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
-                'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/52.html',
-                'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
-                'Spain': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/49.html',
-                'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/54.html',
-                'Championship': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/205.html',
-                'Turkey': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/246.html',
-                'Italy': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/48.html',
-                'Portugal': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/207.html',
-                'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/57.html',
-                'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/56.html',
+                # 'Russia': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/31.html',
+                # 'France': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/51.html',
+                # 'England': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/52.html',
+                # 'Germany': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/50.html',
+                # 'Spain': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/49.html',
+                # 'Netherlands': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/54.html',
+                # 'Championship': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/205.html',
+                # 'Turkey': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/246.html',
+                # 'Italy': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/48.html',
+                # 'Portugal': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/207.html',
+                # 'UEFA_1': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/57.html',
+                # 'UEFA_2': 'https://www.sports.ru/fantasy/football/tournament/ratings/popular/56.html',
             }
 
         if leagues_teams is not None:
             self._leagues_teams = leagues_teams
             return
         self._leagues_teams = {
-            'Russia': 'https://www.sports.ru/fantasy/football/team/points/2301672.html',  # ok
-            'England': 'https://www.sports.ru/fantasy/football/team/points/2316271.html',  # ok
-            'France': 'https://www.sports.ru/fantasy/football/team/points/2311561.html',  # ok
-            'Germany': 'https://www.sports.ru/fantasy/football/team/points/2312024.html',  # ok
-            'Spain': 'https://www.sports.ru/fantasy/football/team/points/2323903.html',  # ok
-            'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2318596.html',  # ok
-            'Championship': 'https://www.sports.ru/fantasy/football/team/points/2314647.html',  # ok
-            'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2321340.html',  # ok
-            'Italy': 'https://www.sports.ru/fantasy/football/team/points/2335856.html',  # ok
-            'Portugal': 'https://www.sports.ru/fantasy/football/team/points/2314643.html',  # ok
-            'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2341584.html',  # ok
-            'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2344140.html',  # ok
+            'Russia': 'https://www.sports.ru/fantasy/football/russia/2517/',  # ok
+            'England': 'https://www.sports.ru/fantasy/football/championship/20246/',  # ok 
+            # 'France': 'https://www.sports.ru/fantasy/football/team/points/2311561.html',  
+            # 'Germany': 'https://www.sports.ru/fantasy/football/team/points/2312024.html',
+            # 'Spain': 'https://www.sports.ru/fantasy/football/team/points/2323903.html',
+            # 'Netherlands': 'https://www.sports.ru/fantasy/football/team/points/2318596.html',
+            # 'Championship': 'https://www.sports.ru/fantasy/football/team/points/2314647.html',
+            # 'Turkey': 'https://www.sports.ru/fantasy/football/team/points/2321340.html',
+            # 'Italy': 'https://www.sports.ru/fantasy/football/team/points/2335856.html',
+            # 'Portugal': 'https://www.sports.ru/fantasy/football/team/points/2314643.html',
+            # 'UEFA_1': 'https://www.sports.ru/fantasy/football/team/points/2341584.html', 
+            # 'UEFA_2': 'https://www.sports.ru/fantasy/football/team/points/2344140.html',
         }
 
     def __transform_deadline(self, deadline: str) -> datetime:
@@ -93,8 +93,9 @@ class Sports:
             response = requests.get(self._leagues_teams[league_name])
             soup = BeautifulSoup(response.text, 'lxml')
 
-            buf = soup.find("div", {"class": "mainPart points-page"}).find("div", {"class": "stat mB20"})
-            return len(buf.find("table").find("tbody").find_all("tr"))
+            matches_list = soup.find("div", {"class": "fantasy-match-list__matches"})
+            print(matches_list)
+            return len(matches_list.find_all("div", {"class": "fantasy-match-item"}))
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
