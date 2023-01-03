@@ -3,8 +3,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.builtin import CommandStart
 from datetime import datetime
 
-from manager_loader import user_manager
-from loader import dp
+from src.manager_loader import user_manager
+from src.loader import dp
 from db.models.user import User
 from states.checking import Check
 from keyboards.inline.menu_buttons import create_menu_keyboard

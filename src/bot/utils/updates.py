@@ -3,7 +3,13 @@ import datetime
 
 from handlers import dp
 from utils.notify_admins import notify_admin
-from manager_loader import league_info_manager, coeff_manager, player_manager, player_stats_manager, xbet
+from src.manager_loader import (
+    league_info_manager,
+    coeff_manager,
+    player_manager,
+    player_stats_manager,
+    xbet,
+)
 
 
 async def update_coeffs(league_name: str):
@@ -40,14 +46,17 @@ async def update_players_leagues():
     await notify_admin(dp, "[INFO] finish update players")
 
 
-async def on_startup(upd_at_start=False, timeout: int = 0.5 * 60 * 60,
-                     upd_time: datetime.datetime = datetime.datetime.strptime("03:00:00", "%H:%M:%S")):
+async def on_startup(
+    upd_at_start=False,
+    timeout: float = 0.5 * 60 * 60,
+    upd_time: datetime.datetime = datetime.datetime.strptime("03:00:00", "%H:%M:%S"),
+):
     await notify_admin(dp, "[INFO] bot started")
     upd_today = True
     if upd_at_start:
         await update_all()
     while True:
-        await asyncio.sleep(timeout)
+        await asyncio.sleep(int(timeout))
         # restart upd_today
         if upd_today and datetime.datetime.now().time() < upd_time.time():
             await notify_admin(dp, "[INFO] restart update today")

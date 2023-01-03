@@ -2,8 +2,8 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery, ParseMode
 
-from loader import dp
-from manager_loader import coeff_manager
+from src.loader import dp
+from src.manager_loader import coeff_manager
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, coeffs_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard

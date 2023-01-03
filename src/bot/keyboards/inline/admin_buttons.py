@@ -2,7 +2,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.inline.callback_datas import admin_callback
 from aiogram.utils.emoji import emojize
-from manager_loader import coeff_manager
+from src.manager_loader import coeff_manager
 
 
 def create_admin_keyboard():

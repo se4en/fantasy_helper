@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.emoji import emojize
 
 from keyboards.inline.callback_datas import menu_callback
-from manager_loader import user_manager
+from src.manager_loader import user_manager
 
 
 def create_menu_keyboard(tg_id: int):

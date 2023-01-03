@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 
 from data import config
-from loader import dp
+from src.loader import dp
 from states.checking import Check
 from keyboards.inline.menu_buttons import create_menu_keyboard
 from domain.users import UserManager

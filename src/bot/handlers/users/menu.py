@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery, ParseMode
 
 from keyboards.inline.player_buttons import create_player_leagues_keyboard
-from loader import dp
+from src.loader import dp
 from keyboards.inline.menu_buttons import create_menu_keyboard, back_to_menu_keyboard
 from keyboards.inline.callback_datas import menu_callback, coeffs_callback, players_callback, stats_callback, \
     sources_callback

@@ -3,13 +3,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery, ParseMode
 
-from loader import dp
+from src.loader import dp
 from states.checking import Check
 from keyboards.inline.callback_datas import menu_callback, sources_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard
 from keyboards.inline.sources_buttons import create_sources_keyboard, create_sources_back_keyboard, \
     create_sources_league_keyboard, create_delete_source_keyboard
-from manager_loader import sources_manager
+from src.manager_loader import sources_manager
 
 
 @dp.callback_query_handler(sources_callback.filter(league_name="cancel", ))

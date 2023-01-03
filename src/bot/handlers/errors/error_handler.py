@@ -1,6 +1,6 @@
 import logging
 
-from loader import dp
+from src.loader import dp
 
 @dp.errors_handler()
 async def errors_handler(update, exception):

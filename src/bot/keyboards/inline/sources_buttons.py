@@ -3,7 +3,7 @@ from aiogram.utils.emoji import emojize
 from aiogram.utils.callback_data import CallbackData
 
 from keyboards.inline.callback_datas import sources_callback
-from manager_loader import coeff_manager, sources_manager
+from src.manager_loader import coeff_manager, sources_manager
 
 
 def create_sources_keyboard():

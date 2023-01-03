@@ -3,8 +3,8 @@ from aiogram.utils.emoji import emojize
 from aiogram.utils.callback_data import CallbackData
 
 from keyboards.inline.callback_datas import stats_callback
-from manager_loader import player_stats_manager
-from manager_loader import fbref
+from src.manager_loader import player_stats_manager
+from src.manager_loader import fbref
 
 
 def create_stats_leagues_keyboard(callback: CallbackData):
