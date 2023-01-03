@@ -7,8 +7,8 @@ from db.utils.create_db import create_database
 import logging
 
 
-if __name__ == '__main__':
-    logging.basicConfig(filename='bot_history.log', level=logging.INFO)
+if __name__ == "__main__":
+    logging.basicConfig(filename="bot_history.log", level=logging.INFO)
     # prepare db
     create_database()
     # run bot
