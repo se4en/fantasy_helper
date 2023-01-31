@@ -1,0 +1,21 @@
+{
+  id_1234567: fantasyQueries {
+    squads(input: { squadID: "$squadID" }) {
+      currentTourInfo {
+        tour {
+          name
+          status
+          id
+          transfersFinishedAt
+          constraints {
+            totalTransfers
+            maxSameTeamPlayers
+          }
+        }
+        totalPrice
+        currentBalance
+        transfersLeft
+      }
+    }
+  }
+}
