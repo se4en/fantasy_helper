@@ -7,6 +7,8 @@ requests_html==0.10.0
 lxml==4.9.1
 sqlalchemy==1.4.2
 sqlalchemy-utils==0.38.3
-psycopg2==2.9.1
+selenium==4.5.0
+psycopg2-binary==2.9.5
 gitpython
 dataframe_image
+iso8601==1.1.0

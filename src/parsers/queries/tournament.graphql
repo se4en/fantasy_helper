@@ -1,0 +1,40 @@
+{
+  id_1234567: fantasyQueries {
+    squads(input: { squadID: "$squadID" }) {
+      season {
+        id
+        isActive
+        tournament {
+          id
+          name
+        }
+        tours {
+          id
+          status
+          name
+          startedAt
+          constraints {
+            totalTransfers
+            maxSameTeamPlayers
+          }
+          matches {
+            id
+            matchStatus
+            scheduledAtStamp
+            dateOnly
+            home {
+              team {
+                name
+              }
+            }
+            away {
+              team {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
