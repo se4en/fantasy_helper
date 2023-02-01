@@ -1,51 +1,36 @@
 import logging
-from typing import Tuple, List, Dict
-import requests
 import os
 import sys
+import typing as t
+
+import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+
+from fantasy_helper.utils.dataclasses import LeagueInfo
 
 
 class FbrefParser:
-    def __init__(self):
-        self.shoots_leagues = {
-            "Russia": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F30%2Fshooting%2FRussian-Premier-League-Stats&div=div_stats_shooting",
-            "France": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fshooting%2FLigue-1-Stats&div=div_stats_shooting",
-            "England": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fshooting%2FPremier-League-Stats&div=div_stats_shooting",
-            "Germany": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fshooting%2FBundesliga-Stats&div=div_stats_shooting",
-            "Spain": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fshooting%2FLa-Liga-Stats&div=div_stats_shooting",
-            "Netherlands": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F23%2Fshooting%2FEredivisie-Stats&div=div_stats_shooting",
-            "Turkey": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F26%2Fshooting%2FSuper-Lig-Stats&div=div_stats_shooting",
-            "Italy": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fshooting%2FSerie-A-Stats&div=div_stats_shooting",
-            "Portugal": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F32%2Fshooting%2FPrimeira-Liga-Stats&div=div_stats_shooting",
-            # 'UEFA_1': 'https://fbref.com/en/comps/8/Champions-League-Stats',
-            # 'UEFA_2': 'https://fbref.com/en/comps/19/Europa-League-Stats',
+    def __init__(self, leagues: t.List[LeagueInfo]):
+        self.__shoots_leagues = {
+            l.name: l.fbref_shoots_url
+            for l in leagues
+            if l.fbref_shoots_url is not None
+        }
+        self.__xg_leagues = {
+            l.name: l.fbref_xg_url for l in leagues if l.fbref_xg_url is not None
+        }
+        self.__shoots_creation_leagues = {
+            l.name: l.fbref_shoots_creation_url
+            for l in leagues
+            if l.fbref_shoots_creation_url is not None
         }
 
-        self.xg_leagues = {
-            "France": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fstats%2FLigue-1-Stats&div=div_stats_standard",
-            "England": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fstats%2FPremier-League-Stats&div=div_stats_standard",
-            "Germany": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fstats%2FBundesliga-Stats&div=div_stats_standard",
-            "Spain": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fstats%2FLa-Liga-Stats&div=div_stats_standard",
-            "Italy": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fstats%2FSerie-A-Stats&div=div_stats_standard",
-        }
-
-        self.shoots_creation_leagues = {
-            "France": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F13%2Fgca%2FLigue-1-Stats&div=div_stats_gca",
-            "England": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F9%2Fgca%2FPremier-League-Stats&div=div_stats_gca",
-            "Germany": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F20%2Fgca%2FBundesliga-Stats&div=div_stats_gca",
-            "Spain": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F12%2Fgca%2FLa-Liga-Stats&div=div_stats_gca",
-            "Italy": "https://widgets.sports-reference.com/wg.fcgi?css=1&site=fb&url=%2Fen%2Fcomps%2F11%2Fgca%2FSerie-A-Stats&div=div_stats_gca",
-        }
-
-    def get_shooting_stats(self, league_name: str) -> List[Dict]:
-        logging.info(f"Get shoots stats in league={league_name}")
-        result = []
+    def get_shooting_stats(self, league_name: str) -> t.List[dict]:
+        result: t.List[dict] = []
         try:
-            if league_name not in self.shoots_leagues:
+            if league_name not in self.__shoots_leagues:
                 return result
-            response = requests.get(self.shoots_leagues[league_name])
+            response = requests.get(self.__shoots_leagues[league_name])
             soup = BeautifulSoup(response.text, "lxml")
             table = soup.find("table")
             players = table.find_all("tr")[2:]
@@ -83,13 +68,12 @@ class FbrefParser:
         finally:
             return result
 
-    def get_xg_stats(self, league_name: str) -> List[Dict]:
-        logging.info(f"Get xg stats in league={league_name}")
-        result = []
+    def get_xg_stats(self, league_name: str) -> t.List[dict]:
+        result: t.List[dict] = []
         try:
-            if league_name not in self.xg_leagues:
+            if league_name not in self.__xg_leagues:
                 return result
-            response = requests.get(self.xg_leagues[league_name])
+            response = requests.get(self.__xg_leagues[league_name])
             soup = BeautifulSoup(response.text, "lxml")
             table = soup.find("table")
             players = table.find_all("tr")[2:]
@@ -119,13 +103,12 @@ class FbrefParser:
         finally:
             return result
 
-    def get_shoot_creation_stats(self, league_name: str) -> List[Dict]:
-        logging.info(f"Get shoot creation stats in league={league_name}")
-        result = []
+    def get_shoot_creation_stats(self, league_name: str) -> t.List[dict]:
+        result: t.List[dict] = []
         try:
-            if league_name not in self.shoots_creation_leagues:
+            if league_name not in self.__shoots_creation_leagues:
                 return result
-            response = requests.get(self.shoots_creation_leagues[league_name])
+            response = requests.get(self.__shoots_creation_leagues[league_name])
             soup = BeautifulSoup(response.text, "lxml")
             table = soup.find("table")
             players = table.find_all("tr")[2:]
@@ -152,10 +135,3 @@ class FbrefParser:
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         finally:
             return result
-
-
-# if __name__ == "__main__":
-#     fbref = FbrefParser()
-#     res = fbref.get_shoot_creation_stats("France")
-#     for _ in res:
-#         print(_)

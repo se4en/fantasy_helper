@@ -1,0 +1,10 @@
+leagues:
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Russia
+    ru_name: Россия
+    emoji: 🇷🇺
+    squad_id: 2517
+    xber_url: null
+    fbref_shoots_url: null
+    fbref_xg_url: null
+    fbref_shoots_creation_url: null
