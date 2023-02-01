@@ -1,6 +1,6 @@
 BOT_TOKEN=bot_token
-PASSWORD=password
-ADMINS=12345
+PASSWORD=bot_password
+ADMINS=[12345]
 
 POSTGRES_USER=user
 POSTGRES_PASSWORD=password

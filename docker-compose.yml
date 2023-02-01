@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-    command: python app.py
+    command: python fantasy_helper/bot.py
     restart: always
     depends_on:
       - db
