@@ -1,29 +1,27 @@
 import os
 import sys
 import logging
-from datetime import datetime
-from typing import List
+import typing as t
 
 from aiogram.utils.emoji import emojize
 from sqlalchemy import and_
-from sqlalchemy.orm import Session as SQLSession
 
-from domain.manager import Manager
-from db.models.sources import Source
-from db.database import Session
-from db.models.leagues_info import League_info
+from fantasy_helper.db.models.source import Source
+from fantasy_helper.db.database import Session
+from fantasy_helper.utils.prettify import emojize_number
 
 
-class SourcesManager(Manager):
-
+class SourceDao:
     def __init__(self):
-        super().__init__()
+        pass
 
-    def add_source(self, name: str, league_name: str, url: str, description: str) -> bool:
+    def add_source(
+        self, name: str, league_name: str, url: str, description: str
+    ) -> bool:
         logging.info(f"Add source {name} for league={league_name}")
-
-        session: SQLSession = Session()
+        session = None
         try:
+            session = Session()
             session.add(Source(name, league_name, url, description))
             return True
         except Exception as ex:
@@ -32,16 +30,20 @@ class SourcesManager(Manager):
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
-            session.commit()
-            session.close()
+            if session is not None:
+                session.commit()
+                session.close()
 
     def delete_source(self, name: str, league_name: str, url: str) -> bool:
         logging.info(f"Delete source {name} for league={league_name}")
-
-        session: SQLSession = Session()
+        session = None
         try:
-            session.query(Source).filter(and_(Source.league == league_name, Source.name == name,
-                                              Source.url == url)).delete()
+            session = Session()
+            session.query(Source).filter(
+                and_(
+                    Source.league == league_name, Source.name == name, Source.url == url
+                )
+            ).delete()
             return True
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -49,15 +51,21 @@ class SourcesManager(Manager):
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return False
         finally:
-            session.commit()
-            session.close()
+            if session is not None:
+                session.commit()
+                session.close()
 
     def delete_source_by_id(self, source_id: int) -> str:
         logging.info(f"Delete source with id={source_id}")
-
-        session: SQLSession = Session()
+        session = None
         try:
-            league_name = session.query(Source).filter(and_(Source.id == source_id)).first().league
+            session = Session()
+            league_name = (
+                session.query(Source)
+                .filter(and_(Source.id == source_id))
+                .first()
+                .league
+            )
             session.query(Source).filter(and_(Source.id == source_id)).delete()
             return league_name
         except Exception as ex:
@@ -66,12 +74,14 @@ class SourcesManager(Manager):
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
-            session.commit()
-            session.close()
+            if session is not None:
+                session.commit()
+                session.close()
 
     def get_sources_repr(self, league_name: str) -> str:
-        session: SQLSession = Session()
+        session = None
         try:
+            session = Session()
             sources = session.query(Source).filter(Source.league == league_name).all()
             return emojize(self.__transform_sources(sources))
         except Exception as ex:
@@ -80,11 +90,13 @@ class SourcesManager(Manager):
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return ""
         finally:
-            session.close()
+            if session is not None:
+                session.close()
 
-    def get_sources(self, league_name: str) -> List[Source]:
-        session: SQLSession = Session()
+    def get_sources(self, league_name: str) -> t.List[Source]:
+        session = None
         try:
+            session = Session()
             sources = session.query(Source).filter(Source.league == league_name).all()
             return sources
         except Exception as ex:
@@ -93,12 +105,16 @@ class SourcesManager(Manager):
             logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
             return []
         finally:
-            session.close()
+            if session is not None:
+                session.close()
 
-    def __transform_sources(self, sources: List[Source]) -> str:
-        result = [":card_index_dividers: Доступные источники:\n"]
+    def __transform_sources(self, sources: t.List[Source]) -> str:
         if not sources:
             return "Источников нет("
-        result += [self.emojize_number(i + 1) + f" [{s.name}]({s.url})\n_{s.description}_\n"
-                   for i, s in enumerate(sources)]
-        return '\n'.join(result)
+
+        result = [":card_index_dividers: Доступные источники:\n"]
+        result += [
+            emojize_number(i + 1) + f" [{s.name}]({s.url})\n_{s.description}_\n"
+            for i, s in enumerate(sources)
+        ]
+        return "\n".join(result)

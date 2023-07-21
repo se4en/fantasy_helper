@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.types import CallbackQuery
 
 from data import config
-from src.loader import dp
+from fantasy_helper.loader import dp
 from states.checking import Check
 from keyboards.inline.callback_datas import admin_callback
 from keyboards.inline.menu_buttons import create_menu_keyboard

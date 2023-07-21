@@ -1,10 +1,11 @@
-from aiogram import executor
+import logging
 import asyncio
 
-from handlers import dp
-from utils.updates import on_startup
+from aiogram import executor
+
+from bot.utils.updates import on_startup
+from bot.handlers import dp
 from db.utils.create_db import create_database
-import logging
 
 
 if __name__ == "__main__":

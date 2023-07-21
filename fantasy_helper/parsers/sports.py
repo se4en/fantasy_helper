@@ -72,7 +72,18 @@ class SportsParser:
 
         return tour
 
-    def get_tour_deadline(self, league_name: str) -> t.Optional[datetime]:
+    def get_cur_tour(self, league_name: str) -> t.Optional[int]:
+        if league_name not in self.__leagues:
+            logging.info(f"Wrong league_name={league_name} in get_deadline")
+            return None
+
+        tour = self.__get_current_tour(self.__leagues[league_name])
+        if tour is not None:
+            return len(tour["matches"])
+        else:
+            return None
+
+    def get_cur_tour_deadline(self, league_name: str) -> t.Optional[datetime]:
         if league_name not in self.__leagues:
             logging.info(f"Wrong league_name={league_name} in get_deadline")
             return None
@@ -83,7 +94,7 @@ class SportsParser:
         else:
             return None
 
-    def get_tour_games_count(self, league_name: str) -> t.Optional[int]:
+    def get_cur_tour_mathces_count(self, league_name: str) -> t.Optional[int]:
         if league_name not in self.__leagues:
             logging.info(f"Wrong league_name={league_name} in get_deadline")
             return None

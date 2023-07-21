@@ -3,7 +3,7 @@ import datetime
 
 from handlers import dp
 from utils.notify_admins import notify_admin
-from src.manager_loader import (
+from fantasy_helper.manager_loader import (
     league_info_manager,
     coeff_manager,
     player_manager,

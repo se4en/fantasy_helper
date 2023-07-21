@@ -3,8 +3,8 @@ leagues:
     name: Russia
     ru_name: Россия
     emoji: 🇷🇺
-    squad_id: 2517
-    xber_url: null
-    fbref_shoots_url: null
+    squad_id: 159004
+    xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
+    fbref_shoots_url: https://fbref.com/en/comps/30/2022-2023/shooting/2022-2023-Russian-Premier-League-Stats
     fbref_xg_url: null
     fbref_shoots_creation_url: null

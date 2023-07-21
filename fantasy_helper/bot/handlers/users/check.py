@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 
 from data import config
-from src.loader import dp
+from fantasy_helper.loader import dp
 from states.checking import Check
 from keyboards.inline.menu_buttons import create_menu_keyboard
 from domain.users import UserManager
@@ -15,7 +15,9 @@ async def bot_checking_password(message: types.Message):
         await Check.no_checking.set()
         um = UserManager()  # message.from_user.username
         um.make_valid(message.from_user.id)
-        await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
+        await message.answer(
+            text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id)
+        )
     else:
         await message.answer(text="Пароль неверный!\nПовторите попытку:")
 
@@ -25,4 +27,6 @@ async def bot_start(message: types.Message, state: FSMContext):
     await state.finish()
     um = UserManager()
     um.add_profile(message.from_user.id, message.text)
-    await message.answer(text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id))
+    await message.answer(
+        text="Меню:", reply_markup=create_menu_keyboard(message.from_user.id)
+    )

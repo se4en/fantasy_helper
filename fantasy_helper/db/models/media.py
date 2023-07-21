@@ -1,11 +1,11 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer, String, Boolean
 
-from db.database import Base
+from fantasy_helper.db.database import Base
 
 
-class MediaIds(Base):
-    __tablename__ = 'media_ids'
+class Media(Base):
+    __tablename__ = "medias"
 
     id = Column(Integer, primary_key=True)
     league = Column(String, nullable=False)
@@ -14,7 +14,9 @@ class MediaIds(Base):
     file_id = Column(String, nullable=False)
     filename = Column(String, nullable=False)
 
-    def __init__(self, league: str, stat_type: str, last_5: bool, file_id: str, filename: str):
+    def __init__(
+        self, league: str, stat_type: str, last_5: bool, file_id: str, filename: str
+    ):
         self.league = league
         self.stat_type = stat_type
         self.last_5 = last_5
