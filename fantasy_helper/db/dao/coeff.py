@@ -173,6 +173,10 @@ class CoeffDAO:
 
         return result
 
+    def get_tour_number(self, league_name: str) -> int:
+        tour_info = self._sports_parser.get_cur_tour_info(league_name)
+        return tour_info["number"]
+
     def update_coeffs(self, leagu_name: str) -> None:
         tour_info = self._sports_parser.get_cur_tour_info(leagu_name)
         matches = self._xbet_parser.get_league_matches(leagu_name)
