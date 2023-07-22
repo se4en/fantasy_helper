@@ -8,7 +8,7 @@ from hydra.utils import instantiate
 from fantasy_helper.utils.dataclasses import LeagueInfo
 
 
-@fixture
+@fixture(scope="session")
 def leagues() -> List[LeagueInfo]:
     # load leagues info
     initialize(config_path="../conf", version_base=None)
