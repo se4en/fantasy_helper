@@ -6,6 +6,7 @@ import typing as t
 @dataclass
 class MatchInfo:
     url: str
+    league_name: str
     home_team: str
     away_team: str
     start_datetime: t.Optional[datetime] = None

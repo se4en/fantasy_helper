@@ -1,7 +1,8 @@
-from typing import Dict, Any, List, Literal, Optional
+from typing import Dict, Any, List, Literal, Optional, Tuple
 import os
 import logging
 import json
+import pytz
 
 import requests
 import iso8601
@@ -58,31 +59,44 @@ class SportsParser:
             # TODO log bad response for graphql
             return None
 
-    def __get_current_tour(self, squad_id: int) -> Optional[dict]:
+    def __get_current_tour(
+        self, squad_id: int
+    ) -> Tuple[Optional[dict], Optional[dict]]:
+        cur_tour, next_tour = None, None
         data = self.__request_for_squad_id(squad_id, "tournament")
         if data is None:
-            return None
+            return cur_tour, next_tour
 
         # looking for current tour
         query_id = list(data["data"].keys())[0]
         for tour in data["data"][query_id]["squads"][0]["season"]["tours"]:
-            if tour["status"] == "OPENED":
+            if cur_tour is not None:
+                next_tour = tour
                 break
+            elif tour["status"] == "OPENED":
+                cur_tour = tour
 
-        return tour
+        return cur_tour, next_tour
 
     def get_cur_tour_info(self, league_name: str) -> Optional[Dict[str, Any]]:
         if league_name not in self.__leagues:
             logging.info(f"Wrong league_name={league_name} in get_deadline")
             return None
 
-        tour = self.__get_current_tour(self.__leagues[league_name])
-        if tour is not None:
-            return {
-                "number": int(tour["name"].split(" ")[0]),
-                "matches_count": len(tour["matches"]),
-                "deadline": iso8601.parse_date(tour["startedAt"]),
+        cur_tour, next_tour = self.__get_current_tour(self.__leagues[league_name])
+        if cur_tour is not None:
+            result = {
+                "number": int(cur_tour["name"].split(" ")[0]),
+                "matches_count": len(cur_tour["matches"]),
+                "deadline": iso8601.parse_date(cur_tour["startedAt"]).replace(
+                    tzinfo=pytz.UTC
+                ),
             }
+            if next_tour is not None:
+                result["next_tour_deadline"] = iso8601.parse_date(
+                    next_tour["startedAt"]
+                ).replace(tzinfo=pytz.UTC)
+            return result
         else:
             return None
 

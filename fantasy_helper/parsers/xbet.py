@@ -4,6 +4,7 @@ import sys
 import os
 import json
 import typing as t
+import pytz
 
 import requests
 from selenium import webdriver
@@ -30,7 +31,7 @@ class XbetParser:
         hour, minute = time.split(":")
 
         return datetime.datetime(
-            int(year), int(month), int(day), int(hour), int(minute)
+            int(year), int(month), int(day), int(hour), int(minute), tzinfo=pytz.UTC
         )
 
     @staticmethod
@@ -73,7 +74,7 @@ class XbetParser:
             return match_info
 
     @staticmethod
-    def __filter_matches(all_matches: t.Any) -> t.List[MatchInfo]:
+    def __filter_matches(all_matches: t.Any, league_name: str) -> t.List[MatchInfo]:
         result = []
         for match_info in all_matches:
             if (
@@ -85,9 +86,10 @@ class XbetParser:
             ):
                 result.append(
                     MatchInfo(
-                        match_info["url"],
-                        match_info["homeTeam"]["name"],
-                        match_info["awayTeam"]["name"],
+                        url=match_info["url"],
+                        league_name=league_name,
+                        home_team=match_info["homeTeam"]["name"],
+                        away_team=match_info["awayTeam"]["name"],
                     )
                 )
         return result
@@ -104,7 +106,7 @@ class XbetParser:
                 "".join(soup.find("script", {"type": "application/ld+json"}).contents)
             )
 
-            result = XbetParser.__filter_matches(all_matches)
+            result = XbetParser.__filter_matches(all_matches, league_name)
             if result:
                 return result
             else:
