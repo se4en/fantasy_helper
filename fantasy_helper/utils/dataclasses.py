@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 import typing as t
 
 
@@ -7,6 +8,7 @@ class MatchInfo:
     url: str
     home_team: str
     away_team: str
+    start_datetime: t.Optional[datetime] = None
     total_1_over_1_5: t.Optional[float] = None
     total_1_under_0_5: t.Optional[float] = None
     total_2_over_1_5: t.Optional[float] = None

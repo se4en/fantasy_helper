@@ -1,3 +1,4 @@
+import datetime
 import logging
 import sys
 import os
@@ -19,6 +20,20 @@ class XbetParser:
         self.__leagues = {l.name: l.xber_url for l in leagues if l.xber_url is not None}
 
     @staticmethod
+    def __parse_start_datetime(driver: t.Any) -> datetime.datetime:
+        start_datetime = WebDriverWait(driver, 3).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "c-scoreboard-start__date"))
+        )
+        date = start_datetime.text.split()[0]
+        time = start_datetime.text.split()[1]
+        day, month, year = date.split("/")
+        hour, minute = time.split(":")
+
+        return datetime.datetime(
+            int(year), int(month), int(day), int(hour), int(minute)
+        )
+
+    @staticmethod
     def __parse_bet_value(all_bets: t.Any, bet_name: str) -> float:
         bet = WebDriverWait(all_bets, 3).until(
             EC.presence_of_element_located(
@@ -33,6 +48,8 @@ class XbetParser:
         try:
             driver = webdriver.Firefox()
             driver.get(match_info.url)
+
+            match_info.start_datetime = XbetParser.__parse_start_datetime(driver)
 
             match_info.total_1_over_1_5 = XbetParser.__parse_bet_value(
                 driver, "Individual Total 1 Over 1.5"
@@ -86,16 +103,16 @@ class XbetParser:
             all_matches = json.loads(
                 "".join(soup.find("script", {"type": "application/ld+json"}).contents)
             )
+
+            result = XbetParser.__filter_matches(all_matches)
+            if result:
+                return result
+            else:
+                return None
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
-            return None
-
-        result = XbetParser.__filter_matches(all_matches)
-        if result:
-            return result
-        else:
             return None
 
     def get_league_matches(self, league_name: str) -> t.List[MatchInfo]:
