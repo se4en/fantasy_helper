@@ -1,13 +1,25 @@
 from collections import defaultdict
 from typing import List
 
-import streamlit_authenticator as stauth
 import pandas as pd
 import streamlit as st
-from fantasy_helper.db.dao.coeff import CoeffDAO
+import streamlit_authenticator as stauth
+from hydra import compose, initialize
+from hydra.utils import instantiate
+from hydra.core.global_hydra import GlobalHydra
 
+from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
+
+if not GlobalHydra().is_initialized():
+    initialize(config_path="../conf", version_base=None)
+cfg = compose(config_name="config")
+credentials = instantiate(cfg.credentials)
+cookie = instantiate(cfg.cookie)
+
+authenticator = stauth.Authenticate(credentials, **cookie)
+name, authentication_status, username = authenticator.login("Login", "main")
 
 Coeff_dao = CoeffDAO()
 
@@ -53,7 +65,7 @@ def coeffs_to_df(league_name: str) -> pd.DataFrame:
             coeffs_info[f"Атака {tour_number} тур"].append(
                 team_stats[team_name].get(f"{tour_type}_attack", None)
             )
-            coeffs_info[f"Оборона {tour_number} тур"].append(
+            coeffs_info[f"Защита {tour_number} тур"].append(
                 team_stats[team_name].get(f"{tour_type}_defend", None)
             )
             coeffs_info[f"Соперник {tour_number} тур"].append(
@@ -63,22 +75,16 @@ def coeffs_to_df(league_name: str) -> pd.DataFrame:
     return pd.DataFrame(coeffs_info)
 
 
-def highlight_survived(s):
-    return (
-        ["background-color: green"] * len(s)
-        if s.Survived
-        else ["background-color: red"] * len(s)
-    )
-
-
-def color_survived(val):
-    if not isinstance(val, float):
+def color_coeff(
+    val: float, th_0: float = 1.5, th_1: float = 2.0, th_2: float = 3.0
+) -> str:
+    if pd.isna(val):
         return ""
-    elif val <= 1.5:
+    elif val <= th_0:
         color = "#85DE6F"
-    elif val <= 2.0:
+    elif val <= th_1:
         color = "#EBE054"
-    elif val <= 3.0:
+    elif val <= th_2:
         color = "#EBA654"
     else:
         color = "#E06456"
@@ -86,8 +92,25 @@ def color_survived(val):
     return f"background-color: {color}"
 
 
-df = coeffs_to_df("Russia")
-coeffs_columns = list(
-    filter(lambda x: x.startswith("Атака") or x.startswith("Оборона"), df.columns)
-)
-st.dataframe(df.style.applymap(color_survived, subset=coeffs_columns))
+def plot_coeff_df(df: pd.DataFrame):
+    not_na_columns = df.columns[~df.isna().all()]
+    attack_columns = list(filter(lambda x: x.startswith("Атака"), not_na_columns))
+    defend_columns = list(filter(lambda x: x.startswith("Защита"), not_na_columns))
+
+    st.dataframe(
+        df.style.format("{:.3}", subset=attack_columns + defend_columns)
+        .applymap(color_coeff, subset=attack_columns)
+        .applymap(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns)
+    )
+
+
+if authentication_status:
+    authenticator.logout("Logout", "main", key="unique_key")
+
+    # df = coeffs_to_df("Russia")
+    df = coeffs_to_df("Championship")
+    plot_coeff_df(df)
+elif authentication_status is False:
+    st.error("Username/password is incorrect")
+elif authentication_status is None:
+    st.warning("Please enter your username and password")

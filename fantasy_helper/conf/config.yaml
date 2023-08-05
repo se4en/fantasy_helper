@@ -8,3 +8,23 @@ leagues:
     fbref_shoots_url: https://fbref.com/en/comps/30/2022-2023/shooting/2022-2023-Russian-Premier-League-Stats
     fbref_xg_url: null
     fbref_shoots_creation_url: null
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Championship
+    ru_name: Шип
+    emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
+    squad_id: 175621
+    xber_url: https://1xstavka.ru/line/football/105759-england-championship
+    fbref_shoots_url: https://fbref.com/en/comps/10/shooting/Championship-Stats
+    fbref_xg_url: null
+    fbref_shoots_creation_url: null
+
+credentials:
+  usernames:
+    ice_planet:
+      email: ice@planet.com
+      name: Ice Planet
+      password: ${oc.env:APP_PASSWORD} # To be replaced with hashed password
+cookie:
+  cookie_name: random_cookie_name
+  key: random_signature_key # Must be string
+  cookie_expiry_days: 30
