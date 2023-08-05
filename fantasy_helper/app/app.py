@@ -15,6 +15,7 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 if not GlobalHydra().is_initialized():
     initialize(config_path="../conf", version_base=None)
 cfg = compose(config_name="config")
+leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues)}
 credentials = instantiate(cfg.credentials)
 cookie = instantiate(cfg.cookie)
 
@@ -22,6 +23,8 @@ authenticator = stauth.Authenticate(credentials, **cookie)
 name, authentication_status, username = authenticator.login("Login", "main")
 
 Coeff_dao = CoeffDAO()
+
+st.session_state["league"] = list(leagues.keys())[0]
 
 
 def get_stat_from_mathes(
@@ -105,10 +108,10 @@ def plot_coeff_df(df: pd.DataFrame):
 
 
 if authentication_status:
-    authenticator.logout("Logout", "main", key="unique_key")
-
-    # df = coeffs_to_df("Russia")
-    df = coeffs_to_df("Championship")
+    st.session_state["league"] = leagues[
+        st.selectbox("League", sorted(leagues.keys()), label_visibility="collapsed")
+    ]
+    df = coeffs_to_df(st.session_state["league"])
     plot_coeff_df(df)
 elif authentication_status is False:
     st.error("Username/password is incorrect")
