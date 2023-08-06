@@ -111,6 +111,7 @@ if authentication_status:
     st.session_state["league"] = leagues[
         st.selectbox("League", sorted(leagues.keys()), label_visibility="collapsed")
     ]
+    st.write("")
     df = coeffs_to_df(st.session_state["league"])
     plot_coeff_df(df)
 elif authentication_status is False:

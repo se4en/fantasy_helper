@@ -45,15 +45,15 @@ leagues:
     fbref_shoots_url: null
     fbref_xg_url: null
     fbref_shoots_creation_url: null
-  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-    name: Portugal
-    ru_name: Португалия
-    emoji: 🇵🇹
-    squad_id: 185282
-    xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+  #   name: Portugal
+  #   ru_name: Португалия
+  #   emoji: 🇵🇹
+  #   squad_id: 185282
+  #   xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
+  #   fbref_shoots_url: null
+  #   fbref_xg_url: null
+  #   fbref_shoots_creation_url: null
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Netherlands
     ru_name: Нидерланды
