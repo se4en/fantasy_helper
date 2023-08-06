@@ -1,15 +1,27 @@
 version: '3'
 
 services:
-  bot:
+  # bot:
+  #   build:
+  #     dockerfile: docker/Dockerfile.bot
+  #     context: .
+  #   container_name: "bot"
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   env_file: .env
+
+  app:
     build:
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.app
       context: .
-    command: python fantasy_helper/bot.py
+    container_name: "app"
     restart: always
-    depends_on:
+    links:
       - db
     env_file: .env
+    ports:
+      - 8501:8501
 
   db:
     image: postgres:12.11-alpine
@@ -22,4 +34,4 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - 5433:5432
+      - ${POSTGRES_PORT}:5432
