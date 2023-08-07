@@ -3,8 +3,8 @@ FROM python:3.9-slim
 RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essential
 
 WORKDIR /fantasy_helper
-COPY . /fantasy_helper/
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . /fantasy_helper/
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
 EXPOSE 8501
