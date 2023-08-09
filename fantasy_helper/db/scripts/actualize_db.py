@@ -1,6 +1,9 @@
 from typing import List
 import os.path as path
 import datetime
+import sys
+
+sys.path.insert(0, "/fantasy_helper")
 
 from fantasy_helper.db.dao.coeff import CoeffDAO
 

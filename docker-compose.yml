@@ -23,6 +23,16 @@ services:
     ports:
       - 8501:8501
 
+  cron:
+    build:
+      dockerfile: docker/Dockerfile.cron
+      context: .
+    container_name: "cron"
+    restart: always
+    links:
+      - db
+    env_file: .env
+
   db:
     image: postgres:12.11-alpine
     volumes:

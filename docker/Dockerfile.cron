@@ -1,0 +1,38 @@
+FROM --platform=linux/amd64 python:3.9-slim
+
+RUN echo "===> Installing system dependencies..." && \
+    BUILD_DEPS="curl unzip" && \
+    apt-get update && apt-get install --no-install-recommends -y \
+    python3-pip python3-dev build-essential cron wget \
+    fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
+    libnspr4 libnss3 lsb-release xdg-utils libxss1 libdbus-glib-1-2 libgbm1 \
+    bzip2 libxtst6 libgtk-3-0 libx11-xcb-dev libxt6 libpci-dev \ 
+    $BUILD_DEPS \
+    xvfb
+
+RUN echo "===> Installing geckodriver and firefox..." && \
+    wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz && \
+    tar -zxf geckodriver-v0.33.0-linux64.tar.gz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/geckodriver && \
+    rm geckodriver-v0.33.0-linux64.tar.gz
+
+RUN FIREFOX_SETUP=firefox-setup.tar.bz2 && \
+    apt-get purge firefox && \
+    wget -O $FIREFOX_SETUP "https://download.mozilla.org/?product=firefox-latest&os=linux64" && \
+    tar xjf $FIREFOX_SETUP -C /opt/ && \
+    ln -s /opt/firefox/firefox /usr/bin/firefox && \
+    rm $FIREFOX_SETUP
+
+RUN echo "===> Remove build dependencies..." && \
+    apt-get remove -y $BUILD_DEPS && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /fantasy_helper
+COPY requirements.txt /fantasy_helper/
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY fantasy_helper/crontab /etc/cron.d/crontab
+COPY . /fantasy_helper/
+RUN chmod 0644 /etc/cron.d/crontab
+RUN /usr/bin/crontab /etc/cron.d/crontab
+
+CMD ["cron", "-f"]
