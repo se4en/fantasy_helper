@@ -50,6 +50,8 @@ class XbetParser:
         try:
             opts = FirefoxOptions()
             opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
