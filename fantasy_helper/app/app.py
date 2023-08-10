@@ -11,7 +11,7 @@ from hydra.core.global_hydra import GlobalHydra
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
-
+# load configs
 if not GlobalHydra().is_initialized():
     initialize(config_path="../conf", version_base=None)
 cfg = compose(config_name="config")
@@ -19,11 +19,17 @@ leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues)}
 credentials = instantiate(cfg.credentials)
 cookie = instantiate(cfg.cookie)
 
-authenticator = stauth.Authenticate(credentials, **cookie)
-name, authentication_status, username = authenticator.login("Login", "main")
-
 Coeff_dao = CoeffDAO()
 
+# streamlit options
+st.set_page_config(
+    page_title="Fantasy Helper",
+    page_icon="🏆",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+authenticator = stauth.Authenticate(credentials, **cookie)
+name, authentication_status, username = authenticator.login("Login", "main")
 st.session_state["league"] = list(leagues.keys())[0]
 
 
