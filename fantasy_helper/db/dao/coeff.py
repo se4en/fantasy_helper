@@ -9,6 +9,7 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text
+from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
@@ -26,7 +27,8 @@ class CoeffDAO:
     TEAM2_MAX_LEN = 9
 
     def __init__(self):
-        # initialize(config_path="../../conf", version_base=None)
+        if not GlobalHydra().is_initialized():
+            initialize(config_path="../../conf", version_base=None)
         cfg = compose(config_name="config")
         self._leagues: List[LeagueInfo] = instantiate(cfg.leagues)
 
