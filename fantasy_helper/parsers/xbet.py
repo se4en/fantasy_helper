@@ -11,6 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import FirefoxOptions
 from bs4 import BeautifulSoup
 
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
@@ -47,7 +48,13 @@ class XbetParser:
     def __parse_match(match_info: MatchInfo) -> MatchInfo:
         driver = None
         try:
-            driver = webdriver.Firefox()
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
+            driver = webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+            )
             driver.get(match_info.url)
 
             match_info.start_datetime = XbetParser.__parse_start_datetime(driver)
@@ -70,7 +77,7 @@ class XbetParser:
             print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
         finally:
             if driver is not None:
-                driver.close()
+                driver.quit()
             return match_info
 
     @staticmethod
@@ -106,6 +113,7 @@ class XbetParser:
                 "".join(soup.find("script", {"type": "application/ld+json"}).contents)
             )
 
+            print(len(all_matches))
             result = XbetParser.__filter_matches(all_matches, league_name)
             if result:
                 return result

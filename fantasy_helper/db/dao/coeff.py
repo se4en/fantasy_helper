@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Literal, Optional, Tuple
 import os.path as path
-import pytz
+from datetime import timezone
 
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
@@ -16,6 +16,9 @@ from fantasy_helper.parsers.xbet import XbetParser
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 from fantasy_helper.utils.prettify import emojize_coeff
+
+
+utc = timezone.utc
 
 
 class CoeffDAO:
@@ -173,9 +176,15 @@ class CoeffDAO:
 
         return result
 
-    def update_coeffs(self, leagu_name: str) -> None:
-        tour_info = self._sports_parser.get_cur_tour_info(leagu_name)
-        matches = self._xbet_parser.get_league_matches(leagu_name)
+    def get_tour_number(self, league_name: str) -> int:
+        tour_info = self._sports_parser.get_cur_tour_info(league_name)
+        return tour_info["number"]
+
+    def update_coeffs(self, league_name: str) -> None:
+        tour_info = self._sports_parser.get_cur_tour_info(league_name)
+        if tour_info is None:
+            return None
+        matches = self._xbet_parser.get_league_matches(league_name)
         db_session: SQLSession = Session()
 
         for match in matches:
@@ -190,7 +199,7 @@ class CoeffDAO:
                 Coeff(
                     **match.__dict__,
                     tour=match_tour,
-                    timestamp=datetime.now().replace(tzinfo=pytz.UTC),
+                    timestamp=datetime.now().replace(tzinfo=utc),
                 )
             )
 

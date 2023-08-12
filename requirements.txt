@@ -14,3 +14,5 @@ psycopg2-binary==2.9.5
 gitpython==3.1.32
 dataframe_image==0.1.5
 iso8601==1.1.0
+streamlit==1.25.0
+streamlit-authenticator==0.2.2
