@@ -26,3 +26,11 @@ class LeagueInfo:
     fbref_shoots_url: t.Optional[str] = None
     fbref_xg_url: t.Optional[str] = None
     fbref_shoots_creation_url: t.Optional[str] = None
+    sportsmole_name: t.Optional[str] = None
+
+
+@dataclass
+class TeamLineup:
+    team_name: str
+    league_name: str
+    lineup: str
