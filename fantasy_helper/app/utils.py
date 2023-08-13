@@ -202,7 +202,8 @@ def pose_352(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
         names.append(prepare_name(name))
 
     # add midfielders
-    for position, name in zip(["RWB", "RСM", "CM", "LСM", "LWB"], zones_players[2]):
+    for position, name in zip(["RWB", "RCM", "CM", "LCM", "LWB"], zones_players[2]):
+        print(position, position_to_id(position), name)
         positions.append(position_to_id(position))
         names.append(prepare_name(name))
 
@@ -223,7 +224,7 @@ def pose_532(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
         names.append(prepare_name(name))
 
     # add midfielders
-    for position, name in zip(["RСM", "CM", "LСM"], zones_players[2]):
+    for position, name in zip(["RCM", "CM", "LCM"], zones_players[2]):
         positions.append(position_to_id(position))
         names.append(prepare_name(name))
 

@@ -34,7 +34,6 @@ st.set_page_config(
 )
 authenticator = stauth.Authenticate(credentials, **cookie)
 name, authentication_status, username = authenticator.login("Login", "main")
-authentication_status = True
 st.session_state["league"] = list(leagues.keys())[0]
 
 

@@ -24,7 +24,6 @@ class MoleParser:
         self.__session.mount("https://", adapter)
 
     def __parse_lineups(self, url: str, league: str) -> List[TeamLineup]:
-        print("URL:", url)
         response = self.__session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         result = []
