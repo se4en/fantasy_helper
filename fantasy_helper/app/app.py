@@ -7,9 +7,12 @@ import streamlit_authenticator as stauth
 from hydra import compose, initialize
 from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
+from fantasy_helper.app.utils import lineup_to_formation, plot_lineup
 
 from fantasy_helper.db.dao.coeff import CoeffDAO
-from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
+from fantasy_helper.db.dao.lineup import LineupDAO
+from fantasy_helper.utils.dataclasses import MatchInfo
+
 
 # load configs
 if not GlobalHydra().is_initialized():
@@ -20,6 +23,7 @@ credentials = instantiate(cfg.credentials)
 cookie = instantiate(cfg.cookie)
 
 Coeff_dao = CoeffDAO()
+Lineup_dao = LineupDAO()
 
 # streamlit options
 st.set_page_config(
@@ -30,6 +34,7 @@ st.set_page_config(
 )
 authenticator = stauth.Authenticate(credentials, **cookie)
 name, authentication_status, username = authenticator.login("Login", "main")
+authentication_status = True
 st.session_state["league"] = list(leagues.keys())[0]
 
 
@@ -118,8 +123,29 @@ if authentication_status:
         st.selectbox("League", sorted(leagues.keys()), label_visibility="collapsed")
     ]
     st.write("")
-    df = coeffs_to_df(st.session_state["league"])
-    plot_coeff_df(df)
+    left, right = st.columns([4, 2])
+
+    # plot coeffs
+    with left:
+        df = coeffs_to_df(st.session_state["league"])
+        plot_coeff_df(df)
+
+    # plot lineup
+    with right:
+        lineups = {
+            lineup.team_name: lineup.lineup
+            for lineup in Lineup_dao.get_lineups(st.session_state["league"])
+        }
+        team_name = st.selectbox(
+            "Team", sorted(list(lineups.keys())), label_visibility="collapsed"
+        )
+        if team_name is not None:
+            formation, positions, names = lineup_to_formation(lineups[team_name])
+            if len(positions) == 11 and len(names) == 11:
+                fig = plot_lineup(formation, positions, names)
+                st.pyplot(fig=fig, clear_figure=None, use_container_width=True)
+            else:
+                st.write("Lineup is not available")
 elif authentication_status is False:
     st.error("Username/password is incorrect")
 elif authentication_status is None:
