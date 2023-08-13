@@ -71,6 +71,53 @@ def pose_433(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
     return positions, names
 
 
+def pose_442(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
+    positions, names = [position_to_id("GK")], [prepare_name(zones_players[0][0])]
+
+    # add defenders
+    for position, name in zip(["RB", "RCB", "LCB", "LB"], zones_players[1]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    # add midfielders
+    for position, name in zip(["RM", "RCM", "LCM", "LM"], zones_players[2]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    # add attackers
+    for position, name in zip(["RCF", "LCF"], zones_players[3]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    return positions, names
+
+
+def pose_4231(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
+    positions, names = [position_to_id("GK")], [prepare_name(zones_players[0][0])]
+
+    # add defenders
+    for position, name in zip(["RB", "RCB", "LCB", "LB"], zones_players[1]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    # add defend midfielders
+    for position, name in zip(["RDM", "LDM"], zones_players[2]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    # add attack midfielders
+    for position, name in zip(["RW", "CAM", "LW"], zones_players[3]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    # add attackers
+    for position, name in zip(["ST"], zones_players[4]):
+        positions.append(position_to_id(position))
+        names.append(prepare_name(name))
+
+    return positions, names
+
+
 def lineup_to_formation(lineup: str) -> Tuple[str, List[int], List[str]]:
     zones = list(map(lambda x: x.strip(), lineup.split(";")))
     zones_players = [
@@ -86,6 +133,23 @@ def lineup_to_formation(lineup: str) -> Tuple[str, List[int], List[str]]:
         and len(zones_players[3]) == 3
     ):
         positions, names = pose_433(zones_players)
+    elif (
+        len(zones_players) == 4
+        and len(zones_players[0]) == 1
+        and len(zones_players[1]) == 4
+        and len(zones_players[2]) == 4
+        and len(zones_players[3]) == 2
+    ):
+        positions, names = pose_442(zones_players)
+    elif (
+        len(zones_players) == 5
+        and len(zones_players[0]) == 1
+        and len(zones_players[1]) == 4
+        and len(zones_players[2]) == 2
+        and len(zones_players[3]) == 3
+        and len(zones_players[4]) == 1
+    ):
+        positions, names = pose_4231(zones_players)
     else:
         positions, names = [], []
 
