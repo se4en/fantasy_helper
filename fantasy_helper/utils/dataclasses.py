@@ -43,6 +43,7 @@ class TeamLineup:
 class PlayerStats:
     # common
     name: str
+    league_name: str
     team_name: str
     position: str
     # playing time
