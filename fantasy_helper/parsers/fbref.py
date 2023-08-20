@@ -590,7 +590,7 @@ class FbrefParser:
                 )
                 players = self.__update_players_stat(players, playing_time_players)
             # shooting stats
-            for league_name, url in self.__playing_time_leagues.items():
+            for league_name, url in self.__shooting_leagues.items():
                 playing_time_players = self.__parse_league_stats(
                     league_name=league_name,
                     url=url,
