@@ -4,7 +4,6 @@ import sys
 from dataclasses import asdict
 from typing import Any, Callable, Dict, Optional, List, Tuple
 
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,6 +12,20 @@ from selenium.webdriver import FirefoxOptions
 from bs4 import BeautifulSoup
 
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats
+
+
+def cast_to_float(text: str) -> Optional[float]:
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def cast_to_int(text: str) -> Optional[int]:
+    try:
+        return int(text)
+    except ValueError:
+        return None
 
 
 class FbrefParser:
@@ -87,36 +100,40 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                goals=int(_goals.text) if _goals else None,
-                shots=int(_shots.text) if _shots else None,
-                shots_on_target=int(_shots_on_target.text)
+                goals=cast_to_int(_goals.text) if _goals else None,
+                shots=cast_to_int(_shots.text) if _shots else None,
+                shots_on_target=cast_to_int(_shots_on_target.text)
                 if _shots_on_target
                 else None,
-                shots_on_target_pct=float(_shots_on_target_pct.text)
+                shots_on_target_pct=cast_to_float(_shots_on_target_pct.text)
                 if _shots_on_target_pct
                 else None,
-                shots_per90=float(_shots_per90.text) if _shots_per90 else None,
-                shots_on_target_per90=float(_shots_on_target_per90.text)
+                shots_per90=cast_to_float(_shots_per90.text) if _shots_per90 else None,
+                shots_on_target_per90=cast_to_float(_shots_on_target_per90.text)
                 if _shots_on_target_per90
                 else None,
-                goals_per_shot=float(_goals_per_shot.text) if _goals_per_shot else None,
-                goals_per_shot_on_target=float(_goals_per_shot_on_target.text)
+                goals_per_shot=cast_to_float(_goals_per_shot.text)
+                if _goals_per_shot
+                else None,
+                goals_per_shot_on_target=cast_to_float(_goals_per_shot_on_target.text)
                 if _goals_per_shot_on_target
                 else None,
-                average_shot_distance=int(_average_shot_distance.text)
+                average_shot_distance=cast_to_int(_average_shot_distance.text)
                 if _average_shot_distance
                 else None,
-                shots_free_kicks=int(_shots_free_kicks.text)
+                shots_free_kicks=cast_to_int(_shots_free_kicks.text)
                 if _shots_free_kicks
                 else None,
-                pens_made=int(_pens_made.text) if _pens_made else None,
-                pens_att=int(_pens_att.text) if _pens_att else None,
-                xg=float(_xg.text) if _xg else None,
-                npxg=float(_npxg.text) if _npxg else None,
-                xa=float(_goals.text) if _xa else None,
-                npxg_per_shot=float(_npxg_per_shot.text) if _npxg_per_shot else None,
-                xg_net=float(_xg_net.text) if _xg_net else None,
-                npxg_net=float(_npxg_net.text) if _npxg_net else None,
+                pens_made=cast_to_int(_pens_made.text) if _pens_made else None,
+                pens_att=cast_to_int(_pens_att.text) if _pens_att else None,
+                xg=cast_to_float(_xg.text) if _xg else None,
+                npxg=cast_to_float(_npxg.text) if _npxg else None,
+                xa=cast_to_float(_goals.text) if _xa else None,
+                npxg_per_shot=cast_to_float(_npxg_per_shot.text)
+                if _npxg_per_shot
+                else None,
+                xg_net=cast_to_float(_xg_net.text) if _xg_net else None,
+                npxg_net=cast_to_float(_npxg_net.text) if _npxg_net else None,
             )
         else:
             return None
@@ -174,53 +191,61 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                passes_completed=int(_passes_completed.text)
+                passes_completed=cast_to_int(_passes_completed.text)
                 if _passes_completed
                 else None,
-                passes=int(_passes.text) if _passes else None,
-                passes_pct=float(_passes_pct.text) if _passes_pct else None,
-                passes_total_distance=int(_passes_total_distance.text)
+                passes=cast_to_int(_passes.text) if _passes else None,
+                passes_pct=cast_to_float(_passes_pct.text) if _passes_pct else None,
+                passes_total_distance=cast_to_int(_passes_total_distance.text)
                 if _passes_total_distance
                 else None,
-                passes_progressive_distance=int(_passes_progressive_distance.text)
+                passes_progressive_distance=cast_to_int(
+                    _passes_progressive_distance.text
+                )
                 if _passes_progressive_distance
                 else None,
-                passes_short=int(_passes_short.text) if _passes_short else None,
-                passes_completed_short=int(_passes_completed_short.text)
+                passes_short=cast_to_int(_passes_short.text) if _passes_short else None,
+                passes_completed_short=cast_to_int(_passes_completed_short.text)
                 if _passes_completed_short
                 else None,
-                passes_pct_short=float(_passes_pct_short.text)
+                passes_pct_short=cast_to_float(_passes_pct_short.text)
                 if _passes_pct_short
                 else None,
-                passes_medium=int(_passes_medium.text) if _passes_medium else None,
-                passes_completed_medium=int(_passes_completed_medium.text)
+                passes_medium=cast_to_int(_passes_medium.text)
+                if _passes_medium
+                else None,
+                passes_completed_medium=cast_to_int(_passes_completed_medium.text)
                 if _passes_completed_medium
                 else None,
-                passes_pct_medium=float(_passes_pct_medium.text)
+                passes_pct_medium=cast_to_float(_passes_pct_medium.text)
                 if _passes_pct_medium
                 else None,
-                passes_long=int(_passes_long.text) if _passes_long else None,
-                passes_completed_long=int(_passes_completed_long.text)
+                passes_long=cast_to_int(_passes_long.text) if _passes_long else None,
+                passes_completed_long=cast_to_int(_passes_completed_long.text)
                 if _passes_completed_long
                 else None,
-                passes_pct_long=float(_passes_pct_long.text)
+                passes_pct_long=cast_to_float(_passes_pct_long.text)
                 if _passes_pct_long
                 else None,
-                assists=int(_assists.text) if _assists else None,
-                xg_assist=float(_xg_assist.text) if _xg_assist else None,
-                pass_xa=float(_pass_xa.text) if _pass_xa else None,
-                xg_assist_net=float(_xg_assist_net.text) if _xg_assist_net else None,
-                assisted_shots=int(_assisted_shots.text) if _assisted_shots else None,
-                passes_into_final_third=int(_passes_into_final_third.text)
+                assists=cast_to_int(_assists.text) if _assists else None,
+                xg_assist=cast_to_float(_xg_assist.text) if _xg_assist else None,
+                pass_xa=cast_to_float(_pass_xa.text) if _pass_xa else None,
+                xg_assist_net=cast_to_float(_xg_assist_net.text)
+                if _xg_assist_net
+                else None,
+                assisted_shots=cast_to_int(_assisted_shots.text)
+                if _assisted_shots
+                else None,
+                passes_into_final_third=cast_to_int(_passes_into_final_third.text)
                 if _passes_into_final_third
                 else None,
-                passes_into_penalty_area=int(_passes_into_penalty_area.text)
+                passes_into_penalty_area=cast_to_int(_passes_into_penalty_area.text)
                 if _passes_into_penalty_area
                 else None,
-                crosses_into_penalty_area=int(_crosses_into_penalty_area.text)
+                crosses_into_penalty_area=cast_to_int(_crosses_into_penalty_area.text)
                 if _crosses_into_penalty_area
                 else None,
-                progressive_passes=int(_progressive_passes.text)
+                progressive_passes=cast_to_int(_progressive_passes.text)
                 if _progressive_passes
                 else None,
             )
@@ -257,34 +282,38 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                passes_live=int(_passes_live.text) if _passes_live else None,
-                passes_dead=int(_passes_dead.text) if _passes_dead else None,
-                passes_free_kicks=int(_passes_free_kicks.text)
+                passes_live=cast_to_int(_passes_live.text) if _passes_live else None,
+                passes_dead=cast_to_int(_passes_dead.text) if _passes_dead else None,
+                passes_free_kicks=cast_to_int(_passes_free_kicks.text)
                 if _passes_free_kicks
                 else None,
-                through_balls=int(_through_balls.text) if _through_balls else None,
-                passes_switches=int(_passes_switches.text)
+                through_balls=cast_to_int(_through_balls.text)
+                if _through_balls
+                else None,
+                passes_switches=cast_to_int(_passes_switches.text)
                 if _passes_switches
                 else None,
-                crosses=int(_crosses.text) if _crosses else None,
-                throw_ins=int(_throw_ins.text) if _throw_ins else None,
-                corner_kicks=int(_corner_kicks.text) if _corner_kicks else None,
-                corner_kicks_in=int(_corner_kicks_in.text)
+                crosses=cast_to_int(_crosses.text) if _crosses else None,
+                throw_ins=cast_to_int(_throw_ins.text) if _throw_ins else None,
+                corner_kicks=cast_to_int(_corner_kicks.text) if _corner_kicks else None,
+                corner_kicks_in=cast_to_int(_corner_kicks_in.text)
                 if _corner_kicks_in
                 else None,
-                corner_kicks_out=int(_corner_kicks_out.text)
+                corner_kicks_out=cast_to_int(_corner_kicks_out.text)
                 if _corner_kicks_out
                 else None,
-                corner_kicks_straight=int(_corner_kicks_straight.text)
+                corner_kicks_straight=cast_to_int(_corner_kicks_straight.text)
                 if _corner_kicks_straight
                 else None,
-                passes_completed=int(_passes_completed.text)
+                passes_completed=cast_to_int(_passes_completed.text)
                 if _passes_completed
                 else None,
-                passes_offsides=int(_passes_offsides.text)
+                passes_offsides=cast_to_int(_passes_offsides.text)
                 if _passes_offsides
                 else None,
-                passes_blocked=int(_passes_blocked.text) if _passes_blocked else None,
+                passes_blocked=cast_to_int(_passes_blocked.text)
+                if _passes_blocked
+                else None,
             )
         else:
             return None
@@ -341,60 +370,64 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                touches=int(_touches.text) if _touches else None,
-                touches_def_pen_area=int(_touches_def_pen_area.text)
+                touches=cast_to_int(_touches.text) if _touches else None,
+                touches_def_pen_area=cast_to_int(_touches_def_pen_area.text)
                 if _touches_def_pen_area
                 else None,
-                touches_def_3rd=int(_touches_def_3rd.text)
+                touches_def_3rd=cast_to_int(_touches_def_3rd.text)
                 if _touches_def_3rd
                 else None,
-                touches_mid_3rd=int(_touches_mid_3rd.text)
+                touches_mid_3rd=cast_to_int(_touches_mid_3rd.text)
                 if _touches_mid_3rd
                 else None,
-                touches_att_3rd=int(_touches_att_3rd.text)
+                touches_att_3rd=cast_to_int(_touches_att_3rd.text)
                 if _touches_att_3rd
                 else None,
-                touches_att_pen_area=int(_touches_att_pen_area.text)
+                touches_att_pen_area=cast_to_int(_touches_att_pen_area.text)
                 if _touches_att_pen_area
                 else None,
-                touches_live_ball=int(_touches_live_ball.text)
+                touches_live_ball=cast_to_int(_touches_live_ball.text)
                 if _touches_live_ball
                 else None,
                 # take_ons
-                take_ons=int(_take_ons.text) if _take_ons else None,
-                take_ons_won=int(_take_ons_won.text) if _take_ons_won else None,
-                take_ons_won_pct=float(_take_ons_won_pct.text)
+                take_ons=cast_to_int(_take_ons.text) if _take_ons else None,
+                take_ons_won=cast_to_int(_take_ons_won.text) if _take_ons_won else None,
+                take_ons_won_pct=cast_to_float(_take_ons_won_pct.text)
                 if _take_ons_won_pct
                 else None,
-                take_ons_tackled=int(_take_ons_tackled.text)
+                take_ons_tackled=cast_to_int(_take_ons_tackled.text)
                 if _take_ons_tackled
                 else None,
-                take_ons_tackled_pct=float(_take_ons_tackled_pct.text)
+                take_ons_tackled_pct=cast_to_float(_take_ons_tackled_pct.text)
                 if _take_ons_tackled_pct
                 else None,
                 # carries
-                carries=int(_carries.text) if _carries else None,
-                carries_distance=int(_carries_distance.text)
+                carries=cast_to_int(_carries.text) if _carries else None,
+                carries_distance=cast_to_int(_carries_distance.text)
                 if _carries_distance
                 else None,
-                carries_progressive_distance=int(_carries_progressive_distance.text)
+                carries_progressive_distance=cast_to_int(
+                    _carries_progressive_distance.text
+                )
                 if _carries_progressive_distance
                 else None,
-                progressive_carries=int(_progressive_carries.text)
+                progressive_carries=cast_to_int(_progressive_carries.text)
                 if _progressive_carries
                 else None,
-                carries_into_final_third=int(_carries_into_final_third.text)
+                carries_into_final_third=cast_to_int(_carries_into_final_third.text)
                 if _carries_into_final_third
                 else None,
-                carries_into_penalty_area=int(_carries_into_penalty_area.text)
+                carries_into_penalty_area=cast_to_int(_carries_into_penalty_area.text)
                 if _carries_into_penalty_area
                 else None,
-                miscontrols=int(_miscontrols.text) if _miscontrols else None,
-                dispossessed=int(_dispossessed.text) if _dispossessed else None,
-                passes_received=int(_passes_received.text)
+                miscontrols=cast_to_int(_miscontrols.text) if _miscontrols else None,
+                dispossessed=cast_to_int(_dispossessed.text) if _dispossessed else None,
+                passes_received=cast_to_int(_passes_received.text)
                 if _passes_received
                 else None,
-                progressive_passes_received=int(_progressive_passes_received.text)
+                progressive_passes_received=cast_to_int(
+                    _progressive_passes_received.text
+                )
                 if _progressive_passes_received
                 else None,
             )
@@ -428,30 +461,30 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                sca=int(_sca.text) if _sca else None,
-                sca_per90=float(_sca_per90.text) if _sca_per90 else None,
-                sca_passes_live=int(_sca_passes_live.text)
+                sca=cast_to_int(_sca.text) if _sca else None,
+                sca_per90=cast_to_float(_sca_per90.text) if _sca_per90 else None,
+                sca_passes_live=cast_to_int(_sca_passes_live.text)
                 if _sca_passes_live
                 else None,
-                sca_passes_dead=int(_sca_passes_dead.text)
+                sca_passes_dead=cast_to_int(_sca_passes_dead.text)
                 if _sca_passes_dead
                 else None,
-                sca_take_ons=int(_sca_take_ons.text) if _sca_take_ons else None,
-                sca_shots=int(_sca_shots.text) if _sca_shots else None,
-                sca_fouled=int(_sca_fouled.text) if _sca_fouled else None,
-                sca_defense=int(_sca_defense.text) if _sca_defense else None,
-                gca=int(_gca.text) if _gca else None,
-                gca_per90=float(_gca_per90.text) if _gca_per90 else None,
-                gca_passes_live=int(_gca_passes_live.text)
+                sca_take_ons=cast_to_int(_sca_take_ons.text) if _sca_take_ons else None,
+                sca_shots=cast_to_int(_sca_shots.text) if _sca_shots else None,
+                sca_fouled=cast_to_int(_sca_fouled.text) if _sca_fouled else None,
+                sca_defense=cast_to_int(_sca_defense.text) if _sca_defense else None,
+                gca=cast_to_int(_gca.text) if _gca else None,
+                gca_per90=cast_to_float(_gca_per90.text) if _gca_per90 else None,
+                gca_passes_live=cast_to_int(_gca_passes_live.text)
                 if _gca_passes_live
                 else None,
-                gca_passes_dead=int(_gca_passes_dead.text)
+                gca_passes_dead=cast_to_int(_gca_passes_dead.text)
                 if _gca_passes_dead
                 else None,
-                gca_take_ons=int(_gca_take_ons.text) if _gca_take_ons else None,
-                gca_shots=int(_gca_shots.text) if _gca_shots else None,
-                gca_fouled=int(_gca_fouled.text) if _gca_fouled else None,
-                gca_defense=int(_gca_defense.text) if _gca_defense else None,
+                gca_take_ons=cast_to_int(_gca_take_ons.text) if _gca_take_ons else None,
+                gca_shots=cast_to_int(_gca_shots.text) if _gca_shots else None,
+                gca_fouled=cast_to_int(_gca_fouled.text) if _gca_fouled else None,
+                gca_defense=cast_to_int(_gca_defense.text) if _gca_defense else None,
             )
         else:
             return None
@@ -471,7 +504,9 @@ class FbrefParser:
             _games_subs = player.find("td", {"data-stat": "games_subs"})
             _minutes_per_sub = player.find("td", {"data-stat": "minutes_per_sub"})
             _unused_subs = player.find("td", {"data-stat": "unused_subs"})
-            _points_per_game = player.find("td", {"data-stat": "points_per_game"})
+            _points_per_game = player.find(
+                "td", {"data-stat": "pocast_to_ints_per_game"}
+            )
             _on_goals_for = player.find("td", {"data-stat": "on_goals_for"})
             _on_goals_against = player.find("td", {"data-stat": "on_goals_against"})
             _plus_minus = player.find("td", {"data-stat": "plus_minus"})
@@ -491,44 +526,50 @@ class FbrefParser:
                 team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
-                games=int(_games.text) if _games else None,
-                minutes=int(_minutes.text) if _minutes else None,
-                minutes_per_game=int(_minutes_per_game.text)
+                games=cast_to_int(_games.text) if _games else None,
+                minutes=cast_to_int(_minutes.text) if _minutes else None,
+                minutes_per_game=cast_to_int(_minutes_per_game.text)
                 if _minutes_per_game
                 else None,
-                minutes_pct=float(_minutes_pct.text) if _minutes_pct else None,
-                minutes_90s=float(_minutes_90s.text) if _minutes_90s else None,
-                games_starts=int(_games_starts.text) if _games_starts else None,
-                minutes_per_start=int(_minutes_per_start.text)
+                minutes_pct=cast_to_float(_minutes_pct.text) if _minutes_pct else None,
+                minutes_90s=cast_to_float(_minutes_90s.text) if _minutes_90s else None,
+                games_starts=cast_to_int(_games_starts.text) if _games_starts else None,
+                minutes_per_start=cast_to_int(_minutes_per_start.text)
                 if _minutes_per_start
                 else None,
-                games_complete=int(_games_complete.text) if _games_complete else None,
-                games_subs=int(_games_subs.text) if _games_subs else None,
-                minutes_per_sub=int(_minutes_per_sub.text)
+                games_complete=cast_to_int(_games_complete.text)
+                if _games_complete
+                else None,
+                games_subs=cast_to_int(_games_subs.text) if _games_subs else None,
+                minutes_per_sub=cast_to_int(_minutes_per_sub.text)
                 if _minutes_per_sub
                 else None,
-                unused_subs=int(_unused_subs.text) if _unused_subs else None,
-                points_per_game=float(_points_per_game.text)
+                unused_subs=cast_to_int(_unused_subs.text) if _unused_subs else None,
+                points_per_game=cast_to_float(_points_per_game.text)
                 if _points_per_game
                 else None,
-                on_goals_for=int(_on_goals_for.text) if _on_goals_for else None,
-                on_goals_against=int(_on_goals_against.text)
+                on_goals_for=cast_to_int(_on_goals_for.text) if _on_goals_for else None,
+                on_goals_against=cast_to_int(_on_goals_against.text)
                 if _on_goals_against
                 else None,
-                plus_minus=int(_plus_minus.text) if _plus_minus else None,
-                plus_minus_per90=float(_plus_minus_per90.text)
+                plus_minus=cast_to_int(_plus_minus.text) if _plus_minus else None,
+                plus_minus_per90=cast_to_float(_plus_minus_per90.text)
                 if _plus_minus_per90
                 else None,
-                plus_minus_wowy=float(_plus_minus_wowy.text)
+                plus_minus_wowy=cast_to_float(_plus_minus_wowy.text)
                 if _plus_minus_wowy
                 else None,
-                on_xg_for=float(_on_xg_for.text) if _on_xg_for else None,
-                on_xg_against=float(_on_xg_against.text) if _on_xg_against else None,
-                xg_plus_minus=float(_xg_plus_minus.text) if _xg_plus_minus else None,
-                xg_plus_minus_per90=float(_xg_plus_minus_per90.text)
+                on_xg_for=cast_to_float(_on_xg_for.text) if _on_xg_for else None,
+                on_xg_against=cast_to_float(_on_xg_against.text)
+                if _on_xg_against
+                else None,
+                xg_plus_minus=cast_to_float(_xg_plus_minus.text)
+                if _xg_plus_minus
+                else None,
+                xg_plus_minus_per90=cast_to_float(_xg_plus_minus_per90.text)
                 if _xg_plus_minus_per90
                 else None,
-                xg_plus_minus_wowy=float(_xg_plus_minus_wowy.text)
+                xg_plus_minus_wowy=cast_to_float(_xg_plus_minus_wowy.text)
                 if _xg_plus_minus_wowy
                 else None,
             )
@@ -551,7 +592,6 @@ class FbrefParser:
             players_table = WebDriverWait(driver, 3).until(
                 EC.presence_of_element_located((By.ID, table_name))
             )
-            print("lol")
             parsed_players_table = BeautifulSoup(
                 players_table.get_attribute("outerHTML"), "html.parser"
             )
