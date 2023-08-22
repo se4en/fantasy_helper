@@ -15,16 +15,22 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats
 
 
 def cast_to_float(text: str) -> Optional[float]:
+    if not text:
+        return None
     try:
         return float(text)
     except ValueError:
+        logging.warning(f"To float: text={text} len={len(text)}")
         return None
 
 
 def cast_to_int(text: str) -> Optional[int]:
+    if not text:
+        return None
     try:
         return int(text)
     except ValueError:
+        logging.warning(f"To int: text={text} len={len(text)}")
         return None
 
 
@@ -615,6 +621,18 @@ class FbrefParser:
             if driver is not None:
                 driver.quit()
 
+    def __update_player_stat(
+        self, old_player_stat: PlayerStats, new_player_stat: PlayerStats
+    ) -> PlayerStats:
+        old_dict_stat = asdict(old_player_stat)
+        new_dict_stat = asdict(new_player_stat)
+
+        for key in old_dict_stat:
+            if key in new_dict_stat and new_dict_stat[key] is not None:
+                old_dict_stat[key] = new_dict_stat[key]
+
+        return PlayerStats(**old_dict_stat)
+
     def __update_players_stat(
         self,
         players: Dict[Tuple[str, str, str, str], PlayerStats],
@@ -627,21 +645,19 @@ class FbrefParser:
                 player.position,
                 player.league_name,
             ) in players:  # update none values
-                old_player_stat = asdict(
-                    players[
-                        (
-                            player.name,
-                            player.team_name,
-                            player.position,
-                            player.league_name,
-                        )
-                    ]
-                )
+                old_player_stat = players[
+                    (
+                        player.name,
+                        player.team_name,
+                        player.position,
+                        player.league_name,
+                    )
+                ]
                 # add new player stats
-                old_player_stat.update(asdict(player))
+                new_player_stat = self.__update_player_stat(old_player_stat, player)
                 players[
                     (player.name, player.team_name, player.position, player.league_name)
-                ] = PlayerStats(**old_player_stat)
+                ] = PlayerStats(**asdict(new_player_stat))
             else:
                 players[
                     (player.name, player.team_name, player.position, player.league_name)
@@ -661,13 +677,13 @@ class FbrefParser:
             players = self.__update_players_stat(players, playing_time_players)
         # shooting stats
         for league_name, url in self.__shooting_leagues.items():
-            playing_time_players = self.__parse_league_stats(
+            shooting_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_shooting",
                 parse_func=self.__parse_player_shooting_stat,
             )
-            players = self.__update_players_stat(players, playing_time_players)
+            players = self.__update_players_stat(players, shooting_players)
         # passing stats
         for league_name, url in self.__passing_leagues.items():
             passing_players = self.__parse_league_stats(
