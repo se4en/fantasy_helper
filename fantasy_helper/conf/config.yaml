@@ -15,7 +15,7 @@ leagues:
     emoji: 🇷🇺
     squad_id: 159004
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
-    fbref_playing_time_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
+    fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
     fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
     fbref_passing_url: null
     fbref_pass_types_url: null
@@ -113,3 +113,29 @@ leagues:
     fbref_possesion_url: https://fbref.com/en/comps/10/possession/Championship-Stats
     fbref_shot_creation_url: https://fbref.com/en/comps/10/gca/Championship-Stats
     sportsmole_name: "Championship"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Italy
+    ru_name: Италия
+    emoji: 🇮🇹
+    squad_id: 217483
+    xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
+    fbref_playing_time_url: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/11/shooting/Serie-A-Stats
+    fbref_passing_url: https://fbref.com/en/comps/11/passing/Serie-A-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/11/passing_types/Serie-A-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/11/possession/Serie-A-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/11/gca/Serie-A-Stats
+    sportsmole_name: "Serie A"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Germany
+    ru_name: Германия
+    emoji: 🇩🇪
+    squad_id: 216145
+    xber_url: https://1xstavka.ru/line/football/96463-germany-bundesliga
+    fbref_playing_time_url: https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/20/shooting/Bundesliga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/20/passing/Bundesliga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/20/passing_types/Bundesliga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/20/possession/Bundesliga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/20/gca/Bundesliga-Stats
+    sportsmole_name: "Bundesliga"
