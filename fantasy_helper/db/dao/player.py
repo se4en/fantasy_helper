@@ -8,7 +8,7 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
 
-from fantasy_helper.db.models.lineup import Lineup
+from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.fbref import FbrefParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats
@@ -77,7 +77,7 @@ class PlayerDAO:
 
         for player in players_stats:
             db_session.add(
-                Lineup(**asdict(player), timestamp=datetime.now().replace(tzinfo=utc))
+                Player(**asdict(player), timestamp=datetime.now().replace(tzinfo=utc))
             )
 
         db_session.commit()

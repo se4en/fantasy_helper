@@ -5,6 +5,11 @@ from dataclasses import asdict
 from typing import Any, Callable, Dict, Optional, List, Tuple
 
 import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import FirefoxOptions
 from bs4 import BeautifulSoup
 
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats
@@ -79,7 +84,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 goals=int(_goals.text) if _goals else None,
@@ -166,7 +171,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 passes_completed=int(_passes_completed.text)
@@ -249,7 +254,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 passes_live=int(_passes_live.text) if _passes_live else None,
@@ -333,7 +338,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 touches=int(_touches.text) if _touches else None,
@@ -420,7 +425,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 sca=int(_sca.text) if _sca else None,
@@ -483,7 +488,7 @@ class FbrefParser:
                 # common
                 name=player.find("td", {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "squad"}).text,
+                team_name=player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 games=int(_games.text) if _games else None,
@@ -533,16 +538,42 @@ class FbrefParser:
     def __parse_league_stats(
         self, league_name: str, url: str, table_name: str, parse_func: Callable
     ) -> List[PlayerStats]:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "lxml")
-        table = soup.find("table", id_=table_name)
-        players = table.find_all("tr")[2:]
-        result = []
-        for player in players:
-            parsed_player = parse_func(player, league_name)
-            if parsed_player is not None:
-                result.append(parsed_player)
-        return result
+        driver = None
+        try:
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
+            driver = webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+            )
+            driver.get(url)
+            players_table = WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.ID, table_name))
+            )
+            print("lol")
+            parsed_players_table = BeautifulSoup(
+                players_table.get_attribute("outerHTML"), "html.parser"
+            )
+            players = parsed_players_table.find_all("tr")[2:]
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logging.warning(
+                f"league_name={league_name} url={url} table_name={table_name}"
+            )
+            return []
+        else:
+            result = []
+            for player in players:
+                parsed_player = parse_func(player, league_name)
+                if parsed_player is not None:
+                    result.append(parsed_player)
+            return result
+        finally:
+            if driver is not None:
+                driver.quit()
 
     def __update_players_stat(
         self,
@@ -579,64 +610,58 @@ class FbrefParser:
 
     def get_stats_all_leagues(self) -> List[PlayerStats]:
         players: Dict[Tuple[str, str, str, str], PlayerStats] = {}
-        try:
-            # playing time stats
-            for league_name, url in self.__playing_time_leagues.items():
-                playing_time_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_playing_time",
-                    parse_func=self.__parse_player_playing_time_stat,
-                )
-                players = self.__update_players_stat(players, playing_time_players)
-            # shooting stats
-            for league_name, url in self.__shooting_leagues.items():
-                playing_time_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_shooting",
-                    parse_func=self.__parse_player_shooting_stat,
-                )
-                players = self.__update_players_stat(players, playing_time_players)
-            # passing stats
-            for league_name, url in self.__passing_leagues.items():
-                passing_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_passing",
-                    parse_func=self.__parse_player_passing_stat,
-                )
-                players = self.__update_players_stat(players, passing_players)
-            # pass types stats
-            for league_name, url in self.__pass_types_leagues.items():
-                pass_types_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_passing_types",
-                    parse_func=self.__parse_player_pass_types_stat,
-                )
-                players = self.__update_players_stat(players, pass_types_players)
-            # possession stats
-            for league_name, url in self.__possession_leagues.items():
-                possession_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_possession",
-                    parse_func=self.__parse_player_possession_stat,
-                )
-                players = self.__update_players_stat(players, possession_players)
-            # shot creation stats
-            for league_name, url in self.__shot_creation_leagues.items():
-                shot_creation_players = self.__parse_league_stats(
-                    league_name=league_name,
-                    url=url,
-                    table_name="stats_gca",
-                    parse_func=self.__parse_player_shot_creation_stat,
-                )
-                players = self.__update_players_stat(players, shot_creation_players)
-        except Exception as ex:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
-        finally:
-            return list(players.values())
+        # playing time stats
+        for league_name, url in self.__playing_time_leagues.items():
+            playing_time_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_playing_time",
+                parse_func=self.__parse_player_playing_time_stat,
+            )
+            players = self.__update_players_stat(players, playing_time_players)
+        # shooting stats
+        for league_name, url in self.__shooting_leagues.items():
+            playing_time_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_shooting",
+                parse_func=self.__parse_player_shooting_stat,
+            )
+            players = self.__update_players_stat(players, playing_time_players)
+        # passing stats
+        for league_name, url in self.__passing_leagues.items():
+            passing_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_passing",
+                parse_func=self.__parse_player_passing_stat,
+            )
+            players = self.__update_players_stat(players, passing_players)
+        # pass types stats
+        for league_name, url in self.__pass_types_leagues.items():
+            pass_types_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_passing_types",
+                parse_func=self.__parse_player_pass_types_stat,
+            )
+            players = self.__update_players_stat(players, pass_types_players)
+        # possession stats
+        for league_name, url in self.__possession_leagues.items():
+            possession_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_possession",
+                parse_func=self.__parse_player_possession_stat,
+            )
+            players = self.__update_players_stat(players, possession_players)
+        # shot creation stats
+        for league_name, url in self.__shot_creation_leagues.items():
+            shot_creation_players = self.__parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_gca",
+                parse_func=self.__parse_player_shot_creation_stat,
+            )
+            players = self.__update_players_stat(players, shot_creation_players)
+        return list(players.values())
