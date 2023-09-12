@@ -171,8 +171,8 @@ class PlayerStats:
 @dataclass
 class PlayerStatsInfo:
     name: str
-    team: str
-    position: str
+    team: Optional[str] = None
+    position: Optional[str] = None
     # playing time
     games: Optional[int] = None
     minutes: Optional[int] = None
@@ -197,8 +197,8 @@ class PlayerStatsInfo:
 @dataclass
 class FreeKicksInfo:
     name: str
-    team: str
-    position: str
+    team: Optional[str] = None
+    position: Optional[str] = None
     # playing time
     games: Optional[int] = None
     # pass types

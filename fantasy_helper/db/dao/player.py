@@ -169,17 +169,17 @@ class PlayerDAO:
         return stats_info
 
     def _compute_stats_values(
-        self, max_stats: Dict, min_stats: Dict
+        self, max_stats: Dict, min_stats: Dict, team_name: str, position: str
     ) -> Tuple[PlayerStatsInfo, PlayerStatsInfo]:
         abs_stats_info = PlayerStatsInfo(
             name=max_stats["name"],
-            team=max_stats["team_name"],
-            position=max_stats["position"],
+            team=team_name,
+            position=position,
         )
         norm_stats_info = PlayerStatsInfo(
             name=max_stats["name"],
-            team=max_stats["team_name"],
-            position=max_stats["position"],
+            team=team_name,
+            position=position,
         )
         league_name = max_stats["league_name"]
 
@@ -220,7 +220,11 @@ class PlayerDAO:
         max_games = group["games"].max()
         if max_games is None or pd.isna(max_games):
             return pd.DataFrame()
+        else:
+            max_games = int(max_games)
         abs_stats_info, norm_stats_info = None, None
+        team_name = group["team_name"].mode()
+        position = group["position"].mode()
 
         max_games_row = group[group["games"] == max_games].iloc[0].to_dict()
         for i in range(max_games - games_count, max_games):
@@ -228,7 +232,7 @@ class PlayerDAO:
             if len(row) > 0:
                 min_games_row = row.iloc[0].to_dict()
                 abs_stats_info, norm_stats_info = self._compute_stats_values(
-                    max_games_row, min_games_row
+                    max_games_row, min_games_row, team_name, position
                 )
                 break
         if is_abs_stats and abs_stats_info is not None:
@@ -241,8 +245,6 @@ class PlayerDAO:
     def _compute_free_kicks_stats_values(self, stats: Dict) -> FreeKicksInfo:
         return FreeKicksInfo(
             name=stats["name"],
-            team=stats["team_name"],
-            position=stats["position"],
             games=stats["games"],
             corner_kicks=stats["corner_kicks"],
             penalty_goals=stats["pens_made"],
@@ -254,9 +256,13 @@ class PlayerDAO:
         max_games = group["games"].max()
         if max_games is None or pd.isna(max_games):
             return pd.DataFrame()
+        team_name = group["team_name"].mode()
+        position = group["position"].mode()
 
         max_games_row = group[group["games"] == max_games].iloc[0].to_dict()
         free_kikcs_info = self._compute_free_kicks_stats_values(max_games_row)
+        free_kikcs_info.team = team_name
+        free_kikcs_info.position = position
         return pd.DataFrame(asdict(free_kikcs_info), index=[0])
 
     def get_players_stats(
@@ -299,11 +305,9 @@ class PlayerDAO:
         db_session.close()
 
         if is_free_kicks:
-            return df.groupby(by=["name", "team_name", "position"]).apply(
-                self._compute_free_kicks_stats
-            )
+            return df.groupby(by=["name"]).apply(self._compute_free_kicks_stats)
         else:
-            return df.groupby(by=["name", "team_name", "position"]).apply(
+            return df.groupby(by=["name"]).apply(
                 lambda x: self._compute_player_stats(x, games_count, is_abs_stats)
             )
 
