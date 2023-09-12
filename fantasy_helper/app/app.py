@@ -136,26 +136,34 @@ def plot_player_stats_df(df: pd.DataFrame):
     st.dataframe(df)
 
 
+def centrize_header(text: str):
+    style = "<style>h2 {text-align: center;}</style>"
+    st.markdown(style, unsafe_allow_html=True)
+    st.header(text)
+
+
 if authentication_status:
     st.session_state["league"] = leagues[
-        st.selectbox("League", sorted(leagues.keys()), label_visibility="collapsed")
+        st.selectbox("League name", sorted(leagues.keys()), label_visibility="visible")
     ]
     st.write("")
     left, right = st.columns([4, 2])
 
     # plot coeffs
     with left:
+        centrize_header("Coefficients")
         coeffs_df = coeffs_to_df(st.session_state["league"])
         plot_coeff_df(coeffs_df)
 
     # plot lineup
     with right:
+        centrize_header("Lineups")
         lineups = {
             lineup.team_name: lineup.lineup
             for lineup in Lineup_dao.get_lineups(st.session_state["league"])
         }
         team_name = st.selectbox(
-            "Team", sorted(list(lineups.keys())), label_visibility="collapsed"
+            "Team", sorted(list(lineups.keys())), label_visibility="visible"
         )
         if team_name is not None:
             formation, positions, names = lineup_to_formation(lineups[team_name])
@@ -164,6 +172,9 @@ if authentication_status:
                 st.pyplot(fig=fig, clear_figure=None, use_container_width=True)
             else:
                 st.write("Lineup is not available")
+
+    # plot stats
+    centrize_header("Players stats")
 
     left, center, right = st.columns([4, 4, 2])
     with left:
@@ -179,7 +190,6 @@ if authentication_status:
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
 
-    # plot stats
     player_stats_df = player_stats_to_df(
         league_name=st.session_state["league"],
         games_count=st.session_state["games_count"],
