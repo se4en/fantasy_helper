@@ -67,6 +67,24 @@ class FbrefParser:
             if l.fbref_shot_creation_url is not None
         }
 
+    def get_playing_time_leagues(self) -> Dict[str, str]:
+        return self.__playing_time_leagues
+
+    def get_shooting_leagues(self) -> Dict[str, str]:
+        return self.__shooting_leagues
+
+    def get_passing_leagues(self) -> Dict[str, str]:
+        return self.__passing_leagues
+
+    def get_pass_types_leagues(self) -> Dict[str, str]:
+        return self.__pass_types_leagues
+
+    def get_possession_leagues(self) -> Dict[str, str]:
+        return self.__possession_leagues
+
+    def get_shot_creation_leagues(self) -> Dict[str, str]:
+        return self.__shot_creation_leagues
+
     def __parse_player_shooting_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
@@ -664,10 +682,11 @@ class FbrefParser:
                 ] = player
         return players
 
-    def get_stats_all_leagues(self) -> List[PlayerStats]:
+    def get_stats_league(self, league_name: str) -> List[PlayerStats]:
         players: Dict[Tuple[str, str, str, str], PlayerStats] = {}
         # playing time stats
-        for league_name, url in self.__playing_time_leagues.items():
+        if league_name in self.__playing_time_leagues:
+            url = self.__playing_time_leagues[league_name]
             playing_time_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -676,7 +695,8 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, playing_time_players)
         # shooting stats
-        for league_name, url in self.__shooting_leagues.items():
+        if league_name in self.__shooting_leagues:
+            url = self.__shooting_leagues[league_name]
             shooting_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -685,7 +705,8 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, shooting_players)
         # passing stats
-        for league_name, url in self.__passing_leagues.items():
+        if league_name in self.__passing_leagues:
+            url = self.__passing_leagues[league_name]
             passing_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -694,7 +715,8 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, passing_players)
         # pass types stats
-        for league_name, url in self.__pass_types_leagues.items():
+        if league_name in self.__pass_types_leagues:
+            url = self.__pass_types_leagues[league_name]
             pass_types_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -703,7 +725,8 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, pass_types_players)
         # possession stats
-        for league_name, url in self.__possession_leagues.items():
+        if league_name in self.__possession_leagues:
+            url = self.__possession_leagues[league_name]
             possession_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -712,7 +735,8 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, possession_players)
         # shot creation stats
-        for league_name, url in self.__shot_creation_leagues.items():
+        if league_name in self.__shot_creation_leagues:
+            url = self.__shot_creation_leagues[league_name]
             shot_creation_players = self.__parse_league_stats(
                 league_name=league_name,
                 url=url,
@@ -721,3 +745,16 @@ class FbrefParser:
             )
             players = self.__update_players_stat(players, shot_creation_players)
         return list(players.values())
+
+    def get_all_leagues(self) -> List[str]:
+        all_leagues: List[str] = []
+        for leagues_dict in [
+            self.__playing_time_leagues,
+            self.__shooting_leagues,
+            self.__passing_leagues,
+            self.__pass_types_leagues,
+            self.__possession_leagues,
+            self.__shot_creation_leagues,
+        ]:
+            all_leagues.extend(league_name for league_name in leagues_dict.keys())
+        return list(set(all_leagues))

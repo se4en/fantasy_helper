@@ -166,3 +166,29 @@ class PlayerStats:
     gca_shots: Optional[int] = None
     gca_fouled: Optional[int] = None
     gca_defense: Optional[int] = None
+
+
+@dataclass
+class PlayerStatsInfo:
+    name: str
+    team: str
+    position: str
+    # playing time
+    games: Optional[int] = None
+    minutes: Optional[int] = None
+    # shooting
+    goals: Optional[float] = None
+    shots: Optional[float] = None
+    shots_on_target: Optional[float] = None
+    xg: Optional[float] = None
+    xg_np: Optional[float] = None
+    # passing
+    xa: Optional[float] = None
+    key_passes: Optional[float] = None
+    passes_into_penalty_area: Optional[float] = None
+    crosses_into_penalty_area: Optional[float] = None
+    # possesion
+    touches_in_attacking_third: Optional[float] = None
+    touches_in_attacking_penalty_area: Optional[float] = None
+    carries_in_attacking_third: Optional[float] = None
+    carries_in_attacking_penalty_area: Optional[float] = None
