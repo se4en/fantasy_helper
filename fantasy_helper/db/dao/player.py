@@ -233,7 +233,9 @@ class PlayerDAO:
         else:
             return pd.DataFrame()
 
-    def get_players_stats(self, league_name: str, games_count: int) -> pd.DataFrame:
+    def get_players_stats(
+        self, league_name: str, games_count: int, is_abs_stats: bool = True
+    ) -> pd.DataFrame:
         db_session: SQLSession = Session()
 
         cur_league_players = (
@@ -267,7 +269,7 @@ class PlayerDAO:
         db_session.close()
 
         return df.groupby(by=["name", "team_name", "position"]).apply(
-            lambda x: self._compute_player_stats(x, games_count)
+            lambda x: self._compute_player_stats(x, games_count, is_abs_stats)
         )
 
     def update_players_stats_all_leagues(self) -> None:
