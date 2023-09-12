@@ -150,12 +150,16 @@ def centrize_header(text: str):
 
 
 if authentication_status:
-    st.session_state["league"] = leagues[
-        st.selectbox("League name", sorted(leagues.keys()), label_visibility="visible")
-    ]
+    with st.columns(3)[1]:
+        centrize_header("League name")
+        st.session_state["league"] = leagues[
+            st.selectbox(
+                "League name", sorted(leagues.keys()), label_visibility="collapsed"
+            )
+        ]
     st.write("")
-    left, right = st.columns([4, 2])
 
+    left, right = st.columns([4, 2])
     # plot coeffs
     with left:
         centrize_header("Coefficients")
