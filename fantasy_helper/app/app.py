@@ -132,6 +132,13 @@ def player_stats_to_df(
     return stats_df
 
 
+def free_kicks_stats_to_df(league_name: str) -> pd.DataFrame:
+    stats_df = Player_dao.get_players_stats(league_name, is_free_kicks=True)
+    stats_df.reset_index(drop=True, inplace=True)
+    stats_df.dropna(axis=1, how="all", inplace=True)
+    return stats_df
+
+
 def plot_player_stats_df(df: pd.DataFrame):
     st.dataframe(df)
 
@@ -197,6 +204,10 @@ if authentication_status:
         min_minutes=st.session_state["min_minutes"],
     )
     plot_player_stats_df(player_stats_df)
+
+    centrize_header("Free kicks stats")
+    free_kicks_stats_df = free_kicks_stats_to_df(league_name=st.session_state["league"])
+    plot_player_stats_df(free_kicks_stats_df)
 
 elif authentication_status is False:
     st.error("Username/password is incorrect")

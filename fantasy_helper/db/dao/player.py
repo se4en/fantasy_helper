@@ -12,7 +12,12 @@ from hydra.core.global_hydra import GlobalHydra
 from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.fbref import FbrefParser
-from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats, PlayerStatsInfo
+from fantasy_helper.utils.dataclasses import (
+    LeagueInfo,
+    PlayerStats,
+    PlayerStatsInfo,
+    FreeKicksInfo,
+)
 
 
 utc = timezone.utc
@@ -213,7 +218,7 @@ class PlayerDAO:
         self, group: pd.DataFrame, games_count: int, is_abs_stats: bool = True
     ) -> pd.DataFrame:
         max_games = group["games"].max()
-        if max_games is None:
+        if max_games is None or pd.isna(max_games):
             return pd.DataFrame()
         abs_stats_info, norm_stats_info = None, None
 
@@ -233,8 +238,33 @@ class PlayerDAO:
         else:
             return pd.DataFrame()
 
+    def _compute_free_kicks_stats_values(self, stats: Dict) -> FreeKicksInfo:
+        return FreeKicksInfo(
+            name=stats["name"],
+            team=stats["team_name"],
+            position=stats["position"],
+            games=stats["games"],
+            corner_kicks=stats["corner_kicks"],
+            penalty_goals=stats["pens_made"],
+            penalty_shots=stats["pens_att"],
+            free_kicks_shots=stats["shots_free_kicks"],
+        )
+
+    def _compute_free_kicks_stats(self, group: pd.DataFrame) -> pd.DataFrame:
+        max_games = group["games"].max()
+        if max_games is None or pd.isna(max_games):
+            return pd.DataFrame()
+
+        max_games_row = group[group["games"] == max_games].iloc[0].to_dict()
+        free_kikcs_info = self._compute_free_kicks_stats_values(max_games_row)
+        return pd.DataFrame(asdict(free_kikcs_info), index=[0])
+
     def get_players_stats(
-        self, league_name: str, games_count: int, is_abs_stats: bool = True
+        self,
+        league_name: str,
+        games_count: Optional[int] = None,
+        is_abs_stats: bool = True,
+        is_free_kicks: bool = False,
     ) -> pd.DataFrame:
         db_session: SQLSession = Session()
 
@@ -268,9 +298,14 @@ class PlayerDAO:
         db_session.commit()
         db_session.close()
 
-        return df.groupby(by=["name", "team_name", "position"]).apply(
-            lambda x: self._compute_player_stats(x, games_count, is_abs_stats)
-        )
+        if is_free_kicks:
+            return df.groupby(by=["name", "team_name", "position"]).apply(
+                self._compute_free_kicks_stats
+            )
+        else:
+            return df.groupby(by=["name", "team_name", "position"]).apply(
+                lambda x: self._compute_player_stats(x, games_count, is_abs_stats)
+            )
 
     def update_players_stats_all_leagues(self) -> None:
         for league_name in self.__fbref_parser.get_all_leagues():

@@ -192,3 +192,18 @@ class PlayerStatsInfo:
     touches_in_attacking_penalty_area: Optional[float] = None
     carries_in_attacking_third: Optional[float] = None
     carries_in_attacking_penalty_area: Optional[float] = None
+
+
+@dataclass
+class FreeKicksInfo:
+    name: str
+    team: str
+    position: str
+    # playing time
+    games: Optional[int] = None
+    # pass types
+    corner_kicks: Optional[float] = None
+    # shooting
+    penalty_goals: Optional[float] = None  # pens_made
+    penalty_shots: Optional[float] = None  # pens_att
+    free_kicks_shots: Optional[float] = None  # shots_free_kicks
