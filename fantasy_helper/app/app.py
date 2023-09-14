@@ -37,9 +37,6 @@ st.set_page_config(
 authenticator = stauth.Authenticate(credentials, **cookie)
 name, authentication_status, username = authenticator.login("Login", "main")
 st.session_state["league"] = list(leagues.keys())[0]
-st.session_state["teams_names"] = Player_dao.get_teams_names(
-    leagues[st.session_state["league"]]
-)
 st.session_state["normalize"] = False
 st.session_state["games_count"] = 3
 st.session_state["min_minutes"] = 5
@@ -202,7 +199,8 @@ if authentication_status:
     with columns[0]:
         st.selectbox(
             "Team name",
-            options=["All"] + st.session_state["teams_names"],
+            options=["All"]
+            + Player_dao.get_teams_names(leagues[st.session_state["league"]]),
             key="player_stats_team_name",
             label_visibility="visible",
         )
@@ -235,7 +233,8 @@ if authentication_status:
     with columns[1]:
         st.selectbox(
             "Team name",
-            options=["All"] + st.session_state["teams_names"],
+            options=["All"]
+            + Player_dao.get_teams_names(leagues[st.session_state["league"]]),
             key="free_kicks_stats_team_name",
             label_visibility="visible",
         )
