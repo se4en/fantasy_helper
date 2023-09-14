@@ -265,6 +265,21 @@ class PlayerDAO:
         free_kikcs_info.position = position
         return pd.DataFrame(asdict(free_kikcs_info), index=[0])
 
+    def get_teams_names(self, league_name: str) -> List[str]:
+        db_session: SQLSession = Session()
+
+        team_names = (
+            db_session.query(Player.team_name)
+            .filter(Player.league_name == league_name)
+            .distinct()
+            .all()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return [team_name[0] for team_name in team_names]
+
     def get_players_stats(
         self,
         league_name: str,

@@ -37,6 +37,9 @@ st.set_page_config(
 authenticator = stauth.Authenticate(credentials, **cookie)
 name, authentication_status, username = authenticator.login("Login", "main")
 st.session_state["league"] = list(leagues.keys())[0]
+st.session_state["teams_names"] = Player_dao.get_teams_names(
+    leagues[st.session_state["league"]]
+)
 st.session_state["normalize"] = False
 st.session_state["games_count"] = 3
 st.session_state["min_minutes"] = 5
@@ -123,19 +126,27 @@ def plot_coeff_df(df: pd.DataFrame):
 
 
 def player_stats_to_df(
-    league_name: str, games_count: int, is_abs_stats: bool = True, min_minutes: int = 5
+    league_name: str,
+    games_count: int,
+    is_abs_stats: bool = True,
+    min_minutes: int = 5,
+    team_name: str = "All",
 ) -> pd.DataFrame:
     stats_df = Player_dao.get_players_stats(league_name, games_count, is_abs_stats)
     stats_df.reset_index(drop=True, inplace=True)
     stats_df.dropna(axis=1, how="all", inplace=True)
     stats_df = stats_df[stats_df["minutes"] >= min_minutes]
+    if team_name != "All":
+        stats_df = stats_df[stats_df["team"] == team_name]
     return stats_df
 
 
-def free_kicks_stats_to_df(league_name: str) -> pd.DataFrame:
+def free_kicks_stats_to_df(league_name: str, team_name: str = "All") -> pd.DataFrame:
     stats_df = Player_dao.get_players_stats(league_name, is_free_kicks=True)
     stats_df.reset_index(drop=True, inplace=True)
     stats_df.dropna(axis=1, how="all", inplace=True)
+    if team_name != "All":
+        stats_df = stats_df[stats_df["team"] == team_name]
     return stats_df
 
 
@@ -187,16 +198,23 @@ if authentication_status:
     # plot stats
     centrize_header("Players stats")
 
-    left, center, right = st.columns([4, 4, 2])
-    with left:
+    columns = st.columns([2, 4, 2, 2])
+    with columns[0]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + st.session_state["teams_names"],
+            key="player_stats_team_name",
+            label_visibility="visible",
+        )
+    with columns[1]:
         st.session_state["games_count"] = st.select_slider(
             "Games count", options=list(range(1, 11)), value=3
         )
-    with center:
+    with columns[2]:
         st.session_state["min_minutes"] = st.number_input(
             "Minimum minutes", value=5, min_value=1, max_value=1000, step=1
         )
-    with right:
+    with columns[3]:
         st.write("")
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
@@ -206,11 +224,26 @@ if authentication_status:
         games_count=st.session_state["games_count"],
         is_abs_stats=not st.session_state["normalize"],
         min_minutes=st.session_state["min_minutes"],
+        team_name=st.session_state["player_stats_team_name"],
     )
     plot_player_stats_df(player_stats_df)
 
+    # plot free kicks stats
     centrize_header("Free kicks stats")
-    free_kicks_stats_df = free_kicks_stats_to_df(league_name=st.session_state["league"])
+
+    columns = st.columns([2, 2, 2])
+    with columns[1]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + st.session_state["teams_names"],
+            key="free_kicks_stats_team_name",
+            label_visibility="visible",
+        )
+
+    free_kicks_stats_df = free_kicks_stats_to_df(
+        league_name=st.session_state["league"],
+        team_name=st.session_state["free_kicks_stats_team_name"],
+    )
     plot_player_stats_df(free_kicks_stats_df)
 
 elif authentication_status is False:
