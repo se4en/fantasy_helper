@@ -278,7 +278,7 @@ class PlayerDAO:
         db_session.commit()
         db_session.close()
 
-        return [team_name[0] for team_name in team_names]
+        return sorted([team_name[0] for team_name in team_names])
 
     def get_players_stats(
         self,
