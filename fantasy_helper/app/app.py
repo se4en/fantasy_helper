@@ -118,8 +118,8 @@ def plot_coeff_df(df: pd.DataFrame):
 
     st.dataframe(
         df.style.format("{:.3}", subset=attack_columns + defend_columns)
-        .applymap(color_coeff, subset=attack_columns)
-        .applymap(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns)
+        .map(color_coeff, subset=attack_columns)
+        .map(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns)
     )
 
 
@@ -228,7 +228,7 @@ if authentication_status:
     # plot stats
     centrize_header("Players stats")
 
-    columns = st.columns([2, 4, 2, 2])
+    columns = st.columns([2, 2, 2, 2])
     with columns[0]:
         st.selectbox(
             "Team name",
@@ -237,12 +237,12 @@ if authentication_status:
             label_visibility="visible",
         )
     with columns[1]:
-        st.session_state["games_count"] = st.select_slider(
-            "Games count", options=list(range(1, 11)), value=3
+        st.session_state["games_count"] = st.number_input(
+            "Games count", value=3, min_value=1, max_value=30, step=1
         )
     with columns[2]:
         st.session_state["min_minutes"] = st.number_input(
-            "Minimum minutes", value=5, min_value=1, max_value=1000, step=1
+            "Minimum minutes", value=10, min_value=1, max_value=1000, step=1
         )
     with columns[3]:
         st.write("")
