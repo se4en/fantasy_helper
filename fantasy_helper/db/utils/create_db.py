@@ -4,6 +4,7 @@ from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.source import Source
 from fantasy_helper.db.models.user import User
 from fantasy_helper.db.models.lineup import Lineup
+from fantasy_helper.db.models.player import Player
 
 
 def create_db():

@@ -15,9 +15,12 @@ leagues:
     emoji: 🇷🇺
     squad_id: 159004
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
-    fbref_shoots_url: https://fbref.com/en/comps/30/2022-2023/shooting/2022-2023-Russian-Premier-League-Stats
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
     sportsmole_name: null
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: England
@@ -25,9 +28,12 @@ leagues:
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
     squad_id: 175618
     xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
+    fbref_passing_url: https://fbref.com/en/comps/9/passing/Premier-League-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/9/passing_types/Premier-League-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/9/possession/Premier-League-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/9/gca/Premier-League-Stats
     sportsmole_name: "Premier League"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Spain
@@ -35,9 +41,12 @@ leagues:
     emoji: 🇪🇸
     squad_id: 185281
     xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/12/passing/La-Liga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/12/passing_types/La-Liga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/12/possession/La-Liga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/12/gca/La-Liga-Stats
     sportsmole_name: "La Liga"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: France
@@ -45,9 +54,12 @@ leagues:
     emoji: 🇫🇷
     squad_id: 175626
     xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
+    fbref_passing_url: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/13/passing_types/Ligue-1-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/13/possession/Ligue-1-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/13/gca/Ligue-1-Stats
     sportsmole_name: "Ligue 1"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Portugal
@@ -55,9 +67,12 @@ leagues:
     emoji: 🇵🇹
     squad_id: 185282
     xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/32/passing_types/Primeira-Liga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/32/possession/Primeira-Liga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/32/gca/Primeira-Liga-Stats
     sportsmole_name: "Primeira Liga"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Netherlands
@@ -65,9 +80,12 @@ leagues:
     emoji: 🇳🇱
     squad_id: 175625
     xber_url: https://1xstavka.ru/line/football/2018750-netherlands-eredivisie
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/23/shooting/Eredivisie-Stats
+    fbref_passing_url: https://fbref.com/en/comps/23/passing/Eredivisie-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/23/passing_types/Eredivisie-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/23/possession/Eredivisie-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/23/gca/Eredivisie-Stats
     sportsmole_name: "Eredivisie"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Turkey
@@ -75,9 +93,12 @@ leagues:
     emoji: 🇹🇷
     squad_id: 175622
     xber_url: https://1xstavka.ru/line/football/11113-turkey-superliga
-    fbref_shoots_url: null
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/26/shooting/Super-Lig-Stats
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
     sportsmole_name: "Turkish Super Lig"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Championship
@@ -85,7 +106,36 @@ leagues:
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
     squad_id: 175621
     xber_url: https://1xstavka.ru/line/football/105759-england-championship
-    fbref_shoots_url: https://fbref.com/en/comps/10/shooting/Championship-Stats
-    fbref_xg_url: null
-    fbref_shoots_creation_url: null
+    fbref_playing_time_url: https://fbref.com/en/comps/10/playingtime/Championship-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/10/shooting/Championship-Stats
+    fbref_passing_url: https://fbref.com/en/comps/10/passing/Championship-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/10/passing_types/Championship-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/10/possession/Championship-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/10/gca/Championship-Stats
     sportsmole_name: "Championship"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Italy
+    ru_name: Италия
+    emoji: 🇮🇹
+    squad_id: 217483
+    xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
+    fbref_playing_time_url: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/11/shooting/Serie-A-Stats
+    fbref_passing_url: https://fbref.com/en/comps/11/passing/Serie-A-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/11/passing_types/Serie-A-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/11/possession/Serie-A-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/11/gca/Serie-A-Stats
+    sportsmole_name: "Serie A"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Germany
+    ru_name: Германия
+    emoji: 🇩🇪
+    squad_id: 216145
+    xber_url: https://1xstavka.ru/line/football/96463-germany-bundesliga
+    fbref_playing_time_url: https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/20/shooting/Bundesliga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/20/passing/Bundesliga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/20/passing_types/Bundesliga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/20/possession/Bundesliga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/20/gca/Bundesliga-Stats
+    sportsmole_name: "Bundesliga"
