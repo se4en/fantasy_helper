@@ -1,4 +1,4 @@
-# Telegram-bot for fantasy football players on [sports.ru](https://www.sports.ru/fantasy/#menu-sub)
+# App for fantasy football players on [sports.ru](https://www.sports.ru/fantasy/#menu-sub)
 ## Setup
 ```bash
 cat env_temp > .env
