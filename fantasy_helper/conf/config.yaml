@@ -139,3 +139,29 @@ leagues:
     fbref_possesion_url: https://fbref.com/en/comps/20/possession/Bundesliga-Stats
     fbref_shot_creation_url: https://fbref.com/en/comps/20/gca/Bundesliga-Stats
     sportsmole_name: "Bundesliga"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: ChampionsLeague
+    ru_name: Лига Чемпионов
+    emoji: 🇪🇺
+    squad_id: 232134
+    xber_url: https://1xstavka.ru/en/line/football/118587-uefa-champions-league
+    fbref_playing_time_url: null
+    fbref_shooting_url: null
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
+    sportsmole_name: "Champions League"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: EuropaLeague
+    ru_name: Лига Европы
+    emoji: 🇪🇺
+    squad_id: 232139
+    xber_url: https://1xstavka.ru/en/line/football/118593-uefa-europa-league
+    fbref_playing_time_url: null
+    fbref_shooting_url: null
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
+    sportsmole_name: "uropa League"
