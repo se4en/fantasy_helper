@@ -68,7 +68,7 @@ def get_stat_from_mathes(
     return result
 
 
-@st.cache_data
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading coefficients...")
 def coeffs_to_df(league_name: str) -> pd.DataFrame:
     cur_tour_matches = Coeff_dao.get_coeffs(league_name, "cur")
     next_tour_matches = Coeff_dao.get_coeffs(league_name, "next")
@@ -123,17 +123,17 @@ def plot_coeff_df(df: pd.DataFrame):
     )
 
 
-@st.cache_data
+@st.cache_data(ttl=3600, max_entries=500, show_spinner="Loading players stats...")
 def players_league_stats_to_df(league_name: str) -> pd.DataFrame:
     return Player_dao.get_players_stats(league_name)
 
 
-@st.cache_data
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading teams...")
 def get_teams_names(league_name: str):
     return Player_dao.get_teams_names(league_name)
 
 
-@st.cache_data
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading lineups...")
 def get_lineups(league_name: str):
     return Lineup_dao.get_lineups(league_name)
 
