@@ -11,9 +11,8 @@ selenium==4.5.0
 sqlalchemy==1.4.2
 sqlalchemy-utils==0.38.3
 psycopg2-binary==2.9.5
-gitpython==3.1.35
-dataframe_image==0.1.5
 iso8601==1.1.0
 streamlit==1.26.0
 streamlit-authenticator==0.2.2
+matplotlib<3.7
 mplsoccer==1.2.1
