@@ -17,6 +17,7 @@ from fantasy_helper.utils.dataclasses import (
     PlayerStats,
     PlayerStatsInfo,
     FreeKicksInfo,
+    PlayersLeagueStats,
 )
 
 
@@ -39,7 +40,10 @@ class PlayerDAO:
             if minutes is None:
                 return max_value - min_value
             else:
-                return (max_value - min_value) * 90 / minutes
+                if minutes > 0:
+                    return (max_value - min_value) * 90 / minutes
+                else:
+                    return None
         else:
             return None
 
@@ -215,30 +219,28 @@ class PlayerDAO:
         return abs_stats_info, norm_stats_info
 
     def _compute_player_stats(
-        self, group: pd.DataFrame, games_count: int, is_abs_stats: bool = True
+        self, group: pd.DataFrame, is_abs_stats: bool = True
     ) -> pd.DataFrame:
-        max_games = group["games"].max()
-        if max_games is None or pd.isna(max_games):
+        sorted_df = group.sort_values("games", ascending=True)
+        if len(sorted_df) == 0:
             return pd.DataFrame()
-        else:
-            max_games = int(max_games)
-        abs_stats_info, norm_stats_info = None, None
-        team_name = group["team_name"].mode()
-        position = group["position"].mode()
+        abs_stats_infos, norm_stats_infos = [], []
 
-        max_games_row = group[group["games"] == max_games].iloc[0].to_dict()
-        for i in range(max_games - games_count, max_games):
-            row = group[group["games"] == i]
-            if len(row) > 0:
-                min_games_row = row.iloc[0].to_dict()
-                abs_stats_info, norm_stats_info = self._compute_stats_values(
-                    max_games_row, min_games_row, team_name, position
-                )
-                break
-        if is_abs_stats and abs_stats_info is not None:
-            return pd.DataFrame(asdict(abs_stats_info), index=[0])
-        elif (not is_abs_stats) and norm_stats_info is not None:
-            return pd.DataFrame(asdict(norm_stats_info), index=[0])
+        team_name = group["team_name"].mode().iloc[0]
+        position = group["position"].mode().iloc[0]
+        max_games_row = sorted_df.iloc[-1].to_dict()
+
+        for _, row in sorted_df.iloc[:-1].iterrows():
+            abs_stats_info, norm_stats_info = self._compute_stats_values(
+                max_games_row, row.to_dict(), team_name, position
+            )
+            abs_stats_infos.append(asdict(abs_stats_info))
+            norm_stats_infos.append(asdict(norm_stats_info))
+
+        if is_abs_stats and abs_stats_infos:
+            return pd.DataFrame(abs_stats_infos)
+        elif (not is_abs_stats) and norm_stats_infos:
+            return pd.DataFrame(norm_stats_infos)
         else:
             return pd.DataFrame()
 
@@ -258,8 +260,8 @@ class PlayerDAO:
             return pd.DataFrame()
         team_name = group["team_name"].mode()
         position = group["position"].mode()
-
         max_games_row = group[group["games"] == max_games].iloc[0].to_dict()
+
         free_kikcs_info = self._compute_free_kicks_stats_values(max_games_row)
         free_kikcs_info.team = team_name
         free_kikcs_info.position = position
@@ -280,13 +282,7 @@ class PlayerDAO:
 
         return sorted([team_name[0] for team_name in team_names])
 
-    def get_players_stats(
-        self,
-        league_name: str,
-        games_count: Optional[int] = None,
-        is_abs_stats: bool = True,
-        is_free_kicks: bool = False,
-    ) -> pd.DataFrame:
+    def get_players_stats(self, league_name: str) -> PlayersLeagueStats:
         db_session: SQLSession = Session()
 
         cur_league_players = (
@@ -319,12 +315,18 @@ class PlayerDAO:
         db_session.commit()
         db_session.close()
 
-        if is_free_kicks:
-            return df.groupby(by=["name"]).apply(self._compute_free_kicks_stats)
-        else:
-            return df.groupby(by=["name"]).apply(
-                lambda x: self._compute_player_stats(x, games_count, is_abs_stats)
-            )
+        result = PlayersLeagueStats(
+            abs_stats=df.groupby(by=["name"])
+            .apply(lambda x: self._compute_player_stats(x, is_abs_stats=True))
+            .reset_index(drop=True, inplace=False),
+            norm_stats=df.groupby(by=["name"])
+            .apply(lambda x: self._compute_player_stats(x, is_abs_stats=False))
+            .reset_index(drop=True, inplace=False),
+            free_kicks=df.groupby(by=["name"])
+            .apply(self._compute_free_kicks_stats)
+            .reset_index(drop=True, inplace=False),
+        )
+        return result
 
     def update_players_stats_all_leagues(self) -> None:
         for league_name in self.__fbref_parser.get_all_leagues():

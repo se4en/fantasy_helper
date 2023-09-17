@@ -12,7 +12,7 @@ from fantasy_helper.app.utils import lineup_to_formation, plot_lineup
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.lineup import LineupDAO
 from fantasy_helper.db.dao.player import PlayerDAO
-from fantasy_helper.utils.dataclasses import MatchInfo
+from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats
 
 
 # load configs
@@ -68,6 +68,7 @@ def get_stat_from_mathes(
     return result
 
 
+@st.cache_data
 def coeffs_to_df(league_name: str) -> pd.DataFrame:
     cur_tour_matches = Coeff_dao.get_coeffs(league_name, "cur")
     next_tour_matches = Coeff_dao.get_coeffs(league_name, "next")
@@ -122,32 +123,63 @@ def plot_coeff_df(df: pd.DataFrame):
     )
 
 
-def player_stats_to_df(
-    league_name: str,
+@st.cache_data
+def players_league_stats_to_df(league_name: str) -> pd.DataFrame:
+    return Player_dao.get_players_stats(league_name)
+
+
+@st.cache_data
+def get_teams_names(league_name: str):
+    return Player_dao.get_teams_names(league_name)
+
+
+@st.cache_data
+def get_lineups(league_name: str):
+    return Lineup_dao.get_lineups(league_name)
+
+
+def plot_main_players_statss(
+    players_stats: PlayersLeagueStats,
     games_count: int,
     is_abs_stats: bool = True,
     min_minutes: int = 5,
     team_name: str = "All",
+):
+    if is_abs_stats:
+        df = players_stats.abs_stats
+    else:
+        df = players_stats.norm_stats
+
+    if team_name != "All":
+        df = df.loc[df["team"] == team_name]
+    df = df.loc[df["games"] <= games_count]
+    df = df.loc[df["minutes"] >= min_minutes]
+    df.dropna(axis=1, how="all", inplace=True)
+
+    def _get_max_game_count_row(group: pd.DataFrame) -> pd.DataFrame:
+        result = group.loc[group["games"] == group["games"].max()]
+        if len(result) > 0:
+            return pd.DataFrame(result.iloc[0].to_dict(), index=[0])
+        else:
+            return pd.DataFrame()
+
+    df = df.groupby(by=["name"]).apply(_get_max_game_count_row)
+    df.reset_index(drop=True, inplace=True)
+    df.fillna(0, inplace=True)
+
+    st.dataframe(df)
+
+
+def plot_free_kicks_stats(
+    players_stats: PlayersLeagueStats, team_name: str = "All"
 ) -> pd.DataFrame:
-    stats_df = Player_dao.get_players_stats(league_name, games_count, is_abs_stats)
-    stats_df.reset_index(drop=True, inplace=True)
-    stats_df.dropna(axis=1, how="all", inplace=True)
-    stats_df = stats_df[stats_df["minutes"] >= min_minutes]
+    df = players_stats.free_kicks
     if team_name != "All":
-        stats_df = stats_df[stats_df["team"] == team_name]
-    return stats_df
+        df = df.loc[df["team"] == team_name]
 
+    df.dropna(axis=1, how="all", inplace=True)
+    df.fillna(0, inplace=True)
 
-def free_kicks_stats_to_df(league_name: str, team_name: str = "All") -> pd.DataFrame:
-    stats_df = Player_dao.get_players_stats(league_name, is_free_kicks=True)
-    stats_df.reset_index(drop=True, inplace=True)
-    stats_df.dropna(axis=1, how="all", inplace=True)
-    if team_name != "All":
-        stats_df = stats_df[stats_df["team"] == team_name]
-    return stats_df
-
-
-def plot_player_stats_df(df: pd.DataFrame):
     st.dataframe(df)
 
 
@@ -167,20 +199,21 @@ if authentication_status:
         ]
     st.write("")
 
+    player_stats_df = players_league_stats_to_df(st.session_state["league"])
+    coeffs_df = coeffs_to_df(st.session_state["league"])
+    team_names = get_teams_names(st.session_state["league"])
+    lineups = get_lineups(st.session_state["league"])
+
     left, right = st.columns([4, 2])
     # plot coeffs
     with left:
         centrize_header("Coefficients")
-        coeffs_df = coeffs_to_df(st.session_state["league"])
         plot_coeff_df(coeffs_df)
 
     # plot lineup
     with right:
         centrize_header("Lineups")
-        lineups = {
-            lineup.team_name: lineup.lineup
-            for lineup in Lineup_dao.get_lineups(st.session_state["league"])
-        }
+        lineups = {lineup.team_name: lineup.lineup for lineup in lineups}
         team_name = st.selectbox(
             "Team", sorted(list(lineups.keys())), label_visibility="visible"
         )
@@ -190,7 +223,7 @@ if authentication_status:
                 fig = plot_lineup(formation, positions, names)
                 st.pyplot(fig=fig, clear_figure=None, use_container_width=True)
             else:
-                st.write("Lineup is not available")
+                st.write(lineups[team_name])
 
     # plot stats
     centrize_header("Players stats")
@@ -199,7 +232,7 @@ if authentication_status:
     with columns[0]:
         st.selectbox(
             "Team name",
-            options=["All"] + Player_dao.get_teams_names(st.session_state["league"]),
+            options=["All"] + team_names,
             key="player_stats_team_name",
             label_visibility="visible",
         )
@@ -216,14 +249,13 @@ if authentication_status:
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
 
-    player_stats_df = player_stats_to_df(
-        league_name=st.session_state["league"],
+    plot_main_players_statss(
+        player_stats_df,
         games_count=st.session_state["games_count"],
         is_abs_stats=not st.session_state["normalize"],
         min_minutes=st.session_state["min_minutes"],
         team_name=st.session_state["player_stats_team_name"],
     )
-    plot_player_stats_df(player_stats_df)
 
     # plot free kicks stats
     centrize_header("Free kicks stats")
@@ -232,16 +264,14 @@ if authentication_status:
     with columns[1]:
         st.selectbox(
             "Team name",
-            options=["All"] + Player_dao.get_teams_names(st.session_state["league"]),
+            options=["All"] + team_names,
             key="free_kicks_stats_team_name",
             label_visibility="visible",
         )
 
-    free_kicks_stats_df = free_kicks_stats_to_df(
-        league_name=st.session_state["league"],
-        team_name=st.session_state["free_kicks_stats_team_name"],
+    plot_free_kicks_stats(
+        player_stats_df, team_name=st.session_state["free_kicks_stats_team_name"]
     )
-    plot_player_stats_df(free_kicks_stats_df)
 
 elif authentication_status is False:
     st.error("Username/password is incorrect")
