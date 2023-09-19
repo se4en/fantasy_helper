@@ -144,11 +144,14 @@ def plot_main_players_statss(
     is_abs_stats: bool = True,
     min_minutes: int = 5,
     team_name: str = "All",
-):
+) -> None:
     if is_abs_stats:
         df = players_stats.abs_stats
     else:
         df = players_stats.norm_stats
+
+    if df is None or len(df) == 0:
+        return
 
     if team_name != "All":
         df = df.loc[df["team"] == team_name]
@@ -172,11 +175,14 @@ def plot_main_players_statss(
 
 def plot_free_kicks_stats(
     players_stats: PlayersLeagueStats, team_name: str = "All"
-) -> pd.DataFrame:
+) -> None:
     df = players_stats.free_kicks
+
+    if df is None or len(df) == 0:
+        return
+
     if team_name != "All":
         df = df.loc[df["team"] == team_name]
-
     df.dropna(axis=1, how="all", inplace=True)
     df.fillna(0, inplace=True)
 
