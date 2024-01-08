@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+import pandas as pd
+
 
 @dataclass
 class MatchInfo:
@@ -207,3 +209,10 @@ class FreeKicksInfo:
     penalty_goals: Optional[float] = None  # pens_made
     penalty_shots: Optional[float] = None  # pens_att
     free_kicks_shots: Optional[float] = None  # shots_free_kicks
+
+
+@dataclass
+class PlayersLeagueStats:
+    abs_stats: pd.DataFrame
+    norm_stats: pd.DataFrame
+    free_kicks: pd.DataFrame
