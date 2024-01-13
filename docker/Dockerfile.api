@@ -1,0 +1,15 @@
+FROM python:3.9-slim
+
+RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essential
+
+WORKDIR /fantasy_helper
+COPY ./requirements /fantasy_helper/requirements
+RUN pip install --no-cache-dir --upgrade -r requirements/api.txt
+COPY ./fantasy_helper/api /fantasy_helper/fantasy_helper/api
+COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
+COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
+COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
+COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
+ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
+
+CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "80"]

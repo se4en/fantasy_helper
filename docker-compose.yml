@@ -11,17 +11,29 @@ services:
   #     - db
   #   env_file: .env
 
-  app:
+  ui:
     build:
-      dockerfile: docker/Dockerfile.app
+      dockerfile: docker/Dockerfile.ui
       context: .
-    container_name: "app"
+    container_name: "ui"
+    restart: always
+    links:
+      - api
+    env_file: .env
+    ports:
+      - 8501:8501
+
+  api:
+    build:
+      dockerfile: docker/Dockerfile.api
+      context: .
+    container_name: "api"
     restart: always
     links:
       - db
     env_file: .env
     ports:
-      - 8501:8501
+      - 80:80
 
   cron:
     build:
