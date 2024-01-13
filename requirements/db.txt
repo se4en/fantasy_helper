@@ -1,0 +1,6 @@
+-r base.txt
+-r conf.txt
+sqlalchemy==1.4.2
+sqlalchemy-utils==0.38.3
+psycopg2-binary==2.9.5
+iso8601==1.1.0

@@ -1,0 +1,6 @@
+-r base.txt
+-r conf.txt
+-r db.txt
+-r parsers.txt
+uvicorn==0.25.0
+fastapi==0.108.0
