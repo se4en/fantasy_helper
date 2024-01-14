@@ -6,6 +6,7 @@ WORKDIR /fantasy_helper
 COPY ./requirements /fantasy_helper/requirements
 RUN pip install --no-cache-dir --upgrade -r requirements/ui.txt
 COPY ./fantasy_helper/ui /fantasy_helper/fantasy_helper/ui
+COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
