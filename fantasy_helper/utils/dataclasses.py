@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 
 import pandas as pd
 
@@ -213,6 +213,18 @@ class FreeKicksInfo:
 
 @dataclass
 class PlayersLeagueStats:
-    abs_stats: pd.DataFrame
-    norm_stats: pd.DataFrame
-    free_kicks: pd.DataFrame
+    abs_stats: Optional[pd.DataFrame] = None
+    norm_stats: Optional[pd.DataFrame] = None
+    free_kicks: Optional[pd.DataFrame] = None
+
+    def to_json(self) -> Dict:
+        return {
+            "abs_stats": self.abs_stats.to_json(),
+            "norm_stats": self.norm_stats.to_json(),
+            "free_kicks": self.free_kicks.to_json(),
+        }
+
+    def from_json(self, json_data: Dict) -> None:
+        self.abs_stats = pd.DataFrame.read_json(json_data["abs_stats"])
+        self.norm_stats = pd.DataFrame.read_json(json_data["norm_stats"])
+        self.free_kicks = pd.DataFrame.read_json(json_data["free_kicks"])
