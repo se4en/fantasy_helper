@@ -218,6 +218,12 @@ class PlayersLeagueStats:
     free_kicks: Optional[pd.DataFrame] = None
 
     def to_json(self) -> Dict:
+        """
+        Converts the instance variables to a JSON object.
+
+        Returns:
+            Dict: A dictionary representing the JSON data.
+        """
         return {
             "abs_stats": self.abs_stats.to_json(),
             "norm_stats": self.norm_stats.to_json(),
@@ -225,6 +231,15 @@ class PlayersLeagueStats:
         }
 
     def from_json(self, json_data: Dict) -> None:
-        self.abs_stats = pd.DataFrame.read_json(json_data["abs_stats"])
-        self.norm_stats = pd.DataFrame.read_json(json_data["norm_stats"])
-        self.free_kicks = pd.DataFrame.read_json(json_data["free_kicks"])
+        """
+        Parses a JSON object and assigns the parsed data to instance variables.
+
+        Args:
+            json_data (Dict): A dictionary representing the JSON data to be parsed.
+
+        Returns:
+            None
+        """
+        self.abs_stats = pd.read_json(json_data["abs_stats"])
+        self.norm_stats = pd.read_json(json_data["norm_stats"])
+        self.free_kicks = pd.read_json(json_data["free_kicks"])
