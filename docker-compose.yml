@@ -24,6 +24,8 @@ services:
     links:
       - db
     env_file: .env
+    ports:
+      - 8000:8000 
     networks:
       - api_network
 
@@ -42,7 +44,7 @@ services:
   db:
     image: postgres:12.11-alpine
     volumes:
-      - ./postgres_data:/var/lib/postgresql/12/main
+      - ./postgres_data:/var/lib/postgresql/data
     restart: always
     container_name: "db"
     env_file: .env

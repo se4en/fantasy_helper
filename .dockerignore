@@ -12,4 +12,6 @@ venv/
 
 .idea/
 
+postgres_data/
+
 *.png

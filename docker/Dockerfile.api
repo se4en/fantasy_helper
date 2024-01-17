@@ -12,4 +12,4 @@ COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
 COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
-CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
