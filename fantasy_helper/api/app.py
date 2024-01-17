@@ -24,32 +24,84 @@ Lineup_dao = LineupDAO()
 Player_dao = PlayerDAO()
 
 
-@app.get("/leagues_names")
+@app.get("/leagues_names/")
 async def get_leagues_names() -> Dict[str, str]:
+    """
+    Get the names of all the leagues.
+
+    Returns:
+        A dictionary with league names as keys and league descriptions as values.
+    """
     return leagues
 
 
-@app.get("/players_stats")
-async def get_players_stats(league_name: str) -> dict:
+@app.get("/players_stats/")
+async def get_players_stats(league_name: str) -> Dict:
+    """
+    Retrieves the statistics of players in a specific league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        Dict: A dictionary containing the players' statistics.
+    """
     players_stats = Player_dao.get_players_stats(league_name)
     return players_stats.to_json()
 
 
-@app.get("/coeffs")
+@app.get("/coeffs/")
 async def get_coeffs(league_name: str, tour: Literal["cur", "next"]) -> List[MatchInfo]:
+    """
+    Retrieve the coefficients for a given league and tour.
+
+    Parameters:
+        league_name (str): The name of the league.
+        tour (Literal["cur", "next"]): The tour to retrieve coefficients for.
+
+    Returns:
+        List[MatchInfo]: The list of coefficients for the given league and tour.
+    """
     return Coeff_dao.get_coeffs(league_name, tour)
 
 
-@app.get("/tour_number")
+@app.get("/tour_number/")
 async def get_coeffs(league_name: str) -> int:
+    """
+    Get the tour number for a given league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        int: The tour number for the given league.
+    """
     return Coeff_dao.get_tour_number(league_name)
 
 
-@app.get("/players_teams_names")
+@app.get("/players_teams_names/")
 async def get_players_teams_names(league_name: str) -> List[str]:
+    """
+    Get the names of all players, teams, and leagues in the database.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        List[str]: A list of team names in the specified league.
+    """
     return Player_dao.get_teams_names(league_name)
 
 
-@app.get("/lineups")
+@app.get("/lineups/")
 async def get_lineups(league_name: str) -> List[TeamLineup]:
+    """
+    Retrieves the lineups for a specific league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        List[TeamLineup]: A list of TeamLineup objects representing the lineups for the league.
+    """
     return Lineup_dao.get_lineups(league_name)
