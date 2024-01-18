@@ -87,7 +87,23 @@ class FSPlayersStatsDAO:
             FSPlayersStats.league_name == league_name
         ).delete()
 
-        # TODO add new stats from pandas DFs
+        # add new stats
+        for index, abs_player_stats in players_stats.abs_stats.iterrows():
+            db_session.add(
+                FSPlayersStats(type="abs", league_name=league_name, **abs_player_stats)
+            )
+
+        for index, norm_player_stats in players_stats.norm_stats.iterrows():
+            db_session.add(
+                FSPlayersStats(
+                    type="norm", league_name=league_name, **norm_player_stats
+                )
+            )
+
+        for index, free_kick_stats in players_stats.free_kicks.iterrows():
+            db_session.add(
+                FSPlayersFreeKicks(league_name=league_name, **free_kick_stats)
+            )
 
         db_session.commit()
         db_session.close()
