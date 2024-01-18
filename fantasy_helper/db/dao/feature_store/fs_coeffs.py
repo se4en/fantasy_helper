@@ -1,18 +1,14 @@
 from typing import List, Literal
-from datetime import timezone
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 
-from fantasy_helper.db.models.feature_store.fs_coeff import FSCoeff
+from fantasy_helper.db.models.feature_store.fs_coeffs import FSCoeff
 from fantasy_helper.db.database import Session
 from fantasy_helper.utils.dataclasses import MatchInfo
 
 
-utc = timezone.utc
-
-
-class CoeffDAO:
+class FSCoeffsDAO:
     def get_coeffs(
         self, league_name: str, tour: Literal["cur", "next"]
     ) -> List[MatchInfo]:

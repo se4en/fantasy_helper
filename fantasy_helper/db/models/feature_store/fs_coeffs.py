@@ -7,7 +7,7 @@ from sqlalchemy import Integer, String, DateTime, Float
 from fantasy_helper.db.database import Base
 
 
-class FSCoeff(Base):
+class FSCoeffs(Base):
     __tablename__ = "fs_coeffs"
 
     id = Column(Integer, primary_key=True)
