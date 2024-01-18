@@ -2,9 +2,10 @@ from typing import List, Tuple, Optional
 
 import pandas as pd
 import matplotlib as mpl
+import streamlit as st
 from mplsoccer import VerticalPitch, Sbopen, FontManager, inset_image
 
-from fantasy_helper.utils.dataclasses import MatchInfo
+from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats
 
 
 def position_to_id(position: str) -> int:
@@ -521,6 +522,15 @@ def pose_4132(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
 
 
 def lineup_to_formation(lineup: str) -> Tuple[str, List[int], List[str]]:
+    """
+    Takes a lineup string and converts it into a formation.
+
+    Args:
+        lineup (str): The lineup string.
+
+    Returns:
+        Tuple[str, List[int], List[str]]: A tuple containing the formation string, the list of positions, and the list of player names.
+    """
     zones = list(map(lambda x: x.strip(), lineup.split(";")))
     zones_players = [
         [player.strip() for player in players.split(",")] for players in zones
@@ -699,7 +709,18 @@ def lineup_to_formation(lineup: str) -> Tuple[str, List[int], List[str]]:
     return formation, positions, names
 
 
-def plot_lineup(formation, positions, names):
+def plot_lineup(formation, positions, names) -> mpl.figure.Figure:
+    """
+    Generate a pitch lineup plot.
+
+    Args:
+        formation (str): The formation of the lineup.
+        positions (list): The positions of the players.
+        names (list): The names of the players.
+
+    Returns:
+        matplotlib.figure.Figure: The generated pitch lineup plot.
+    """
     pitch = VerticalPitch(goal_type="box")
     fig, ax = pitch.draw(figsize=(6, 8.72))
     ax_text = pitch.formation(
@@ -733,6 +754,16 @@ def plot_lineup(formation, positions, names):
 def get_stat_from_mathes(
     cur_tour_matches: List[MatchInfo], next_tour_matches: List[MatchInfo]
 ) -> dict:
+    """
+    Generate a dictionary containing statistical information for each team based on the given lists of current tour matches and next tour matches.
+
+    Args:
+        cur_tour_matches (List[MatchInfo]): A list of MatchInfo objects representing the matches in the current tour.
+        next_tour_matches (List[MatchInfo]): A list of MatchInfo objects representing the matches in the next tour.
+
+    Returns:
+        dict: A dictionary with team names as keys and nested dictionaries as values. Each nested dictionary contains statistical information for the corresponding team, including the opponent's name in the current and next tour, attack and defense statistics for the current tour, and attack and defense statistics for the next tour.
+    """
     unique_teams = set(
         [match.home_team for match in cur_tour_matches + next_tour_matches]
         + [match.away_team for match in cur_tour_matches + next_tour_matches]
@@ -759,6 +790,18 @@ def get_stat_from_mathes(
 def color_coeff(
     val: float, th_0: float = 1.5, th_1: float = 2.0, th_2: float = 3.0
 ) -> str:
+    """
+    Calculate the color coefficient based on the input value.
+
+    Args:
+        val (float): The input value.
+        th_0 (float, optional): The threshold for color category 0. Defaults to 1.5.
+        th_1 (float, optional): The threshold for color category 1. Defaults to 2.0.
+        th_2 (float, optional): The threshold for color category 2. Defaults to 3.0.
+
+    Returns:
+        str: The CSS background color based on the input value.
+    """
     if pd.isna(val):
         return ""
     elif val <= th_0:
@@ -771,6 +814,127 @@ def color_coeff(
         color = "#E06456"
 
     return f"background-color: {color}"
+
+
+def plot_coeff_df(df: pd.DataFrame):
+    """
+    Plot the coefficient dataframe.
+
+    Args:
+        df (pd.DataFrame): The dataframe containing the coefficient data.
+
+    Returns:
+        None
+    """
+    not_na_columns = df.columns[~df.isna().all()]
+    attack_columns = list(filter(lambda x: x.startswith("Атака"), not_na_columns))
+    defend_columns = list(filter(lambda x: x.startswith("Защита"), not_na_columns))
+
+    st.dataframe(
+        df.style.format("{:.3}", subset=attack_columns + defend_columns)
+        .map(color_coeff, subset=attack_columns)
+        .map(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns)
+    )
+
+
+def plot_main_players_stats(
+    players_stats: PlayersLeagueStats,
+    games_count: int,
+    is_abs_stats: bool = True,
+    min_minutes: int = 5,
+    team_name: str = "All",
+) -> None:
+    """
+    Plot the main players' stats based on the given parameters.
+
+    Args:
+        players_stats (PlayersLeagueStats): The object containing the players' league stats.
+        games_count (int): The maximum number of games to consider.
+        is_abs_stats (bool, optional): Flag indicating whether to use absolute stats or normalized stats. Defaults to True.
+        min_minutes (int, optional): The minimum number of minutes played to consider. Defaults to 5.
+        team_name (str, optional): The name of the team to filter the stats for. Defaults to "All".
+
+    Returns:
+        None
+    """
+    if is_abs_stats:
+        df = players_stats.abs_stats
+    else:
+        df = players_stats.norm_stats
+
+    if df is None or len(df) == 0:
+        return
+
+    if team_name != "All":
+        df = df.loc[df["team"] == team_name]
+    df = df.loc[df["games"] <= games_count]
+    df = df.loc[df["minutes"] >= min_minutes]
+    df.dropna(axis=1, how="all", inplace=True)
+
+    def _get_max_game_count_row(group: pd.DataFrame) -> pd.DataFrame:
+        """
+        Get the row with the maximum game count from a given group.
+
+        Args:
+            group (pd.DataFrame): The group of data to search for the row with the maximum game count.
+
+        Returns:
+            pd.DataFrame: The row with the maximum game count, as a DataFrame. If no such row exists, an empty DataFrame is returned.
+        """
+        result = group.loc[group["games"] == group["games"].max()]
+        if len(result) > 0:
+            return pd.DataFrame(result.iloc[0].to_dict(), index=[0])
+        else:
+            return pd.DataFrame()
+
+    if not df.empty:
+        df = df.groupby(by=["name"]).apply(_get_max_game_count_row)
+        df.reset_index(drop=True, inplace=True)
+        df.fillna(0, inplace=True)
+
+    st.dataframe(df)
+
+
+def plot_free_kicks_stats(
+    players_stats: PlayersLeagueStats, team_name: str = "All"
+) -> None:
+    """
+    Generate a plot of free kicks statistics for players.
+
+    Args:
+        players_stats (PlayersLeagueStats): The players' league statistics.
+        team_name (str, optional): The name of the team to filter the statistics for. Defaults to "All".
+
+    Returns:
+        None
+
+    """
+    df = players_stats.free_kicks
+
+    if df is None or len(df) == 0:
+        return
+
+    if team_name != "All":
+        df = df.loc[df["team"] == team_name]
+    df.dropna(axis=1, how="all", inplace=True)
+    df.fillna(0, inplace=True)
+
+    st.dataframe(df)
+
+
+def centrize_header(text: str) -> None:
+    """
+    Centrize the header text by applying a CSS style to the Markdown content.
+
+    Args:
+        text (str): The text to be displayed as the header.
+
+    Returns:
+        None
+    """
+    style = "<style>h2 {text-align: center;}</style>"
+    st.markdown(style, unsafe_allow_html=True)
+    st.header(text)
 
 
 if __name__ == "__main__":
