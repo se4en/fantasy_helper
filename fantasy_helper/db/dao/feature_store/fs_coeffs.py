@@ -30,9 +30,6 @@ class FSCoeffsDAO:
             .all()
         )
 
-        db_session.commit()
-        db_session.close()
-
         result = [
             MatchInfo(
                 url=match.url,
@@ -47,6 +44,9 @@ class FSCoeffsDAO:
             )
             for match in cur_tour_matches
         ]
+
+        db_session.commit()
+        db_session.close()
 
         return result
 
