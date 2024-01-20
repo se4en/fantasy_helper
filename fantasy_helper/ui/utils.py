@@ -841,7 +841,7 @@ def plot_main_players_stats(
     players_stats: PlayersLeagueStats,
     games_count: int,
     is_abs_stats: bool = True,
-    min_minutes: int = 5,
+    min_minutes: Optional[int] = None,
     team_name: str = "All",
 ) -> None:
     """
@@ -851,7 +851,7 @@ def plot_main_players_stats(
         players_stats (PlayersLeagueStats): The object containing the players' league stats.
         games_count (int): The maximum number of games to consider.
         is_abs_stats (bool, optional): Flag indicating whether to use absolute stats or normalized stats. Defaults to True.
-        min_minutes (int, optional): The minimum number of minutes played to consider. Defaults to 5.
+        min_minutes (Optional[int], optional): The minimum number of minutes played to consider. Defaults to None.
         team_name (str, optional): The name of the team to filter the stats for. Defaults to "All".
 
     Returns:
@@ -865,10 +865,14 @@ def plot_main_players_stats(
     if df is None or len(df) == 0:
         return
 
+    df.drop(columns=["id", "type", "league_name"], inplace=True, errors="ignore")
+
     if team_name != "All":
         df = df.loc[df["team"] == team_name]
     df = df.loc[df["games"] <= games_count]
-    df = df.loc[df["minutes"] >= min_minutes]
+    if min_minutes is not None:
+        df = df.loc[df["minutes"] >= min_minutes]
+
     df.dropna(axis=1, how="all", inplace=True)
 
     def _get_max_game_count_row(group: pd.DataFrame) -> pd.DataFrame:
@@ -913,6 +917,8 @@ def plot_free_kicks_stats(
 
     if df is None or len(df) == 0:
         return
+
+    df.drop(columns=["id", "type", "league_name"], inplace=True, errors="ignore")
 
     if team_name != "All":
         df = df.loc[df["team"] == team_name]

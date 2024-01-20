@@ -210,7 +210,7 @@ if authentication_status:
         )
     with columns[2]:
         st.session_state["min_minutes"] = st.number_input(
-            "Minimum minutes", value=10, min_value=1, max_value=1000, step=1
+            "Minimum minutes", value=None, min_value=1, max_value=1000, step=1
         )
     with columns[3]:
         st.write("")
