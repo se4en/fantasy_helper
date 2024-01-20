@@ -8,4 +8,6 @@ from fantasy_helper.db.utils.create_db import create_db
 
 if __name__ == "__main__":
     create_db()
-    PlayerDAO().update_players_stats_all_leagues()
+    dao = PlayerDAO()
+    dao.update_players_stats_all_leagues()
+    dao.update_feature_store()

@@ -14,7 +14,7 @@ from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.xbet import XbetParser
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
-from fantasy_helper.utils.prettify import emojize_coeff
+from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 
 
 utc = timezone.utc
@@ -139,3 +139,12 @@ class CoeffDAO:
     def update_coeffs_all_leagues(self) -> None:
         for league in self._leagues:
             self.update_coeffs(league.name)
+
+    def update_feature_store(self) -> None:
+        feature_store = FSCoeffsDAO()
+
+        for league in self._leagues:
+            cur_tour_matches = self.get_coeffs(league.name, "cur")
+            next_tour_matches = self.get_coeffs(league.name, "next")
+            feature_store.update_coeffs(league.name, "cur", cur_tour_matches)
+            feature_store.update_coeffs(league.name, "next", next_tour_matches)

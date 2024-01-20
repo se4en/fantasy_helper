@@ -1,7 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import Column
-from sqlalchemy import Integer, String, Float
+from sqlalchemy import Integer, String, Float, BigInteger
 
 from fantasy_helper.db.database import Base
 
@@ -9,11 +9,11 @@ from fantasy_helper.db.database import Base
 class FSPlayersFreeKicks(Base):
     __tablename__ = "fs_players_free_kicks"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     league_name = Column(String, nullable=False)
     # common
     name = Column(String, primary_key=False)
-    team_name = Column(String, nullable=False)
+    team = Column(String, nullable=False)
     position = Column(String, nullable=False)
     # playing time
     games = Column(Integer, nullable=True)
@@ -29,7 +29,7 @@ class FSPlayersFreeKicks(Base):
         league_name: str,
         # common
         name: str,
-        team_name: str,
+        team: str,
         position: str,
         # playing time
         games: Optional[int],
@@ -44,7 +44,7 @@ class FSPlayersFreeKicks(Base):
         self.league_name = league_name
         # common
         self.name = name
-        self.team_name = team_name
+        self.team = team
         self.position = position
         # playing time
         self.games = games

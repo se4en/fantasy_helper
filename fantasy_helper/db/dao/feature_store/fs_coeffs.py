@@ -3,7 +3,7 @@ from typing import List, Literal
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 
-from fantasy_helper.db.models.feature_store.fs_coeffs import FSCoeff
+from fantasy_helper.db.models.feature_store.fs_coeffs import FSCoeffs
 from fantasy_helper.db.database import Session
 from fantasy_helper.utils.dataclasses import MatchInfo
 
@@ -25,8 +25,8 @@ class FSCoeffsDAO:
         db_session: SQLSession = Session()
 
         cur_tour_matches = (
-            db_session.query(FSCoeff)
-            .filter(and_(FSCoeff.league_name == league_name, FSCoeff.tour == tour))
+            db_session.query(FSCoeffs)
+            .filter(and_(FSCoeffs.league_name == league_name, FSCoeffs.tour == tour))
             .all()
         )
 
@@ -67,14 +67,14 @@ class FSCoeffsDAO:
         db_session: SQLSession = Session()
 
         # remove all previous matches
-        db_session.query(FSCoeff).filter(
-            and_(FSCoeff.league_name == league_name, FSCoeff.tour == tour)
+        db_session.query(FSCoeffs).filter(
+            and_(FSCoeffs.league_name == league_name, FSCoeffs.tour == tour)
         ).delete()
 
         # add new matches
         for match in matches:
             db_session.add(
-                FSCoeff(
+                FSCoeffs(
                     home_team=match.home_team,
                     away_team=match.away_team,
                     league_name=league_name,

@@ -6,11 +6,13 @@ from fastapi import FastAPI
 from hydra.utils import instantiate
 import pandas as pd
 
-from fantasy_helper.api.utils import get_stat_from_mathes
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.db.dao.coeff import CoeffDAO
-from fantasy_helper.db.dao.lineup import LineupDAO
 from fantasy_helper.db.dao.player import PlayerDAO
+from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
+from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
+from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
+
 from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, TeamLineup
 
 
@@ -20,8 +22,10 @@ leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues)}
 app = FastAPI()
 
 Coeff_dao = CoeffDAO()
-Lineup_dao = LineupDAO()
 Player_dao = PlayerDAO()
+FS_Coeff_dao = FSCoeffsDAO()
+FS_Lineup_dao = FSLineupsDAO()
+FS_Player_dao = FSPlayersStatsDAO()
 
 
 @app.get("/leagues_names/")
@@ -46,7 +50,7 @@ async def get_players_stats(league_name: str) -> Dict:
     Returns:
         Dict: A dictionary containing the players' statistics.
     """
-    players_stats = Player_dao.get_players_stats(league_name)
+    players_stats = FS_Player_dao.get_players_stats(league_name)
     return players_stats.to_json()
 
 
@@ -62,7 +66,7 @@ async def get_coeffs(league_name: str, tour: Literal["cur", "next"]) -> List[Mat
     Returns:
         List[MatchInfo]: The list of coefficients for the given league and tour.
     """
-    return Coeff_dao.get_coeffs(league_name, tour)
+    return FS_Coeff_dao.get_coeffs(league_name, tour)
 
 
 @app.get("/tour_number/")
@@ -104,4 +108,4 @@ async def get_lineups(league_name: str) -> List[TeamLineup]:
     Returns:
         List[TeamLineup]: A list of TeamLineup objects representing the lineups for the league.
     """
-    return Lineup_dao.get_lineups(league_name)
+    return FS_Lineup_dao.get_lineups(league_name)

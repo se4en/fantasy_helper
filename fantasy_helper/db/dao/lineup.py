@@ -12,6 +12,7 @@ from fantasy_helper.db.models.lineup import Lineup
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.mole import MoleParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, TeamLineup
+from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 
 
 utc = timezone.utc
@@ -92,3 +93,10 @@ class LineupDAO:
 
         db_session.commit()
         db_session.close()
+
+    def update_feature_store(self) -> None:
+        feature_store = FSLineupsDAO()
+
+        for league in self.__leagues:
+            league_lineups = self.get_lineups(league.name)
+            feature_store.update_lineups(league.name, league_lineups)
