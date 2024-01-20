@@ -37,7 +37,7 @@ services:
     restart: always
     links:
       - db
-    env_file: .env
+    env_file: .env_debug
     networks:
       - api_network
 
@@ -53,6 +53,19 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - api_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    ports:
+      - "5555:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${POSTGRES_USER}@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
     networks:
       - api_network
 
