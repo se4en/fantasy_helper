@@ -7,8 +7,6 @@ from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.utils import instantiate
-from aiogram.utils.emoji import emojize
-from aiogram.utils.markdown import text
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.coeff import Coeff
@@ -16,7 +14,7 @@ from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.xbet import XbetParser
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
-from fantasy_helper.utils.prettify import emojize_coeff
+from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 
 
 utc = timezone.utc
@@ -37,76 +35,6 @@ class CoeffDAO:
             leagues=self._leagues,
             queries_path=path.join(path.dirname(__file__), "../../parsers/queries"),
         )
-
-    @staticmethod
-    def __format_coeff_value(coeff_value: float) -> str:
-        return emojize(
-            emojize_coeff(coeff_value) + " " + str(coeff_value) + "  "
-            if len(str(coeff_value)) == 4
-            else emojize_coeff(coeff_value) + " " + (str(coeff_value) + "0")[:4] + "  "
-        )
-
-    def __coeff_to_str(
-        self, coeff: Coeff, attack: bool = True
-    ) -> Tuple[float, Tuple[str]]:
-        # get needed coeff value
-        if attack:
-            home_team_coeff_value = coeff.total_1_over_1_5
-            away_team_coeff_value = coeff.total_2_over_1_5
-        else:
-            home_team_coeff_value = coeff.total_1_under_0_5
-            away_team_coeff_value = coeff.total_2_under_0_5
-
-        # emojize coeff value
-        home_team_coeff_str = CoeffDAO.__format_coeff_value(home_team_coeff_value)
-        away_team_coeff_str = CoeffDAO.__format_coeff_value(away_team_coeff_value)
-
-        # format team name
-        home_team_name = coeff.home_team[
-            : min(len(coeff.home_team), self.TEAM1_MAX_LEN)
-        ]
-        away_team_name = coeff.away_team[
-            : min(len(coeff.away_team), self.TEAM2_MAX_LEN)
-        ]
-
-        home_team_coeff = (
-            home_team_coeff_value,
-            text(
-                home_team_coeff_str,
-                f"<b>{home_team_name} [д] </b>",
-                f"<i>vs {away_team_name}</i>",
-                sep="",
-            ),
-        )
-        away_team_coeff = (
-            away_team_coeff_value,
-            text(
-                away_team_coeff_str,
-                f"<b>{away_team_name} [г] </b>",
-                f"<i>vs {home_team_name}</i>",
-                sep="",
-            ),
-        )
-
-        return home_team_coeff, away_team_coeff
-
-    def __coeffs_to_str(self, coeffs: List[Coeff], is_cur_tour: bool) -> str:
-        if is_cur_tour:
-            result = [emojize(":one: Текущий тур:\n")]
-        else:
-            result = [emojize(":two: Следующий тур:\n")]
-
-        result += ["\U0001F5E1 Атакующий потенциал:\n"]
-        attack_coeffs = [self.__coeff_to_str(coeff, attack=True) for coeff in coeffs]
-        sorted_attack_coeffs = sorted(attack_coeffs, key=lambda x: x[0])
-        result += list(map(lambda x: x[1], sorted_attack_coeffs))
-
-        result += ["\n\U0001F6E1 Защитный потенциал:\n"]
-        defend_coeffs = [self.__coeff_to_str(coeff, attack=False) for coeff in coeffs]
-        sorted_defend_coeffs = sorted(defend_coeffs, key=lambda x: x[0])
-        result += list(map(lambda x: x[1], sorted_defend_coeffs))
-
-        return "\n".join(result)
 
     def get_coeffs_message(
         self, league: str, is_cur_tour: bool = True
@@ -211,3 +139,12 @@ class CoeffDAO:
     def update_coeffs_all_leagues(self) -> None:
         for league in self._leagues:
             self.update_coeffs(league.name)
+
+    def update_feature_store(self) -> None:
+        feature_store = FSCoeffsDAO()
+
+        for league in self._leagues:
+            cur_tour_matches = self.get_coeffs(league.name, "cur")
+            next_tour_matches = self.get_coeffs(league.name, "next")
+            feature_store.update_coeffs(league.name, "cur", cur_tour_matches)
+            feature_store.update_coeffs(league.name, "next", next_tour_matches)

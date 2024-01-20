@@ -1,0 +1,4 @@
+-r base.txt
+-r conf.txt
+aiogram==2.11.2
+emoji==1.2.0

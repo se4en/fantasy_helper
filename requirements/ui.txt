@@ -1,0 +1,6 @@
+-r base.txt
+-r conf.txt
+streamlit==1.27.0
+streamlit-authenticator==0.2.3
+matplotlib<3.7
+mplsoccer==1.2.1

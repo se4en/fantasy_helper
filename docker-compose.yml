@@ -1,27 +1,33 @@
 version: '3'
 
 services:
-  # bot:
-  #   build:
-  #     dockerfile: docker/Dockerfile.bot
-  #     context: .
-  #   container_name: "bot"
-  #   restart: always
-  #   depends_on:
-  #     - db
-  #   env_file: .env
-
-  app:
+  ui:
     build:
-      dockerfile: docker/Dockerfile.app
+      dockerfile: docker/Dockerfile.ui
       context: .
-    container_name: "app"
+    container_name: "ui"
+    restart: always
+    links:
+      - api
+    env_file: .env
+    ports:
+      - 8501:8501
+    networks:
+      - api_network
+
+  api:
+    build:
+      dockerfile: docker/Dockerfile.api
+      context: .
+    container_name: "api"
     restart: always
     links:
       - db
     env_file: .env
     ports:
-      - 8501:8501
+      - 8000:8000 
+    networks:
+      - api_network
 
   cron:
     build:
@@ -31,17 +37,38 @@ services:
     restart: always
     links:
       - db
-    env_file: .env
+    env_file: .env_debug
+    networks:
+      - api_network
 
   db:
     image: postgres:12.11-alpine
     volumes:
-      - ./postgres_data:/var/lib/postgresql/12/main
+      - ./postgres_data:/var/lib/postgresql/data
     restart: always
+    container_name: "db"
     env_file: .env
     environment:
+      PGPORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - api_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
     ports:
-      - ${POSTGRES_PORT}:5432
+      - "5555:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${POSTGRES_USER}@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - api_network
+
+networks:
+  api_network:
+    driver: bridge

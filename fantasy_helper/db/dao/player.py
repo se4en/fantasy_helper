@@ -19,6 +19,7 @@ from fantasy_helper.utils.dataclasses import (
     FreeKicksInfo,
     PlayersLeagueStats,
 )
+from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 
 
 utc = timezone.utc
@@ -344,3 +345,10 @@ class PlayerDAO:
 
             db_session.commit()
             db_session.close()
+
+    def update_feature_store(self) -> None:
+        feature_store = FSPlayersStatsDAO()
+
+        for league in self.__leagues:
+            players_stats = self.get_players_stats(league.name)
+            feature_store.update_players_stats(league.name, players_stats)
