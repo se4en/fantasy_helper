@@ -313,8 +313,6 @@ class PlayerDAO:
 
         df = pd.read_sql(games_stat.statement, games_stat.session.bind)
 
-        print("Df shape", df.shape)
-
         db_session.commit()
         db_session.close()
 
