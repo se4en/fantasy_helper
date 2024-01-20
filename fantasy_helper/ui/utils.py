@@ -280,7 +280,7 @@ def pose_3421(zones_players: List[List[str]]) -> Tuple[List[int], List[str]]:
         names.append(prepare_name(name))
 
     # add attackers
-    for position, name in zip(["ST"], zones_players[3]):
+    for position, name in zip(["ST"], zones_players[4]):
         positions.append(position_to_id(position))
         names.append(prepare_name(name))
 
