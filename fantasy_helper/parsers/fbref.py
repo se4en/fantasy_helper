@@ -27,6 +27,9 @@ def cast_to_float(text: str) -> Optional[float]:
 def cast_to_int(text: str) -> Optional[int]:
     if not text:
         return None
+    elif "," in text:
+        text = text.replace(",", "")
+
     try:
         return int(text)
     except ValueError:
@@ -142,7 +145,7 @@ class FbrefParser:
                 goals_per_shot_on_target=cast_to_float(_goals_per_shot_on_target.text)
                 if _goals_per_shot_on_target
                 else None,
-                average_shot_distance=cast_to_int(_average_shot_distance.text)
+                average_shot_distance=cast_to_float(_average_shot_distance.text)
                 if _average_shot_distance
                 else None,
                 shots_free_kicks=cast_to_int(_shots_free_kicks.text)
