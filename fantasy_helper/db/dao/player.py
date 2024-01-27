@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from dataclasses import asdict
 
 import pandas as pd
+import numpy as np
 from sqlalchemy import func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
@@ -37,8 +38,10 @@ class PlayerDAO:
     def _compute_diff_value(
         self, max_value: Any, min_value: Any, minutes: Optional[int] = None
     ) -> Any:
-        if max_value is not None and min_value is not None:
-            if minutes is None:
+        if (max_value is not None and not np.isnan(max_value)) and (
+            min_value is not None and not np.isnan(min_value)
+        ):
+            if minutes is None or np.isnan(minutes):
                 return max_value - min_value
             else:
                 if minutes > 0:
@@ -222,6 +225,7 @@ class PlayerDAO:
     def _compute_player_stats(
         self, group: pd.DataFrame, is_abs_stats: bool = True
     ) -> pd.DataFrame:
+        group = group[~group["games"].isna()]
         sorted_df = group.sort_values("games", ascending=True)
         if len(sorted_df) == 0:
             return pd.DataFrame()
