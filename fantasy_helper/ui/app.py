@@ -40,8 +40,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-authenticator = stauth.Authenticate(credentials, **cookie)
-name, authentication_status, username = authenticator.login("Login", "main")
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie['name'],
+    cookie['key'],
+    cookie['expiry_days']
+)
+name, authentication_status, username = authenticator.login(location="main")
 
 
 @st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading coefficients...")

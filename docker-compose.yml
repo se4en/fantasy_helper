@@ -37,7 +37,7 @@ services:
     restart: always
     links:
       - db
-    env_file: .env_debug
+    env_file: .env
     networks:
       - api_network
 

@@ -3,11 +3,11 @@ credentials:
     ice_planet:
       email: ice@planet.com
       name: Ice Planet
-      password: ${oc.env:APP_PASSWORD} # To be replaced with hashed password
+      password: ${oc.env:APP_PASSWORD}
 cookie:
-  cookie_name: random_cookie_name
-  key: random_signature_key # Must be string
-  cookie_expiry_days: 30
+  name: random_cookie_name
+  key: random_signature_key
+  expiry_days: 30
 leagues:
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Russia
