@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 def load_config(
     config_path: str = "../conf", config_name: str = "config"
 ) -> DictConfig:
-    if not GlobalHydra().is_initialized():
+    if not GlobalHydra.instance().is_initialized():
         initialize(config_path=config_path, version_base=None)
     cfg = compose(config_name=config_name)
 
