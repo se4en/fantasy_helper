@@ -1,12 +1,13 @@
 from collections import defaultdict
 from dataclasses import asdict
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
 
 from fastapi import FastAPI
 from hydra.utils import instantiate
 import pandas as pd
 
 from fantasy_helper.utils.common import load_config
+from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.player import PlayerDAO
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
@@ -21,6 +22,7 @@ leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues)}
 
 app = FastAPI()
 
+create_db()
 Coeff_dao = CoeffDAO()
 Player_dao = PlayerDAO()
 FS_Coeff_dao = FSCoeffsDAO()
@@ -70,7 +72,7 @@ async def get_coeffs(league_name: str, tour: Literal["cur", "next"]) -> List[Mat
 
 
 @app.get("/tour_number/")
-async def get_coeffs(league_name: str) -> int:
+async def get_tour_number(league_name: str) -> Optional[int]:
     """
     Get the tour number for a given league.
 

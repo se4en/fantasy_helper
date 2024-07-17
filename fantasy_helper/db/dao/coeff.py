@@ -106,9 +106,9 @@ class CoeffDAO:
 
         return result
 
-    def get_tour_number(self, league_name: str) -> int:
+    def get_tour_number(self, league_name: str) -> Optional[int]:
         tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        return tour_info["number"]
+        return tour_info.get("number") if tour_info is not None else None
 
     def update_coeffs(self, league_name: str) -> None:
         tour_info = self._sports_parser.get_cur_tour_info(league_name)
