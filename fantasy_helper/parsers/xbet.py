@@ -19,7 +19,7 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 class XbetParser:
     def __init__(self, leagues: t.List[LeagueInfo]):
-        self.__leagues = {l.name: l.xber_url for l in leagues if l.xber_url is not None}
+        self.__leagues = {l.name: l.xber_url for l in leagues if l.xber_url is not None and l.is_active}
 
     @staticmethod
     def __parse_start_datetime(driver: t.Any) -> datetime.datetime:

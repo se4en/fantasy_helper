@@ -23,6 +23,7 @@ class LeagueInfo:
     name: str
     ru_name: str
     emoji: str
+    is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
     fbref_playing_time_url: Optional[str] = None

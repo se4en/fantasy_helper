@@ -39,6 +39,8 @@ def cast_to_int(text: str) -> Optional[int]:
 
 class FbrefParser:
     def __init__(self, leagues: List[LeagueInfo]):
+        leagues = list(filter(lambda x: x.is_active, leagues))
+
         self.__playing_time_leagues = {
             l.name: l.fbref_playing_time_url
             for l in leagues
