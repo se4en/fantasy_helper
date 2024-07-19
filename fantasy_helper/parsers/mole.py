@@ -14,7 +14,7 @@ class MoleParser:
     def __init__(self, leagues: List[LeagueInfo]):
         self.__url = "https://www.sportsmole.co.uk/football/preview/"
         self.__leagues = {
-            l.sportsmole_name: l.name for l in leagues if l.sportsmole_name is not None
+            l.sportsmole_name: l.name for l in leagues if l.sportsmole_name is not None and l.is_active
         }
 
         self.__session = requests.Session()

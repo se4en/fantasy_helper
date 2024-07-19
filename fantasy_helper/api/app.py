@@ -18,7 +18,7 @@ from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, Team
 
 
 cfg = load_config(config_path="../conf", config_name="config")
-leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues)}
+leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues) if league.is_active}
 
 app = FastAPI()
 

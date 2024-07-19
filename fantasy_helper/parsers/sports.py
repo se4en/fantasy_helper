@@ -23,7 +23,7 @@ class SportsParser:
         else:
             self.__queries_path = os.path.join(os.path.dirname(__file__), "/queries")
 
-        self.__leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None}
+        self.__leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None and l.is_active}
 
     def __get_query_body(
         self, query_name: Literal["squad", "tournament"]
