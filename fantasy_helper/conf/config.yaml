@@ -13,7 +13,8 @@ leagues:
     name: Russia
     ru_name: Россия
     emoji: 🇷🇺
-    squad_id: 159004
+    squad_id: 316902
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
     fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
     fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
