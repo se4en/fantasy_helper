@@ -219,7 +219,7 @@ class SportsPlayerStats:
     role: Optional[str] = None
     price: Optional[float] = None
     percent_ownership: Optional[float] = None
-    team: Optional[str] = None
+    team_name: Optional[str] = None
     place: Optional[int] = None
     score: Optional[int] = None
     average_score: Optional[float] = None

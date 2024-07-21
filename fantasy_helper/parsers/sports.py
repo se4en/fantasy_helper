@@ -123,7 +123,7 @@ class SportsParser:
                     role=player_data.get("role", None),
                     price=player_data.get("price", None),
                     percent_ownership=status.get("percentOwnership", None),
-                    team=team.get("name", None),
+                    team_name=team.get("name", None),
                     place=seasonScoreInfo.get("place", None),
                     score=seasonScoreInfo.get("score", None),
                     average_score=seasonScoreInfo.get("averageScore", None),
