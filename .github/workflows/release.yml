@@ -125,6 +125,8 @@ jobs:
         env:
           APPTOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ secrets.DEPLOY_USERNAME }}
+          IMAGE_REPO: ${{ env.image_repository_name }}
+          RELEASE_VERSION: ${{ env.TAG_NAME }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
@@ -132,7 +134,7 @@ jobs:
           port: 22
           envs: APPTOKEN,USERNAME
           script: |
-            echo $APPTOKEN | docker login ghcr.io -u $USERNAME --password-stdin
+            echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
             cd ~/${{ github.event.repository.name }}
             sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml stop
             sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
