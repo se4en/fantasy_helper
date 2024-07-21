@@ -26,7 +26,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Env variables assignment
         run: |
