@@ -3,51 +3,28 @@ permissions:
   packages: write
   contents: write
 on:
-  # Triggered on new GitHub Release
-  release:
-    types: [published]
-  # Triggered on every successful Build action
-  workflow_run:
-    workflows: ["Build"]
-    branches: [main,master,i45]
-    types:
-      - completed
-  # Manual trigger for rollback to specific release or redeploy latest
-  workflow_dispatch:
-    inputs:
-      version:
-        default: latest
-        description: Tag you want to release.
-        required: true
+  push:
+    branches:
+      - main
+    paths:
+      - "fantasy_helper/**"
+      - ".github/workflows/**"
+      - "docker/**"
+      - "docker-compose.prod.yml"
+      - "docker-compose.yml"
 
 jobs:
   push_to_registry:
     runs-on: ubuntu-22.04
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     steps:
-      # Checkout latest or specific tag
       - name: checkout
-        if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
-        uses: actions/checkout@v3
-      - name: checkout tag
-        if: ${{ github.event.inputs.version != '' && github.event.inputs.version != 'latest' }}
-        uses: actions/checkout@v3
-        with:
-          ref: refs/tags/${{ github.event.inputs.version }}
-          
-      # Assign environment variables used in subsequent steps
-      - name: Env variable assignment
-        run: echo "image_repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-      # TAG_NAME defaults to 'latest' if not a release or manual deployment
-      - name: Assign version
+        uses: actions/checkout@v4
+
+      - name: Env variables assignment
         run: |
-          echo "TAG_NAME=latest" >> $GITHUB_ENV
-          if [ "${{ github.event.release.tag_name }}" != "" ]; then
-            echo "TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-          fi;
-          if [ "${{ github.event.inputs.version }}" != "" ]; then
-            echo "TAG_NAME=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          fi;
+          echo "image_repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "TAG_NAME=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -55,98 +32,90 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      # Build and push new docker image, skip for manual redeploy other than 'latest'
-      - name: Build and push Docker images
+
+      - name: Build and push ui Docker image
         uses: docker/build-push-action@v3
-        if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
         with:
           file: docker/Dockerfile.ui
           context: .
           push: true
-          tags: ghcr.io/${{ env.image_repository_name }}:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ env.image_repository_name }}_ui:${{ env.TAG_NAME }}
+
+      - name: Build and push api Docker image
+        uses: docker/build-push-action@v3
+        with:
+          file: docker/Dockerfile.api
+          context: .
+          push: true
+          tags: ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }}
   
-  # deploy_via_ssh:
-  #   needs: push_to_registry
-  #   runs-on: ubuntu-22.04
-  #   if: ${{ github.event.workflow_run.conclusion != 'failure' }}
-  #   steps:
-  #     # Checkout latest or specific tag
-  #     - name: checkout
-  #       if: ${‎{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }‎}
-  #       uses: actions/checkout@v3
-  #     - name: checkout tag
-  #       if: ${‎{ github.event.inputs.version != '' && github.event.inputs.version != 'latest' }‎}
-  #       uses: actions/checkout@v3
-  #       with:
-  #         ref: refs/tags/${‎{ github.event.inputs.version }‎}
+      - name: Build and push cron Docker image
+        uses: docker/build-push-action@v3
+        with:
+          file: docker/Dockerfile.cron
+          context: .
+          push: true
+          tags: ghcr.io/${{ env.image_repository_name }}_cron:${{ env.TAG_NAME }}
 
-  #     - name: repository name fix and env
-  #       run: |
-  #         echo "image_repository_name=$(echo ${‎{ github.repository }‎} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-  #         echo "domain=${‎{ secrets.DEPLOY_HOST }‎}" >> $GITHUB_ENV
-  #         echo "letsencrypt_email=${‎{ secrets.LETSENCRYPT_EMAIL }‎}" >> $GITHUB_ENV
-  #         echo "TAG_NAME=latest" >> $GITHUB_ENV
-  #         if [ "${‎{ github.event.release.tag_name }‎}" != "" ]; then
-  #           echo "TAG_NAME=${‎{ github.event.release.tag_name }‎}" >> $GITHUB_ENV
-  #         fi;
-  #         if [ "${‎{ github.event.inputs.version }‎}" != "" ]; then
-  #           echo "TAG_NAME=${‎{ github.event.inputs.version }‎}" >> $GITHUB_ENV
-  #         fi;
+  deploy_via_ssh:
+    needs: push_to_registry
+    runs-on: ubuntu-22.04
+    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
 
-  #     - name: Create .env file
-  #       run: |
-  #         echo "Generating .env file"
+      - name: repository name fix and env
+        run: |
+          echo "image_repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "domain=${{ secrets.DEPLOY_HOST }}" >> $GITHUB_ENV
+          echo "letsencrypt_email=${{ secrets.LETSENCRYPT_EMAIL }}" >> $GITHUB_ENV
+          echo "TAG_NAME=latest" >> $GITHUB_ENV
 
-  #         echo "# Autogenerated .env file" > .env
-  #         echo "HOST_DOMAIN=${‎{ secrets.DEPLOY_HOST }‎}" >> .env
-  #         echo "LETSENCRYPT_EMAIL=${‎{ secrets.LETSENCRYPT_EMAIL }‎}" >> .env
+      - name: Create .env file
+        run: |
+          echo "Generating .env file"
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+          echo "ADMINS=${{ secrets.ADMINS }}" >> .env
+          echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
+          echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env
+          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
+          echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
 
-  #         echo "IMAGE_REPO=${‎{ env.image_repository_name }‎}" >> .env
-  #         echo "RELEASE_VERSION=${‎{ env.TAG_NAME }‎}" >> .env
-      
-  #     # Copy docker-compose and .env files to target server
-  #     - name: copy files to target server via scp
-  #       uses: appleboy/scp-action@v0.1.3
-  #       with:
-  #         host: ${‎{ secrets.DEPLOY_HOST }‎}
-  #         username: ${‎{ secrets.DEPLOY_USERNAME }‎}
-  #         port: 22
-  #         key: ${‎{ secrets.DEPLOY_KEY }‎}
-  #         source: "./docker-compose.yml,./docker-compose.prod.yml,./.env"
-  #         target: "~/.deploy/${‎{ github.event.repository.name }‎}/"
-      
-  #     - name: Run remote db migrations
-  #       uses: appleboy/ssh-action@v0.1.5
-  #       env:
-  #         APPTOKEN: ${‎{ secrets.GITHUB_TOKEN }‎}
-  #         USERNAME: ${‎{ secrets.DEPLOY_USERNAME }‎}
-  #       with:
-  #         host: ${‎{ secrets.DEPLOY_HOST }‎}
-  #         username: ${‎{ secrets.DEPLOY_USERNAME }‎}
-  #         key: ${‎{ secrets.DEPLOY_KEY }‎}
-  #         port: 22
-  #         envs: APPTOKEN,USERNAME
-  #         script: |
-  #           echo $APPTOKEN | docker login ghcr.io -u $USERNAME --password-stdin
-  #           cd ~/.deploy/${‎{ github.event.repository.name }‎}
-  #           docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
-  #           docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up app-migration
+          echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
+          echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
 
-  #     # Deploy Docker image with your application using `docker compose up app` remotely
-  #     - name: remote docker-compose up via ssh
-  #       uses: appleboy/ssh-action@v0.1.5
-  #       env:
-  #         APPTOKEN: ${‎{ secrets.GITHUB_TOKEN }‎}
-  #         USERNAME: ${‎{ secrets.DEPLOY_USERNAME }‎}
-  #       with:
-  #         host: ${‎{ secrets.DEPLOY_HOST }‎}
-  #         username: ${‎{ secrets.DEPLOY_USERNAME }‎}
-  #         key: ${‎{ secrets.DEPLOY_KEY }‎}
-  #         port: 22
-  #         envs: APPTOKEN,USERNAME
-  #         script: |
-  #           echo $APPTOKEN | docker login ghcr.io -u $USERNAME --password-stdin
-  #           cd ~/.deploy/${‎{ github.event.repository.name }‎}
-  #           docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
-  #           docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up app -d
+      - name: copy files to target server via scp
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          port: 22
+          key: ${{ secrets.DEPLOY_KEY }}
+          source: "./docker-compose.yml,./docker-compose.prod.yml,./.env"
+          target: "~/${{ github.event.repository.name }}/"
+
+      - name: remote docker-compose up via ssh
+        uses: appleboy/ssh-action@v0.1.5
+        env:
+          APPTOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ secrets.DEPLOY_USERNAME }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
+          envs: APPTOKEN,USERNAME
+          script: |
+            echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
+            cd ~/${{ github.event.repository.name }}
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml stop
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up -d
