@@ -83,22 +83,22 @@ jobs:
       - name: Create .env file
         run: |
           echo "Generating .env file"
-          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env_docker
-          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env_docker
-          echo "ADMINS=${{ secrets.ADMINS }}" >> .env_docker
-          echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env_docker
-          echo "API_PORT=${{ secrets.API_PORT }}" >> .env_docker
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env_docker
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env_docker
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env_docker
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env_docker
-          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env_docker
-          echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env_docker
-          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env_docker
-          echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env_docker
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+          echo "ADMINS=${{ secrets.ADMINS }}" >> .env
+          echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
+          echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env
+          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
+          echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
 
-          echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env_docker
-          echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env_docker
+          echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
+          echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
       
       # Copy docker-compose and .env files to target server
       - name: copy files to target server via scp
