@@ -34,7 +34,6 @@ COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
 COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
 COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
-COPY .env /fantasy_helper/.env
 COPY ./fantasy_helper/crontab /etc/cron.d/crontab
 RUN chmod 0644 /etc/cron.d/crontab
 RUN /usr/bin/crontab /etc/cron.d/crontab
