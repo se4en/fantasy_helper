@@ -83,6 +83,20 @@ jobs:
       - name: Create .env file
         run: |
           echo "Generating .env file"
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env_docker
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env_docker
+          echo "ADMINS=${{ secrets.ADMINS }}" >> .env_docker
+          echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env_docker
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env_docker
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env_docker
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env_docker
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env_docker
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env_docker
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env_docker
+          echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env_docker
+          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env_docker
+          echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env_docker
+
           echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env_docker
           echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env_docker
       
@@ -94,7 +108,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USERNAME }}
           port: 22
           key: ${{ secrets.DEPLOY_KEY }}
-          source: "./docker-compose.yml,./docker-compose.prod.yml"
+          source: "./docker-compose.yml,./docker-compose.prod.yml,./.env"
           target: "~/${{ github.event.repository.name }}/"
       
       # - name: Run remote db migrations
@@ -131,6 +145,6 @@ jobs:
           script: |
             echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
             cd ~/${{ github.event.repository.name }}
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml --env-file .env_docker stop
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml --env-file .env_docker pull
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml --env-file .env_docker up -d
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml stop
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
+            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up -d
