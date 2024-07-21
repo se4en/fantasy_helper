@@ -6,7 +6,7 @@ import pytest
 
 from fantasy_helper.tests.fixtures import leagues
 from fantasy_helper.parsers.sports import SportsParser
-from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
+from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo, SportsPlayerStats
 
 
 @pytest.fixture
@@ -27,3 +27,12 @@ def test_empty_cur_tour_info(leagues: List[LeagueInfo], parser: SportsParser):
             and info["matches_count"] > 0
         )
         assert isinstance(info["deadline"], datetime.datetime)
+
+
+def test_basic_players_stats_info(leagues: List[LeagueInfo], parser: SportsParser):
+    for league in leagues:
+        players = parser.get_players_stats_info(league.name)
+        assert players is not None
+        assert isinstance(players, list)
+        assert len(players) > 0
+        assert isinstance(players[0], SportsPlayerStats)

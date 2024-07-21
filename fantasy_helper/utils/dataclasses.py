@@ -213,6 +213,26 @@ class FreeKicksInfo:
 
 
 @dataclass
+class SportsPlayerStats:
+    sports_id: int
+    name: str
+    role: Optional[str] = None
+    price: Optional[float] = None
+    percent_ownership: Optional[float] = None
+    team: Optional[str] = None
+    place: Optional[int] = None
+    score: Optional[int] = None
+    average_score: Optional[float] = None
+    goals: Optional[int] = None
+    assists: Optional[int] = None
+    goals_conceded: Optional[int] = None
+    yellow_cards: Optional[int] = None
+    red_cards: Optional[int] = None
+    field_minutes: Optional[int] = None
+    saves: Optional[int] = None
+
+
+@dataclass
 class PlayersLeagueStats:
     abs_stats: Optional[pd.DataFrame] = None
     norm_stats: Optional[pd.DataFrame] = None

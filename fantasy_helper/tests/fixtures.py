@@ -1,4 +1,4 @@
-from typing import List
+from typing import Generator, List
 import os.path as path
 
 from pytest import fixture
@@ -10,10 +10,10 @@ from fantasy_helper.utils.dataclasses import LeagueInfo
 
 
 @fixture(scope="session")
-def leagues() -> List[LeagueInfo]:
+def leagues() -> Generator[List[LeagueInfo], None, None]:
     # load leagues info
     if not GlobalHydra().is_initialized():
         initialize(config_path="../conf", version_base=None)
     cfg = compose(config_name="config")
     leagues = instantiate(cfg.leagues)
-    yield leagues
+    yield [league for league in leagues if league.is_active]
