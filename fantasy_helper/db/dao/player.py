@@ -12,7 +12,7 @@ from hydra.core.global_hydra import GlobalHydra
 from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.fbref import FbrefParser
-from fantasy_helper.utils.common import instantiate_leagues
+from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import (
     LeagueInfo,
     PlayerStats,
@@ -28,9 +28,7 @@ utc = timezone.utc
 
 class PlayerDAO:
     def __init__(self):
-        if not GlobalHydra().is_initialized():
-            initialize(config_path="../../conf", version_base=None)
-        cfg = compose(config_name="config")
+        cfg = load_config(config_path="../../conf", config_name="config")
 
         self.__leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self.__fbref_parser = FbrefParser(leagues=self.__leagues)

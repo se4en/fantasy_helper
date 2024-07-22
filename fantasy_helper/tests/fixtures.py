@@ -6,6 +6,7 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
 
+from fantasy_helper.utils.common import load_config, instantiate_leagues
 from fantasy_helper.utils.dataclasses import LeagueInfo
 
 
