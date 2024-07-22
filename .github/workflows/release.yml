@@ -116,6 +116,6 @@ jobs:
           script: |
             echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
             cd ~/${{ github.event.repository.name }}
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml stop
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
-            sudo docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up -d
+            sudo docker-compose -f ./docker-compose.prod.yml stop
+            sudo docker-compose -f ./docker-compose.prod.yml pull
+            sudo docker-compose -f ./docker-compose.prod.yml up -d
