@@ -1,9 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-from hydra import compose, initialize
-from hydra.utils import instantiate
-from hydra.core.global_hydra import GlobalHydra
+
+from fantasy_helper.utils.common import load_config, instantiate_leagues
 
 
 load_dotenv()
@@ -21,7 +20,5 @@ POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 # load leagues info
-if not GlobalHydra().is_initialized():
-    initialize(config_path=".", version_base=None)
-cfg = compose(config_name="config")
-leagues = instantiate(cfg.leagues)
+cfg = load_config(config_path=".", config_name="config")
+leagues = instantiate_leagues(cfg)
