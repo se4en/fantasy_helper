@@ -5,12 +5,12 @@ from dataclasses import asdict
 from sqlalchemy import func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
-from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.lineup import Lineup
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.mole import MoleParser
+from fantasy_helper.utils.common import instantiate_leagues
 from fantasy_helper.utils.dataclasses import LeagueInfo, TeamLineup
 from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 
@@ -24,7 +24,7 @@ class LineupDAO:
             initialize(config_path="../../conf", version_base=None)
         cfg = compose(config_name="config")
 
-        self.__leagues: List[LeagueInfo] = instantiate(cfg.leagues)
+        self.__leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self.__mole_parser = MoleParser(leagues=self.__leagues)
 
     def get_lineups(self, league_name: str) -> List[TeamLineup]:

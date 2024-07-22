@@ -6,13 +6,13 @@ from datetime import timezone
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
-from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.xbet import XbetParser
 from fantasy_helper.parsers.sports import SportsParser
+from fantasy_helper.utils.common import instantiate_leagues
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 
@@ -28,7 +28,7 @@ class CoeffDAO:
         if not GlobalHydra().is_initialized():
             initialize(config_path="../../conf", version_base=None)
         cfg = compose(config_name="config")
-        self._leagues: List[LeagueInfo] = instantiate(cfg.leagues)
+        self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
 
         self._xbet_parser = XbetParser(leagues=self._leagues)
         self._sports_parser = SportsParser(
