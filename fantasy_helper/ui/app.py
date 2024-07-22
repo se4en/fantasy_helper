@@ -46,7 +46,10 @@ authenticator = stauth.Authenticate(
     cookie['key'],
     cookie['expiry_days']
 )
-name, authentication_status, username = authenticator.login(location="main")
+try:
+    name, authentication_status, username = authenticator.login(location="main")
+except KeyError:
+    authentication_status = False
 
 
 @st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading coefficients...")
