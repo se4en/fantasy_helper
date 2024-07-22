@@ -7,12 +7,12 @@ import numpy as np
 from sqlalchemy import func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
-from hydra.utils import instantiate
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.fbref import FbrefParser
+from fantasy_helper.utils.common import instantiate_leagues
 from fantasy_helper.utils.dataclasses import (
     LeagueInfo,
     PlayerStats,
@@ -32,7 +32,7 @@ class PlayerDAO:
             initialize(config_path="../../conf", version_base=None)
         cfg = compose(config_name="config")
 
-        self.__leagues: List[LeagueInfo] = instantiate(cfg.leagues)
+        self.__leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self.__fbref_parser = FbrefParser(leagues=self.__leagues)
 
     def _compute_diff_value(
