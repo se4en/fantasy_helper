@@ -3,6 +3,7 @@ permissions:
   packages: write
   contents: write
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - master
