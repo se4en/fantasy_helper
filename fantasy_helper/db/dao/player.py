@@ -53,38 +53,38 @@ class PlayerDAO:
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
         stats_info.goals = self._compute_diff_value(
-            max_stats["goals"], min_stats["goals"]
+            max_stats["goals"], min_stats.get("goals", 0)
         )
         stats_info.shots = self._compute_diff_value(
-            max_stats["shots"], min_stats["shots"]
+            max_stats["shots"], min_stats.get("shots", 0)
         )
         stats_info.shots_on_target = self._compute_diff_value(
-            max_stats["shots_on_target"], min_stats["shots_on_target"]
+            max_stats["shots_on_target"], min_stats.get("shots_on_target", 0)
         )
-        stats_info.xg = self._compute_diff_value(max_stats["xg"], min_stats["xg"])
+        stats_info.xg = self._compute_diff_value(max_stats["xg"], min_stats.get("xg", 0))
         stats_info.xg_np = self._compute_diff_value(
-            max_stats["npxg"], min_stats["npxg"]
+            max_stats["npxg"], min_stats.get("npxg", 0)
         )
         return stats_info
 
     def _add_shooting_stats_norm(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
-        minutes = max_stats["minutes"] - min_stats["minutes"]
+        minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
         stats_info.goals = self._compute_diff_value(
-            max_stats["goals"], min_stats["goals"], minutes
+            max_stats["goals"], min_stats.get("goals", 0), minutes
         )
         stats_info.shots = self._compute_diff_value(
-            max_stats["shots"], min_stats["shots"], minutes
+            max_stats["shots"], min_stats.get("shots", 0), minutes
         )
         stats_info.shots_on_target = self._compute_diff_value(
-            max_stats["shots_on_target"], min_stats["shots_on_target"], minutes
+            max_stats["shots_on_target"], min_stats.get("shots_on_target", 0), minutes
         )
         stats_info.xg = self._compute_diff_value(
-            max_stats["xg"], min_stats["xg"], minutes
+            max_stats["xg"], min_stats.get("xg", 0), minutes
         )
         stats_info.xg_np = self._compute_diff_value(
-            max_stats["npxg"], min_stats["npxg"], minutes
+            max_stats["npxg"], min_stats.get("npxg", 0), minutes
         )
         return stats_info
 
@@ -92,38 +92,38 @@ class PlayerDAO:
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
         stats_info.xa = self._compute_diff_value(
-            max_stats["pass_xa"], min_stats["pass_xa"]
+            max_stats["pass_xa"], min_stats.get("pass_xa", 0)
         )
         stats_info.key_passes = self._compute_diff_value(
-            max_stats["assisted_shots"], min_stats["assisted_shots"]
+            max_stats["assisted_shots"], min_stats.get("assisted_shots", 0)
         )
         stats_info.passes_into_penalty_area = self._compute_diff_value(
-            max_stats["passes_into_penalty_area"], min_stats["passes_into_penalty_area"]
+            max_stats["passes_into_penalty_area"], min_stats.get("passes_into_penalty_area", 0)
         )
         stats_info.crosses_into_penalty_area = self._compute_diff_value(
             max_stats["crosses_into_penalty_area"],
-            min_stats["crosses_into_penalty_area"],
+            min_stats.get("crosses_into_penalty_area", 0),
         )
         return stats_info
 
     def _add_passing_stats_norm(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
-        minutes = max_stats["minutes"] - min_stats["minutes"]
+        minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
         stats_info.xa = self._compute_diff_value(
-            max_stats["pass_xa"], min_stats["pass_xa"], minutes
+            max_stats["pass_xa"], min_stats.get("pass_xa", 0), minutes
         )
         stats_info.key_passes = self._compute_diff_value(
-            max_stats["assisted_shots"], min_stats["assisted_shots"], minutes
+            max_stats["assisted_shots"], min_stats.get("assisted_shots", 0), minutes
         )
         stats_info.passes_into_penalty_area = self._compute_diff_value(
             max_stats["passes_into_penalty_area"],
-            min_stats["passes_into_penalty_area"],
+            min_stats.get("passes_into_penalty_area", 0),
             minutes,
         )
         stats_info.crosses_into_penalty_area = self._compute_diff_value(
             max_stats["crosses_into_penalty_area"],
-            min_stats["crosses_into_penalty_area"],
+            min_stats.get("crosses_into_penalty_area", 0),
             minutes,
         )
         return stats_info
@@ -132,44 +132,44 @@ class PlayerDAO:
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
         stats_info.touches_in_attacking_third = self._compute_diff_value(
-            max_stats["touches_att_3rd"], min_stats["touches_att_3rd"]
+            max_stats["touches_att_3rd"], min_stats.get("touches_att_3rd", 0)
         )
         stats_info.touches_in_attacking_penalty_area = self._compute_diff_value(
             max_stats["touches_att_pen_area"],
-            min_stats["touches_att_pen_area"],
+            min_stats.get("touches_att_pen_area", 0),
         )
         stats_info.carries_in_attacking_third = self._compute_diff_value(
             max_stats["carries_into_final_third"],
-            min_stats["carries_into_final_third"],
+            min_stats.get("carries_into_final_third", 0),
         )
         stats_info.carries_in_attacking_penalty_area = self._compute_diff_value(
             max_stats["carries_into_penalty_area"],
-            min_stats["carries_into_penalty_area"],
+            min_stats.get("carries_into_penalty_area", 0),
         )
         return stats_info
 
     def _add_possesion_stats_norm(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
-        minutes = max_stats["minutes"] - min_stats["minutes"]
+        minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
         stats_info.touches_in_attacking_third = self._compute_diff_value(
             max_stats["touches_att_3rd"],
-            min_stats["touches_att_3rd"],
+            min_stats.get("touches_att_3rd", 0),
             minutes,
         )
         stats_info.touches_in_attacking_penalty_area = self._compute_diff_value(
             max_stats["touches_att_pen_area"],
-            min_stats["touches_att_pen_area"],
+            min_stats.get("touches_att_pen_area", 0),
             minutes,
         )
         stats_info.carries_in_attacking_third = self._compute_diff_value(
             max_stats["carries_into_final_third"],
-            min_stats["carries_into_final_third"],
+            min_stats.get("carries_into_final_third", 0),
             minutes,
         )
         stats_info.carries_in_attacking_penalty_area = self._compute_diff_value(
             max_stats["carries_into_penalty_area"],
-            min_stats["carries_into_penalty_area"],
+            min_stats.get("carries_into_penalty_area", 0),
             minutes,
         )
         return stats_info
@@ -190,10 +190,10 @@ class PlayerDAO:
         league_name = max_stats["league_name"]
 
         if league_name in self.__fbref_parser.get_playing_time_leagues():
-            games = self._compute_diff_value(max_stats["games"], min_stats["games"])
+            games = self._compute_diff_value(max_stats["games"], min_stats.get("games", 0))
             abs_stats_info.games, norm_stats_info.games = games, games
             minutes = self._compute_diff_value(
-                max_stats["minutes"], min_stats["minutes"]
+                max_stats["minutes"], min_stats.get("minutes", 0)
             )
             abs_stats_info.minutes, norm_stats_info.minutes = minutes, minutes
         if league_name in self.__fbref_parser.get_shooting_leagues():
@@ -232,13 +232,21 @@ class PlayerDAO:
         team_name = group["team_name"].mode().iloc[0]
         position = group["position"].mode().iloc[0]
         max_games_row = sorted_df.iloc[-1].to_dict()
+        min_games_row = sorted_df.iloc[0].to_dict()
 
-        for _, row in sorted_df.iloc[:-1].iterrows():
+        if min_games_row["games"] == max_games_row["games"] and max_games_row["games"] == 1:
             abs_stats_info, norm_stats_info = self._compute_stats_values(
-                max_games_row, row.to_dict(), team_name, position
+                max_games_row, {}, team_name, position
             )
             abs_stats_infos.append(asdict(abs_stats_info))
             norm_stats_infos.append(asdict(norm_stats_info))
+        else:
+            for _, row in sorted_df.iloc[:-1].iterrows():
+                abs_stats_info, norm_stats_info = self._compute_stats_values(
+                    max_games_row, row.to_dict(), team_name, position
+                )
+                abs_stats_infos.append(asdict(abs_stats_info))
+                norm_stats_infos.append(asdict(norm_stats_info))
 
         if is_abs_stats and abs_stats_infos:
             return pd.DataFrame(abs_stats_infos)
