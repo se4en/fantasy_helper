@@ -27,7 +27,8 @@ leagues:
     name: England
     ru_name: Англия
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
-    squad_id: 175618
+    squad_id: 344967
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
     fbref_playing_time_url: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
     fbref_shooting_url: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
@@ -40,7 +41,8 @@ leagues:
     name: Spain
     ru_name: Испания
     emoji: 🇪🇸
-    squad_id: 185281
+    squad_id: 347718
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
     fbref_playing_time_url: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
@@ -53,7 +55,8 @@ leagues:
     name: France
     ru_name: Франция
     emoji: 🇫🇷
-    squad_id: 175626
+    squad_id: 347725
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
     fbref_playing_time_url: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
     fbref_shooting_url: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
@@ -66,7 +69,8 @@ leagues:
     name: Portugal
     ru_name: Португалия
     emoji: 🇵🇹
-    squad_id: 185282
+    squad_id: 335045
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
     fbref_playing_time_url: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
@@ -79,7 +83,8 @@ leagues:
     name: Netherlands
     ru_name: Нидерланды
     emoji: 🇳🇱
-    squad_id: 175625
+    squad_id: 335035
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/2018750-netherlands-eredivisie
     fbref_playing_time_url: https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats
     fbref_shooting_url: https://fbref.com/en/comps/23/shooting/Eredivisie-Stats
@@ -92,7 +97,8 @@ leagues:
     name: Turkey
     ru_name: Турция
     emoji: 🇹🇷
-    squad_id: 175622
+    squad_id: 335059
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/11113-turkey-superliga
     fbref_playing_time_url: https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats
     fbref_shooting_url: https://fbref.com/en/comps/26/shooting/Super-Lig-Stats
@@ -105,7 +111,8 @@ leagues:
     name: Championship
     ru_name: Чемпионшип
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
-    squad_id: 175621
+    squad_id: 335052
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/105759-england-championship
     fbref_playing_time_url: https://fbref.com/en/comps/10/playingtime/Championship-Stats
     fbref_shooting_url: https://fbref.com/en/comps/10/shooting/Championship-Stats
@@ -118,7 +125,8 @@ leagues:
     name: Italy
     ru_name: Италия
     emoji: 🇮🇹
-    squad_id: 217483
+    squad_id: 347720
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
     fbref_playing_time_url: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
     fbref_shooting_url: https://fbref.com/en/comps/11/shooting/Serie-A-Stats
