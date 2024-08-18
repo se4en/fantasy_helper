@@ -22,10 +22,25 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: Env variables assignment
+      - name: Create .env file
         run: |
-          echo "image_repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "TAG_NAME=latest" >> $GITHUB_ENV
+          echo "Generating .env file"
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+          echo "ADMINS=${{ secrets.ADMINS }}" >> .env
+          echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
+          echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env
+          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
+          echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
+
+          echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
+          echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -40,7 +55,7 @@ jobs:
           file: docker/Dockerfile.ui
           context: .
           push: true
-          tags: ghcr.io/${{ env.image_repository_name }}_ui:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ env.IMAGE_REPO }}_ui:${{ env.RELEASE_VERSION }}
 
       - name: Build and push api Docker image
         uses: docker/build-push-action@v3
@@ -48,7 +63,7 @@ jobs:
           file: docker/Dockerfile.api
           context: .
           push: true
-          tags: ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ env.IMAGE_REPO }}_api:${{ env.RELEASE_VERSION }}
   
       - name: Build and push cron Docker image
         uses: docker/build-push-action@v3
@@ -56,7 +71,7 @@ jobs:
           file: docker/Dockerfile.cron
           context: .
           push: true
-          tags: ghcr.io/${{ env.image_repository_name }}_cron:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ env.IMAGE_REPO }}_cron:${{ env.RELEASE_VERSION }}
 
   deploy_via_ssh:
     needs: push_to_registry
