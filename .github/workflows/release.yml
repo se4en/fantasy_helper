@@ -40,7 +40,7 @@ jobs:
           echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
 
           echo "IMAGE_REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
