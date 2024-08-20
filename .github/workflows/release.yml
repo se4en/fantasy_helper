@@ -129,6 +129,7 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           port: 22
           envs: APPTOKEN,USERNAME
+          command_timeout: 120m
           script: |
             echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
             cd ~/${{ github.event.repository.name }}
