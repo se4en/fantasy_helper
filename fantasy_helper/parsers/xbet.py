@@ -26,9 +26,11 @@ class XbetParser:
         start_datetime = WebDriverWait(driver, 3).until(
             EC.presence_of_element_located((By.CLASS_NAME, "c-scoreboard-start__date"))
         )
-        date = start_datetime.text.split()[0]
-        time = start_datetime.text.split()[1]
-        day, month, year = date.split("/")
+        date, time = start_datetime.text.strip().split()
+        if "/" in date:
+            day, month, year = date.split("/")
+        else:
+            day, month, year = date.split(".")
         hour, minute = time.split(":")
 
         return datetime.datetime(
