@@ -12,19 +12,21 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, TeamLineup
 
 class MoleParser:
     def __init__(self, leagues: List[LeagueInfo]):
-        self.__url = "https://www.sportsmole.co.uk/football/preview/"
-        self.__leagues = {
+        self._url = "https://www.sportsmole.co.uk/football/preview/"
+        self._leagues = {
             l.sportsmole_name: l.name for l in leagues if l.sportsmole_name is not None and l.is_active
         }
 
-        self.__session = requests.Session()
+        self._session = requests.Session()
         retry = Retry(connect=3, backoff_factor=0.5)
         adapter = HTTPAdapter(max_retries=retry)
-        self.__session.mount("http://", adapter)
-        self.__session.mount("https://", adapter)
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
 
-    def __parse_lineups(self, url: str, league: str) -> List[TeamLineup]:
-        response = self.__session.get(url)
+    def _parse_lineups(self, url: str, league: str) -> List[TeamLineup]:
+        response = self._session.get(url)
+        if response.status_code != 200:
+            return []
         soup = BeautifulSoup(response.content, "html.parser")
         result = []
 
@@ -37,7 +39,7 @@ class MoleParser:
         return result
 
     def get_lineups(self) -> List[TeamLineup]:
-        response = requests.get(self.__url)
+        response = requests.get(self._url)
         soup = BeautifulSoup(response.content, "html.parser")
         found_leagues = soup.find_all(
             "div", class_="l_s_blocks_header l_s_blocks margin"
@@ -46,23 +48,22 @@ class MoleParser:
 
         for i in range(len(found_leagues)):
             start_tag = found_leagues[i]
-            if i < len(found_leagues) - 1:
-                end_tag = found_leagues[i + 1]
-            else:
-                end_tag = None
             mole_league_name = start_tag.get_text("|").split("|")[0]
-            if mole_league_name not in self.__leagues:
+            if mole_league_name not in self._leagues:
                 continue
-            league_name = self.__leagues[mole_league_name]
 
-            current_tag = start_tag
-            while current_tag != end_tag:
+            league_name = self._leagues[mole_league_name]
+
+            current_tag = start_tag.find_next()
+            while current_tag.class_name != "l_s_blocks_header l_s_blocks margin":
                 if current_tag.name == "a":
                     match_url = "https://www.sportsmole.co.uk" + current_tag.get("href")
-                    match_lineups = self.__parse_lineups(
+                    match_lineups = self._parse_lineups(
                         url=match_url, league=league_name
                     )
                     all_lineups += match_lineups
+                elif current_tag.name != "div" and current_tag.class_name != "day":
+                    break
 
                 current_tag = current_tag.find_next()
 
