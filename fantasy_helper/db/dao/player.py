@@ -329,13 +329,16 @@ class PlayerDAO:
         result = PlayersLeagueStats(
             abs_stats=df.groupby(by=["name"])
             .apply(lambda x: self._compute_player_stats(x, is_abs_stats=True))
+            .drop_duplicates(subset=["name", "team"], ignore_index=True)
             .reset_index(drop=True, inplace=False),
             norm_stats=df.groupby(by=["name"])
             .apply(lambda x: self._compute_player_stats(x, is_abs_stats=False))
+            .drop_duplicates(subset=["name", "team"], ignore_index=True)
             .reset_index(drop=True, inplace=False),
             free_kicks=df.groupby(by=["name"])
             .apply(self._compute_free_kicks_stats)
-            .reset_index(drop=True, inplace=False),
+            .drop_duplicates(subset=["name", "team"], ignore_index=True)
+            .reset_index(drop=False, inplace=False),
         )
         return result
 
