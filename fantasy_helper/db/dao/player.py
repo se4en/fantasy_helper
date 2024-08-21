@@ -338,7 +338,7 @@ class PlayerDAO:
             free_kicks=df.groupby(by=["name"])
             .apply(self._compute_free_kicks_stats)
             .drop_duplicates(subset=["name", "team"], ignore_index=True)
-            .reset_index(drop=False, inplace=False),
+            .reset_index(drop=True, inplace=False),
         )
         return result
 
