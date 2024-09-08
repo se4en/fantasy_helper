@@ -3,22 +3,20 @@ import logging
 import sys
 import os
 import json
-import typing as t
 import pytz
+from typing import Any, Dict, List, Optional
 
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import FirefoxOptions
-from bs4 import BeautifulSoup
 
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 
 class XbetParser:
-    def __init__(self, leagues: t.List[LeagueInfo]):
+    def __init__(self, leagues: List[LeagueInfo]):
         self._leagues = {
             l.name: l.xber_url
             for l in leagues
@@ -26,7 +24,7 @@ class XbetParser:
         }
 
     @staticmethod
-    def _parse_start_datetime(driver: t.Any) -> datetime.datetime:
+    def _parse_start_datetime(driver: Any) -> datetime.datetime:
         start_datetime = WebDriverWait(driver, 3).until(
             EC.presence_of_element_located((By.CLASS_NAME, "c-scoreboard-start__date"))
         )
@@ -42,22 +40,37 @@ class XbetParser:
         )
 
     @staticmethod
-    def _parse_bet_value(driver: t.Any, bet_name: str, bet_value: str) -> float:
-        bet_group = WebDriverWait(driver, 3).until(
-            EC.presence_of_element_located(
-                (
-                    By.XPATH,
-                    f"//*[contains(@class, 'bet_group') and contains(text(), '{bet_name}')]",
-                )
-            )
+    def _parse_bets_values(driver: Any) -> Dict[str, Dict[str, float]]:
+        bet_groups = WebDriverWait(driver, 3).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "bet_group"))
         )
 
-        bet = WebDriverWait(bet_group, 3).until(
-            EC.presence_of_element_located(
-                (By.XPATH, f"//*[contains(text(), '{bet_value}')]/../*[@class='koeff']")
-            )
-        )
-        return float(bet.get_attribute("data-coef"))
+        result = {}
+        for i, bet_group in enumerate(bet_groups):
+            driver.execute_script("arguments[0].scrollIntoView(true);", bet_group)
+
+            bet_lines = bet_group.text.split("\n")
+            if len(bet_lines) == 0:
+                continue
+
+            bet_group_name = bet_lines[0]
+
+            bets_values = {}
+            bet_name, bet_value = None, None
+            for bet_line in bet_lines[1:]:
+                if bet_name is None:
+                    bet_name = bet_line.strip()
+                else:
+                    try:
+                        bet_value = float(bet_line.strip())
+                        bets_values[bet_name] = bet_value
+                        bet_name, bet_value = None, None
+                    except ValueError:
+                        pass
+
+            result[bet_group_name] = bets_values
+
+        return result
 
     @staticmethod
     def _parse_match(match_info: MatchInfo) -> MatchInfo:
@@ -73,18 +86,11 @@ class XbetParser:
 
             match_info.start_datetime = XbetParser._parse_start_datetime(driver)
 
-            match_info.total_1_over_1_5 = XbetParser._parse_bet_value(
-                driver, bet_name="Индивидуальный тотал 1-го", bet_value="1.5 Б"
-            )
-            match_info.total_1_under_0_5 = XbetParser._parse_bet_value(
-                driver, bet_name="Индивидуальный тотал 1-го", bet_value="0.5 М"
-            )
-            match_info.total_2_over_1_5 = XbetParser._parse_bet_value(
-                driver, bet_name="Индивидуальный тотал 2-го", bet_value="1.5 Б"
-            )
-            match_info.total_2_under_0_5 = XbetParser._parse_bet_value(
-                driver, bet_name="Индивидуальный тотал 2-го", bet_value="0.5 М"
-            )
+            bets_values = XbetParser._parse_bets_values(driver)
+            match_info.total_1_over_1_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("1.5 Б")
+            match_info.total_1_under_0_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("0.5 М")
+            match_info.total_2_over_1_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("1.5 Б")
+            match_info.total_2_under_0_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("0.5 М")
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -92,10 +98,11 @@ class XbetParser:
         finally:
             if driver is not None:
                 driver.quit()
+
             return match_info
 
     @staticmethod
-    def _filter_matches(all_matches: t.Any, league_name: str) -> t.List[MatchInfo]:
+    def _filter_matches(all_matches: Any, league_name: str) -> List[MatchInfo]:
         result = []
         for match_info in all_matches:
             if (
@@ -115,7 +122,7 @@ class XbetParser:
                 )
         return result
 
-    def _parse_league_matches(self, league_name: str) -> t.Optional[t.List[MatchInfo]]:
+    def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
         if league_name not in self._leagues:
             return None
 
@@ -153,13 +160,14 @@ class XbetParser:
         finally:
             if driver is not None:
                 driver.quit()
+
             return result
 
-    def get_league_matches(self, league_name: str) -> t.List[MatchInfo]:
+    def get_league_matches(self, league_name: str) -> List[MatchInfo]:
         result = []
         league_matches = self._parse_league_matches(league_name)
         if league_matches is not None:
-            for match in league_matches[:1]:
+            for match in league_matches:
                 parsed_match = self._parse_match(match)
                 if (
                     parsed_match.total_1_over_1_5 is not None
