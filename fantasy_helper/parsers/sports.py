@@ -7,7 +7,7 @@ import pytz
 import requests
 import iso8601
 
-from fantasy_helper.utils.dataclasses import LeagueInfo
+from fantasy_helper.utils.dataclasses import LeagueInfo, SportsPlayerStats
 
 
 class SportsParser:
@@ -17,18 +17,18 @@ class SportsParser:
         url: str = "https://www.sports.ru/gql/graphql/",
         queries_path: Optional[str] = None,
     ):
-        self.__url = url
+        self._url = url
         if queries_path is not None:
-            self.__queries_path = queries_path
+            self._queries_path = queries_path
         else:
-            self.__queries_path = os.path.join(os.path.dirname(__file__), "/queries")
+            self._queries_path = os.path.join(os.path.dirname(__file__), "/queries")
 
-        self.__leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None and l.is_active}
+        self._leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None and l.is_active}
 
-    def __get_query_body(
+    def _get_query_body(
         self, query_name: Literal["squad", "tournament"]
     ) -> Optional[str]:
-        fname = os.path.join(self.__queries_path, f"{query_name}.graphql")
+        fname = os.path.join(self._queries_path, f"{query_name}.graphql")
 
         if os.path.exists(fname):
             with open(fname, "r") as f:
@@ -37,18 +37,21 @@ class SportsParser:
             # TODO log incorrect query file name
             return None
 
-    def __request_for_squad_id(
-        self, squad_id: int, query_name: Literal["squad", "tournament"]
+    def _request_for_specific_id(
+        self, 
+        id: int, 
+        query_name: Literal["squad", "tournament", "season", "players"],
+        id_type: Literal["$squadID", "$seasonID"] = "$squadID"
     ) -> Optional[dict]:
         headers = {"Content-Type": "application/json"}
-        body = self.__get_query_body(query_name)
+        body = self._get_query_body(query_name)
         if body is None:
             return None
-        body = body.replace("$squadID", str(squad_id))
+        body = body.replace(id_type, str(id))
 
         response = requests.request(
             "POST",
-            self.__url,
+            self._url,
             headers=headers,
             data=json.dumps({"query": body, "variables": {}}),
         )
@@ -59,11 +62,21 @@ class SportsParser:
             # TODO log bad response for graphql
             return None
 
-    def __get_current_tour(
+    def _get_season_id(
+        self, squad_id: int
+    ) -> Optional[int]:
+        data = self._request_for_specific_id(squad_id, "season")
+        if data is None:
+            return None
+
+        query_id = list(data["data"].keys())[0]  
+        return data["data"][query_id]["squads"][0]["season"]["id"]
+
+    def _get_current_tour(
         self, squad_id: int
     ) -> Tuple[Optional[dict], Optional[dict]]:
         cur_tour, next_tour = None, None
-        data = self.__request_for_squad_id(squad_id, "tournament")
+        data = self._request_for_specific_id(squad_id, "tournament")
         if data is None:
             return cur_tour, next_tour
 
@@ -78,12 +91,64 @@ class SportsParser:
 
         return cur_tour, next_tour
 
-    def get_cur_tour_info(self, league_name: str) -> Optional[Dict[str, Any]]:
-        if league_name not in self.__leagues:
+    def get_players_stats_info(self, league_name: str) -> Optional[List[SportsPlayerStats]]:
+        if league_name not in self._leagues:
             logging.info(f"Wrong league_name={league_name} in get_deadline")
             return None
 
-        cur_tour, next_tour = self.__get_current_tour(self.__leagues[league_name])
+        season_id = self._get_season_id(self._leagues[league_name])
+        players_data = self._request_for_specific_id(season_id, "players", id_type="$seasonID")
+        tour_info = self.get_cur_tour_info(league_name)
+        tour_number = tour_info.get("number") if tour_info is not None else None
+
+        result = []
+        query_id = list(players_data["data"].keys())[0]
+        for player_data in players_data["data"][query_id]["season"]["players"]["list"]:
+            player_data = player_data.get("player", None)
+            if player_data is None:
+                pass
+
+            sports_id = player_data.get("id", None)
+            name = player_data.get("name", None)
+            if not isinstance(sports_id, int) or not isinstance(name, str):
+                pass
+
+            status = player_data.get("status", None) or {}
+            team = player_data.get("team", None) or {}
+            seasonScoreInfo = player_data.get("seasonScoreInfo", None) or {}
+            gameStat = player_data.get("gameStat", None) or {}
+
+            result.append(
+                SportsPlayerStats(
+                    sports_id=sports_id,
+                    name=name,
+                    league_name=league_name,
+                    tour=tour_number,
+                    role=player_data.get("role", None),
+                    price=player_data.get("price", None),
+                    percent_ownership=status.get("percentOwnership", None),
+                    team_name=team.get("name", None),
+                    place=seasonScoreInfo.get("place", None),
+                    score=seasonScoreInfo.get("score", None),
+                    average_score=seasonScoreInfo.get("averageScore", None),
+                    goals=gameStat.get("goals", None),
+                    assists=gameStat.get("assists", None),
+                    goals_conceded=gameStat.get("goalsConceded", None),
+                    yellow_cards=gameStat.get("yellowCards", None),
+                    red_cards=gameStat.get("redCards", None),
+                    field_minutes=gameStat.get("fieldMinutes", None),
+                    saves=gameStat.get("saves", None)
+                )
+            )
+
+        return result
+
+    def get_cur_tour_info(self, league_name: str) -> Optional[Dict[str, Any]]:
+        if league_name not in self._leagues:
+            logging.info(f"Wrong league_name={league_name} in get_deadline")
+            return None
+
+        cur_tour, next_tour = self._get_current_tour(self._leagues[league_name])
         if cur_tour is not None:
             result = {
                 "number": int(cur_tour["name"].split(" ")[0]),
@@ -101,7 +166,7 @@ class SportsParser:
             return None
 
     def get_tour_transfers(self, squad_id: int) -> Optional[bool]:
-        data = self.__request_for_squad_id(squad_id, "squad")
+        data = self._request_for_specific_id(squad_id, "squad")
         if data is None:
             return None
 

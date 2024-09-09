@@ -13,8 +13,9 @@ from fantasy_helper.db.dao.player import PlayerDAO
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
+from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, TeamLineup
+from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -28,6 +29,7 @@ Player_dao = PlayerDAO()
 FS_Coeff_dao = FSCoeffsDAO()
 FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
+FS_Sports_Players_dao = FSSportsPlayersDAO()
 
 
 @app.get("/leagues_names/")
@@ -54,6 +56,20 @@ async def get_players_stats(league_name: str) -> Dict:
     """
     players_stats = FS_Player_dao.get_players_stats(league_name)
     return players_stats.to_json()
+
+
+@app.get("/players_stats_teams_names/")
+async def get_players_stats_teams_names(league_name: str) -> List[str]:
+    """
+    Get the names of all players, teams, and leagues in the database.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        List[str]: A list of team names in the specified league.
+    """
+    return Player_dao.get_teams_names(league_name)
 
 
 @app.get("/coeffs/")
@@ -85,20 +101,6 @@ async def get_tour_number(league_name: str) -> Optional[int]:
     return Coeff_dao.get_tour_number(league_name)
 
 
-@app.get("/players_teams_names/")
-async def get_players_teams_names(league_name: str) -> List[str]:
-    """
-    Get the names of all players, teams, and leagues in the database.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        List[str]: A list of team names in the specified league.
-    """
-    return Player_dao.get_teams_names(league_name)
-
-
 @app.get("/lineups/")
 async def get_lineups(league_name: str) -> List[TeamLineup]:
     """
@@ -111,3 +113,8 @@ async def get_lineups(league_name: str) -> List[TeamLineup]:
         List[TeamLineup]: A list of TeamLineup objects representing the lineups for the league.
     """
     return FS_Lineup_dao.get_lineups(league_name)
+
+
+@app.get("/sports_players/")
+async def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
+    return FS_Sports_Players_dao.get_sports_players(league_name)

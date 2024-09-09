@@ -5,7 +5,7 @@ import matplotlib as mpl
 import streamlit as st
 from mplsoccer import VerticalPitch, Sbopen, FontManager, inset_image
 
-from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff
 
 
 def position_to_id(position: str) -> int:
@@ -924,6 +924,37 @@ def plot_free_kicks_stats(
         df = df.loc[df["team"] == team_name]
     df.dropna(axis=1, how="all", inplace=True)
     df.fillna(0, inplace=True)
+
+    st.dataframe(df)
+
+
+def rename_sports_role(role: str) -> Optional[str]:
+    return {
+        "GOALKEEPER": "вр",
+        "DEFENDER": "зщ",
+        "MIDFIELDER": "пз",
+        "FORWARD": "нп",
+    }.get(role)
+
+
+def plot_sports_players(players: SportsPlayerDiff, team_name: str = "All") -> None:
+    df = pd.DataFrame([player.__dict__ for player in players])
+
+    df.drop(columns=["league_name"], inplace=True, errors="ignore")
+    df["role"] = df["role"].apply(rename_sports_role)
+
+    if team_name != "All":
+        df = df.loc[df["team_name"] == team_name]
+    df.dropna(axis=1, how="all", inplace=True)
+    df.fillna(0, inplace=True)
+    df = df.rename(columns={
+        "name": "Имя",
+        "team_name": "Команда",
+        "role": "Позиция",
+        "price": "Цена",
+        "percent_ownership": "Популярность",
+        "percent_ownership_diff": "Динамика",
+    })
 
     st.dataframe(df)
 
