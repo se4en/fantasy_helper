@@ -17,9 +17,10 @@ from fantasy_helper.ui.utils import (
     plot_free_kicks_stats,
     plot_lineup,
     plot_main_players_stats,
+    plot_sports_players,
 )
 from fantasy_helper.utils.common import load_config
-from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, TeamLineup
+from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
@@ -113,8 +114,8 @@ def get_players_league_stats(league_name: str) -> PlayersLeagueStats:
     return league_stats
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading teams...")
-def get_teams_names(league_name: str) -> List[str]:
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players stats...")
+def get_players_stats_teams_names(league_name: str) -> List[str]:
     """
     A function that retrieves the names of teams in a given league.
 
@@ -124,7 +125,7 @@ def get_teams_names(league_name: str) -> List[str]:
     Returns:
         List[str]: A list of team names in the specified league.
     """
-    r = requests.get(api_url + f"/players_teams_names/?league_name={league_name}")
+    r = requests.get(api_url + f"/players_stats_teams_names/?league_name={league_name}")
     return r.json()
 
 
@@ -144,7 +145,7 @@ def get_lineups(league_name: str) -> List[TeamLineup]:
     return result
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading lineups...")
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading leagues...")
 def get_leagues() -> Dict[str, str]:
     """
     A function that retrieves the leagues from the API.
@@ -157,6 +158,13 @@ def get_leagues() -> Dict[str, str]:
     """
     r = requests.get(api_url + "/leagues_names/")
     return r.json()
+
+
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players popularity...")
+def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
+    r = requests.get(api_url + f"/sports_players/?league_name={league_name}")
+    result = [SportsPlayerDiff(**player) for player in r.json()]
+    return result
 
 
 if authentication_status:
@@ -175,10 +183,12 @@ if authentication_status:
         ]
     st.write("")
 
-    players_league_stats = get_players_league_stats(st.session_state["league"])
     coeffs_df = coeffs_to_df(st.session_state["league"])
-    team_names = get_teams_names(st.session_state["league"])
+    players_stats = get_players_league_stats(st.session_state["league"])
+    players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
     lineups = get_lineups(st.session_state["league"])
+    sports_players = get_sports_players(st.session_state["league"])
+    sports_players_team_names = sorted(set([player.team_name for player in sports_players]))
 
     left, right = st.columns([4, 2])
     # plot coeffs
@@ -208,7 +218,7 @@ if authentication_status:
     with columns[0]:
         st.selectbox(
             "Team name",
-            options=["All"] + team_names,
+            options=["All"] + players_stats_team_names,
             key="player_stats_team_name",
             label_visibility="visible",
         )
@@ -226,7 +236,7 @@ if authentication_status:
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
 
     plot_main_players_stats(
-        players_league_stats,
+        players_stats,
         games_count=st.session_state["games_count"],
         is_abs_stats=not st.session_state["normalize"],
         min_minutes=st.session_state["min_minutes"],
@@ -240,14 +250,31 @@ if authentication_status:
     with columns[1]:
         st.selectbox(
             "Team name",
-            options=["All"] + team_names,
+            options=["All"] + players_stats_team_names,
             key="free_kicks_stats_team_name",
             label_visibility="visible",
         )
 
     plot_free_kicks_stats(
-        players_league_stats, team_name=st.session_state["free_kicks_stats_team_name"]
+        players_stats, team_name=st.session_state["free_kicks_stats_team_name"]
     )
+
+    # plot players popularity
+    centrize_header("Players popularity")
+
+    columns = st.columns([2, 2, 2])
+    with columns[1]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + sports_players_team_names,
+            key="sports_players_team_name",
+            label_visibility="visible",
+        )
+
+    plot_sports_players(
+        sports_players, team_name=st.session_state["sports_players_team_name"]
+    )
+
 elif authentication_status is False:
     st.error("Username/password is incorrect")
 elif authentication_status is None:
