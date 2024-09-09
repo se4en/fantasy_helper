@@ -120,6 +120,7 @@ class SportsParser:
                 SportsPlayerStats(
                     sports_id=sports_id,
                     name=name,
+                    league_name=league_name,
                     role=player_data.get("role", None),
                     price=player_data.get("price", None),
                     percent_ownership=status.get("percentOwnership", None),

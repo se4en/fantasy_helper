@@ -216,6 +216,8 @@ class FreeKicksInfo:
 class SportsPlayerStats:
     sports_id: int
     name: str
+    league_name: str
+    tour: Optional[int] = None
     role: Optional[str] = None
     price: Optional[float] = None
     percent_ownership: Optional[float] = None
@@ -230,6 +232,16 @@ class SportsPlayerStats:
     red_cards: Optional[int] = None
     field_minutes: Optional[int] = None
     saves: Optional[int] = None
+
+
+@dataclass
+class SportsPlayerDiff:
+    name: str
+    team_name: Optional[str] = None
+    role: Optional[str] = None
+    price: Optional[float] = None
+    percent_ownership: Optional[float] = None
+    percent_ownership_diff: Optional[float] = None
 
 
 @dataclass

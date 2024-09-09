@@ -15,6 +15,7 @@ class SportsPlayer(Base):
     name = Column(String, nullable=False)
     league_name = Column(String, nullable=False)
     timestamp = Column(DateTime, nullable=False)
+    tour = Column(Integer, nullable=True)
     role = Column(String, nullable=True)
     price = Column(Float, nullable=True)
     percent_ownership = Column(Float, nullable=True)
@@ -36,6 +37,7 @@ class SportsPlayer(Base):
         name: str,
         league_name: str,
         timestamp: datetime,
+        tour: Optional[int],
         role: Optional[str],
         price: Optional[float],
         percent_ownership: Optional[float],
@@ -54,6 +56,7 @@ class SportsPlayer(Base):
         self.sports_id = sports_id
         self.name = name
         self.league_name = league_name
+        self.tour = tour
         self.timestamp = timestamp
         self.role = role
         self.price = price
