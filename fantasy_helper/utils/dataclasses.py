@@ -237,6 +237,7 @@ class SportsPlayerStats:
 @dataclass
 class SportsPlayerDiff:
     name: str
+    league_name: str
     team_name: Optional[str] = None
     role: Optional[str] = None
     price: Optional[float] = None
