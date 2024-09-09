@@ -98,6 +98,8 @@ class SportsParser:
 
         season_id = self._get_season_id(self._leagues[league_name])
         players_data = self._request_for_specific_id(season_id, "players", id_type="$seasonID")
+        tour_info = self.get_cur_tour_info(league_name)
+        tour_number = tour_info.get("number") if tour_info is not None else None
 
         result = []
         query_id = list(players_data["data"].keys())[0]
@@ -121,6 +123,7 @@ class SportsParser:
                     sports_id=sports_id,
                     name=name,
                     league_name=league_name,
+                    tour=tour_number,
                     role=player_data.get("role", None),
                     price=player_data.get("price", None),
                     percent_ownership=status.get("percentOwnership", None),

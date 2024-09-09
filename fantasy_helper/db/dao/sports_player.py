@@ -1,20 +1,16 @@
 from typing import List
 from datetime import datetime, timezone
-from dataclasses import asdict
+import os.path as path
 
 import pandas as pd
-from sqlalchemy import and_, func
+from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
-from hydra import compose, initialize
-from hydra.utils import instantiate
-from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.database import Session
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, SportsPlayerDiff
-
-from fantasy_helper.utils.common import load_config
+from fantasy_helper.utils.common import instantiate_leagues, load_config
 
 
 utc = timezone.utc
@@ -24,8 +20,11 @@ class SportsPlayerDAO:
     def __init__(self):
         cfg = load_config(config_path="../../conf")
 
-        self._leagues: List[LeagueInfo] = instantiate(cfg.leagues)
-        self._sports_parser = SportsParser(leagues=self._leagues)
+        self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._sports_parser = SportsParser(
+            leagues=self._leagues,
+            queries_path=path.join(path.dirname(__file__), "../../parsers/queries")
+        )
 
     @staticmethod
     def _compute_popularity_diff(group: pd.DataFrame) -> pd.DataFrame:
@@ -61,16 +60,6 @@ class SportsPlayerDAO:
             .subquery()
         )
 
-        # grouped_rows = db_session.query(
-        #     cur_tour_rows,
-        #     func.row_number()
-        #     .over(
-        #         order_by=cur_tour_rows.c.timestamp.desc(),
-        #         partition_by=cur_tour_rows.c.sports_id,
-        #     )
-        #     .label("row_number"),
-        # ).subquery()
-
         df = pd.read_sql(cur_tour_rows.statement, cur_tour_rows.session.bind)
 
         db_session.commit()
@@ -83,8 +72,6 @@ class SportsPlayerDAO:
         return result
 
     def update_players(self, league_name) -> None:
-        tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        
         players_stats = self._sports_parser.get_players_stats_info(league_name)
         db_session: SQLSession = Session()
         
@@ -92,7 +79,6 @@ class SportsPlayerDAO:
             db_session.add(
                 SportsPlayer(
                     **player_stats.__dict__,
-                    tour=tour_info.get("number") if tour_info is not None else None,
                     timestamp=datetime.now().replace(tzinfo=utc),
                 )
             )
