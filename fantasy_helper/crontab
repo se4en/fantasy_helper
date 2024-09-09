@@ -1,5 +1,5 @@
 # START CRON JOB
-0 0 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/actualize_db.py > /proc/1/fd/1 2>/proc/1/fd/2
+0 0 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_coeffs.py > /proc/1/fd/1 2>/proc/1/fd/2
 0,30 * * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_lineups.py > /proc/1/fd/1 2>/proc/1/fd/2
 0 2 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_players_stats.py > /proc/1/fd/1 2>/proc/1/fd/2
 15,45 * * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_sports_players.py > /proc/1/fd/1 2>/proc/1/fd/2
