@@ -243,37 +243,41 @@ if authentication_status:
         team_name=st.session_state["player_stats_team_name"],
     )
 
-    # plot free kicks stats
-    centrize_header("Free kicks stats")
 
-    columns = st.columns([2, 2, 2])
-    with columns[1]:
-        st.selectbox(
-            "Team name",
-            options=["All"] + players_stats_team_names,
-            key="free_kicks_stats_team_name",
-            label_visibility="visible",
+    columns = st.columns([1, 1])
+    with columns[0]:
+        # plot free kicks stats
+        centrize_header("Free kicks stats")
+
+        subcolumns = st.columns([1, 2, 1])
+        with subcolumns[1]:
+            st.selectbox(
+                "Team name",
+                options=["All"] + players_stats_team_names,
+                key="free_kicks_stats_team_name",
+                label_visibility="visible",
+            )
+
+        plot_free_kicks_stats(
+            players_stats, team_name=st.session_state["free_kicks_stats_team_name"]
         )
 
-    plot_free_kicks_stats(
-        players_stats, team_name=st.session_state["free_kicks_stats_team_name"]
-    )
-
-    # plot players popularity
-    centrize_header("Players popularity")
-
-    columns = st.columns([2, 2, 2])
     with columns[1]:
-        st.selectbox(
-            "Team name",
-            options=["All"] + sports_players_team_names,
-            key="sports_players_team_name",
-            label_visibility="visible",
-        )
+        # plot players popularity
+        centrize_header("Players popularity")
 
-    plot_sports_players(
-        sports_players, team_name=st.session_state["sports_players_team_name"]
-    )
+        subcolumns = st.columns([1, 2, 1])
+        with subcolumns[1]:
+            st.selectbox(
+                "Team name",
+                options=["All"] + sports_players_team_names,
+                key="sports_players_team_name",
+                label_visibility="visible",
+            )
+
+        plot_sports_players(
+            sports_players, team_name=st.session_state["sports_players_team_name"]
+        )
 
 elif authentication_status is False:
     st.error("Username/password is incorrect")
