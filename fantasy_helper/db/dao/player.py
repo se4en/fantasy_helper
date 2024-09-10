@@ -227,26 +227,24 @@ class PlayerDAO:
         sorted_df = group.sort_values("games", ascending=True)
         if len(sorted_df) == 0:
             return pd.DataFrame()
+        
         abs_stats_infos, norm_stats_infos = [], []
-
         team_name = group["team_name"].mode().iloc[0]
         position = group["position"].mode().iloc[0]
         max_games_row = sorted_df.iloc[-1].to_dict()
-        min_games_row = sorted_df.iloc[0].to_dict()
+        
+        abs_stats_info, norm_stats_info = self._compute_stats_values(
+            max_games_row, {}, team_name, position
+        )
+        abs_stats_infos.append(asdict(abs_stats_info))
+        norm_stats_infos.append(asdict(norm_stats_info))
 
-        if min_games_row["games"] == max_games_row["games"] and max_games_row["games"] == 1:
+        for _, row in sorted_df.iloc[:-1].iterrows():
             abs_stats_info, norm_stats_info = self._compute_stats_values(
-                max_games_row, {}, team_name, position
+                max_games_row, row.to_dict(), team_name, position
             )
             abs_stats_infos.append(asdict(abs_stats_info))
             norm_stats_infos.append(asdict(norm_stats_info))
-        else:
-            for _, row in sorted_df.iloc[:-1].iterrows():
-                abs_stats_info, norm_stats_info = self._compute_stats_values(
-                    max_games_row, row.to_dict(), team_name, position
-                )
-                abs_stats_infos.append(asdict(abs_stats_info))
-                norm_stats_infos.append(asdict(norm_stats_info))
 
         if is_abs_stats and abs_stats_infos:
             return pd.DataFrame(abs_stats_infos)
@@ -329,11 +327,11 @@ class PlayerDAO:
         result = PlayersLeagueStats(
             abs_stats=df.groupby(by=["name"])
             .apply(lambda x: self._compute_player_stats(x, is_abs_stats=True))
-            .drop_duplicates(subset=["name", "team"], ignore_index=True)
+            .drop_duplicates(subset=["name", "team", "games"], ignore_index=True)
             .reset_index(drop=True, inplace=False),
             norm_stats=df.groupby(by=["name"])
             .apply(lambda x: self._compute_player_stats(x, is_abs_stats=False))
-            .drop_duplicates(subset=["name", "team"], ignore_index=True)
+            .drop_duplicates(subset=["name", "team", "games"], ignore_index=True)
             .reset_index(drop=True, inplace=False),
             free_kicks=df.groupby(by=["name"])
             .apply(self._compute_free_kicks_stats)

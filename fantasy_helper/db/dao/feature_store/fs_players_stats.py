@@ -105,6 +105,11 @@ class FSPlayersStatsDAO:
                 )
             )
 
+        # remove all previous stats
+        db_session.query(FSPlayersFreeKicks).filter(
+            FSPlayersFreeKicks.league_name == league_name
+        ).delete()
+
         for index, free_kick_stats in players_stats.free_kicks.replace(
             np.nan, None
         ).iterrows():
