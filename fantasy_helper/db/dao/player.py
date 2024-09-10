@@ -43,7 +43,7 @@ class PlayerDAO:
                 return max_value - min_value
             else:
                 if minutes > 0:
-                    return (max_value - min_value) * 90 / minutes
+                    return float(max_value - min_value) * 90.0 / minutes
                 else:
                     return None
         else:
