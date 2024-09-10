@@ -17,12 +17,12 @@ class FSPlayersStats(Base):
     team = Column(String, nullable=False)
     position = Column(String, nullable=False)
     # playing time
-    games = Column(Integer, nullable=True)
-    minutes = Column(Integer, nullable=True)
+    games = Column(Float, nullable=True)
+    minutes = Column(Float, nullable=True)
     # shooting
-    goals = Column(Integer, nullable=True)
-    shots = Column(Integer, nullable=True)
-    shots_on_target = Column(Integer, nullable=True)
+    goals = Column(Float, nullable=True)
+    shots = Column(Float, nullable=True)
+    shots_on_target = Column(Float, nullable=True)
     xg = Column(Float, nullable=True)
     xg_np = Column(Float, nullable=True)
     # passing
