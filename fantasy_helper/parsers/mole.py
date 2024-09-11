@@ -55,15 +55,13 @@ class MoleParser:
             league_name = self._leagues[mole_league_name]
 
             current_tag = start_tag.find_next()
-            while current_tag.class_name != "l_s_blocks_header l_s_blocks margin":
+            while "l_s_blocks_header" not in current_tag.get("class", []):
                 if current_tag.name == "a":
                     match_url = "https://www.sportsmole.co.uk" + current_tag.get("href")
                     match_lineups = self._parse_lineups(
                         url=match_url, league=league_name
                     )
                     all_lineups += match_lineups
-                elif current_tag.name != "div" and current_tag.class_name != "day":
-                    break
 
                 current_tag = current_tag.find_next()
 
