@@ -145,7 +145,7 @@ def get_lineups(league_name: str) -> List[TeamLineup]:
     return result
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading leagues...")
+@st.cache_data(ttl=600, max_entries=10, show_spinner="Loading leagues...")
 def get_leagues() -> Dict[str, str]:
     """
     A function that retrieves the leagues from the API.
@@ -160,7 +160,7 @@ def get_leagues() -> Dict[str, str]:
     return r.json()
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players popularity...")
+@st.cache_data(ttl=600, max_entries=10, show_spinner="Loading players popularity...")
 def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
     r = requests.get(api_url + f"/sports_players/?league_name={league_name}")
     result = [SportsPlayerDiff(**player) for player in r.json()]
