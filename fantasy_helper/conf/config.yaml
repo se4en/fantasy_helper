@@ -140,6 +140,7 @@ leagues:
     ru_name: Германия
     emoji: 🇩🇪
     squad_id: 216145
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/96463-germany-bundesliga
     fbref_playing_time_url: https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/20/shooting/Bundesliga-Stats
@@ -152,7 +153,8 @@ leagues:
     name: ChampionsLeague
     ru_name: Лига Чемпионов
     emoji: 🇪🇺
-    squad_id: 232134
+    squad_id: 379313
+    is_active: true
     xber_url: https://1xstavka.ru/en/line/football/118587-uefa-champions-league
     fbref_playing_time_url: null
     fbref_shooting_url: null
