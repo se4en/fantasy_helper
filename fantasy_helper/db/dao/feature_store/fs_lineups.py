@@ -2,7 +2,6 @@ from typing import List
 
 from sqlalchemy.orm import Session as SQLSession
 
-from fantasy_helper.db.models.lineup import Lineup
 from fantasy_helper.db.database import Session
 from fantasy_helper.utils.dataclasses import TeamLineup
 from fantasy_helper.db.models.feature_store.fs_lineups import FSLineups
@@ -22,7 +21,7 @@ class FSLineupsDAO:
         db_session: SQLSession = Session()
 
         league_lineups = (
-            db_session.query(FSLineups).filter(Lineup.league_name == league_name).all()
+            db_session.query(FSLineups).filter(FSLineups.league_name == league_name).all()
         )
 
         result = [
