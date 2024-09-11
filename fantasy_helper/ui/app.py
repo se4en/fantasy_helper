@@ -129,7 +129,7 @@ def get_players_stats_teams_names(league_name: str) -> List[str]:
     return r.json()
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading lineups...")
+@st.cache_data(ttl=600, max_entries=10, show_spinner="Loading lineups...")
 def get_lineups(league_name: str) -> List[TeamLineup]:
     """
     Retrieves lineups for a given league.
@@ -145,7 +145,7 @@ def get_lineups(league_name: str) -> List[TeamLineup]:
     return result
 
 
-@st.cache_data(ttl=600, max_entries=10, show_spinner="Loading leagues...")
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading leagues...")
 def get_leagues() -> Dict[str, str]:
     """
     A function that retrieves the leagues from the API.
