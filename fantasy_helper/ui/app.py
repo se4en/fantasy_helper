@@ -9,16 +9,11 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from hydra.utils import instantiate
 
-from fantasy_helper.ui.utils import (
-    centrize_header,
-    get_stat_from_mathes,
-    lineup_to_formation,
-    plot_coeff_df,
-    plot_free_kicks_stats,
-    plot_lineup,
-    plot_main_players_stats,
-    plot_sports_players,
-)
+from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
+from fantasy_helper.ui.utils.common import centrize_header
+from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
+from fantasy_helper.ui.utils.players_stats import plot_free_kicks_stats, plot_main_players_stats
+from fantasy_helper.ui.utils.sports_players import plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
@@ -185,6 +180,10 @@ if authentication_status:
 
     coeffs_df = coeffs_to_df(st.session_state["league"])
     players_stats = get_players_league_stats(st.session_state["league"])
+    available_stats_columns = filter(
+        lambda x: x not in {"name", "team", "position", "games", "minutes"}, 
+        players_stats.abs_stats.columns
+    )
     players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
     lineups = get_lineups(st.session_state["league"])
     sports_players = get_sports_players(st.session_state["league"])
@@ -214,23 +213,31 @@ if authentication_status:
     # plot stats
     centrize_header("Players stats")
 
-    columns = st.columns([2, 2, 2, 2])
+    columns = st.columns([2, 2, 2, 2, 2])
     with columns[0]:
+        st.multiselect(
+            "Stats columns",
+            options=available_stats_columns,
+            default=available_stats_columns,
+            key="stats_columns",
+            label_visibility="visible",
+        )
+    with columns[1]:
         st.selectbox(
             "Team name",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name",
             label_visibility="visible",
         )
-    with columns[1]:
+    with columns[2]:
         st.session_state["games_count"] = st.number_input(
             "Games count", value=3, min_value=1, max_value=30, step=1
         )
-    with columns[2]:
+    with columns[3]:
         st.session_state["min_minutes"] = st.number_input(
             "Minimum minutes", value=None, min_value=1, max_value=1000, step=1
         )
-    with columns[3]:
+    with columns[4]:
         st.write("")
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
