@@ -24,7 +24,12 @@ class MoleParser:
         self._session.mount("https://", adapter)
 
     def _parse_lineups(self, url: str, league: str) -> List[TeamLineup]:
-        response = self._session.get(url)
+        try:
+            response = self._session.get(url)
+        except requests.exceptions.TooManyRedirects:
+            # todo logging
+            return []
+
         if response.status_code != 200:
             return []
         soup = BeautifulSoup(response.content, "html.parser")
