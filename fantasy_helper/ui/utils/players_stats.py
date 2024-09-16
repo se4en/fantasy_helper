@@ -1,9 +1,13 @@
-from typing import Optional
+from typing import List, Optional
 
 import pandas as pd
 import streamlit as st
 
 from fantasy_helper.utils.dataclasses import PlayersLeagueStats
+
+
+NOT_VISIBLE_COLUMNS = {"id", "type", "league_name"}
+DEFAULT_COLUMNS = {"name", "team", "position", "games", "minutes"}
 
 
 def plot_main_players_stats(
@@ -34,7 +38,7 @@ def plot_main_players_stats(
     if df is None or len(df) == 0:
         return
 
-    df.drop(columns=["id", "type", "league_name"], inplace=True, errors="ignore")
+    df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
 
     if team_name != "All":
         df = df.loc[df["team"] == team_name]
@@ -68,6 +72,14 @@ def plot_main_players_stats(
     st.dataframe(df)
 
 
+def get_all_stats_columns(df: pd.DataFrame) -> List[str]:
+    pass
+
+
+def get_default_stats_columns(df: pd.DataFrame) -> List[str]:
+    pass
+
+
 def plot_free_kicks_stats(
     players_stats: PlayersLeagueStats, team_name: str = "All"
 ) -> None:
@@ -87,7 +99,7 @@ def plot_free_kicks_stats(
     if df is None or len(df) == 0:
         return
 
-    df.drop(columns=["id", "type", "league_name"], inplace=True, errors="ignore")
+    df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
 
     if team_name != "All":
         df = df.loc[df["team"] == team_name]
