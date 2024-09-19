@@ -96,5 +96,5 @@ class SportsPlayerDAO:
 
         for league in self._leagues:
             players = self.get_players(league.name)
-            if players is not None:
+            if players:
                 feature_store.update_sports_players(league.name, players)
