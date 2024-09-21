@@ -30,7 +30,7 @@ class SportsPlayerDAO:
     @staticmethod
     def _compute_popularity_diff(group: pd.DataFrame) -> pd.DataFrame:
         group = group[~group["percent_ownership"].isna()]
-        group = group[group["percent_ownership"] > 0]
+        group = group[group["percent_ownership"] > 0.01]
         if len(group) == 0:
             return pd.DataFrame()
         sorted_df = group.sort_values("timestamp", ascending=True)
