@@ -167,7 +167,8 @@ leagues:
     name: EuropaLeague
     ru_name: Лига Европы
     emoji: 🇪🇺
-    squad_id: 232139
+    squad_id: 390500
+    is_active: true
     xber_url: https://1xstavka.ru/en/line/football/118593-uefa-europa-league
     fbref_playing_time_url: null
     fbref_shooting_url: null
