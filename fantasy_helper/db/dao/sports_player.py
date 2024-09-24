@@ -57,9 +57,11 @@ class SportsPlayerDAO:
         tour_number = tour_info["number"]
         db_session: SQLSession = Session()
         
-        cur_tour_rows = db_session.query(SportsPlayer).filter(
-            and_(SportsPlayer.league_name == league_name, SportsPlayer.tour == tour_number)
-        )
+        cur_tour_rows = db_session.query(SportsPlayer).filter(and_(
+            SportsPlayer.league_name == league_name, 
+            SportsPlayer.tour == tour_number, 
+            SportsPlayer.percent_ownership > 0
+        ))
 
         df = pd.read_sql(cur_tour_rows.statement, cur_tour_rows.session.bind)
 
