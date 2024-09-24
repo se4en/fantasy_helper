@@ -102,6 +102,8 @@ class SportsParser:
         tour_number = tour_info.get("number") if tour_info is not None else None
 
         result = []
+        if "data" not in players_data:
+            return None
         query_id = list(players_data["data"].keys())[0]
         for player_data in players_data["data"][query_id]["season"]["players"]["list"]:
             player_data = player_data.get("player", None)
