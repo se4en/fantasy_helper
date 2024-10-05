@@ -690,7 +690,7 @@ class FbrefParser:
         else:
             return None
 
-    def _parse_league_table(self, league_name: str) -> List[LeagueTableInfo]:
+    def get_league_table(self, league_name: str) -> List[LeagueTableInfo]:
         if league_name not in self._table_leagues:
             return []
         if league_name not in self._leagues_ids:
@@ -756,7 +756,7 @@ class FbrefParser:
         else:
             return None
 
-    def _parse_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
+    def get_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
         if league_name not in self._schedule_leagues:
             return []
         if league_name not in self._leagues_ids:
