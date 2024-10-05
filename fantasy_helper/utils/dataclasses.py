@@ -26,6 +26,7 @@ class LeagueInfo:
     is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
+    fbref_league_id: Optional[int] = None
     fbref_table_url: Optional[str] = None
     fbref_schedule_url: Optional[str] = None
     fbref_playing_time_url: Optional[str] = None
@@ -57,6 +58,16 @@ class LeagueTableInfo:
     goals_against: int
     xg_for: Optional[float] = None
     xg_against: Optional[float] = None
+
+
+@dataclass
+class LeagueScheduleInfo:
+    league_name: str
+    home_team: str
+    away_team: str
+    gameweek: int
+    home_goals: Optional[int]
+    away_goals: Optional[int]
 
 
 @dataclass
