@@ -26,6 +26,8 @@ class LeagueInfo:
     is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
+    fbref_table_url: Optional[str] = None
+    fbref_schedule_url: Optional[str] = None
     fbref_playing_time_url: Optional[str] = None
     fbref_shooting_url: Optional[str] = None
     fbref_passing_url: Optional[str] = None
@@ -40,6 +42,21 @@ class TeamLineup:
     team_name: str
     league_name: str
     lineup: str
+
+
+@dataclass
+class LeagueTableInfo:
+    team_name: str
+    league_name: str
+    rank: int
+    wins: int
+    draws: int
+    losses: int
+    points: int
+    goals_for: int
+    goals_against: int
+    xg_for: Optional[float] = None
+    xg_against: Optional[float] = None
 
 
 @dataclass
