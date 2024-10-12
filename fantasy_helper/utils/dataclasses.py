@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, Dict
 
 import pandas as pd
@@ -66,6 +66,7 @@ class LeagueScheduleInfo:
     home_team: str
     away_team: str
     gameweek: int
+    date: Optional[date]
     home_goals: Optional[int]
     away_goals: Optional[int]
 

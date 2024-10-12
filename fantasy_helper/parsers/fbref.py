@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from datetime import date, datetime
 from dataclasses import asdict
 from typing import Any, Callable, Dict, Optional, List, Tuple
 
@@ -731,6 +732,13 @@ class FbrefParser:
             if driver is not None:
                 driver.quit()
 
+    @staticmethod
+    def _parse_fbref_date(date_str: str) -> Optional[date]:
+        try:
+            return datetime.strptime(date_str, "%d/%m/%Y").date()
+        except ValueError:
+            return None
+
     def _parse_schedule_row(
         self, table_row: Any, league_name: str
     ) -> Optional[LeagueScheduleInfo]:
@@ -738,18 +746,22 @@ class FbrefParser:
             _gameweek = table_row.find("th", {"data-stat": "gameweek"})
             _home_team = table_row.find("td", {"data-stat": "home_team"})
             _away_team = table_row.find("td", {"data-stat": "away_team"})
+            _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})
+
             if _score.text:
                 goals = _score.text.split("–")
                 _home_goals = cast_to_int(goals[0])
                 _away_goals = cast_to_int(goals[1])
             else:
                 _home_goals, _away_goals = None, None
+
             return LeagueScheduleInfo(
                 league_name=league_name,
                 gameweek=cast_to_int(_gameweek.text) if _gameweek else None,
                 home_team=_home_team.text.strip(),
                 away_team=_away_team.text.strip(),
+                date=self._parse_fbref_date(_date.text.strip()) if _date else None,
                 home_goals=_home_goals,
                 away_goals=_away_goals
             )
@@ -757,6 +769,7 @@ class FbrefParser:
             return None
 
     def get_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
+
         if league_name not in self._schedule_leagues:
             return []
         if league_name not in self._leagues_ids:

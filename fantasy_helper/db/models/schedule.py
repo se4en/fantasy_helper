@@ -1,8 +1,8 @@
-from datetime import datetime
+import datetime
 from typing import Optional
 
 from sqlalchemy import Column
-from sqlalchemy import Integer, String, DateTime, Float
+from sqlalchemy import Integer, String, DateTime, Date, Float
 
 from fantasy_helper.db.database import Base
 
@@ -16,16 +16,18 @@ class Schedule(Base):
     home_team = Column(String, nullable=False)
     away_team = Column(String, nullable=False)
     gameweek = Column(Integer, nullable=False)
+    date = Column(Date, nullable=True)
     home_goals = Column(Integer, nullable=True)
     away_goals = Column(Integer, nullable=True)
 
     def __init__(
         self,
         league_name: str,
-        timestamp: datetime,
+        timestamp: datetime.datetime,
         home_team: str,
         away_team: str,
         gameweek: int,
+        date: Optional[datetime.date],
         home_goals: Optional[int],
         away_goals: Optional[int],
     ):
@@ -34,6 +36,7 @@ class Schedule(Base):
         self.home_team = home_team
         self.away_team = away_team
         self.gameweek = gameweek
+        self.date = date
         self.home_goals = home_goals
         self.away_goals = away_goals
 
