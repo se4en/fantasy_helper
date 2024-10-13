@@ -9,16 +9,11 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from hydra.utils import instantiate
 
-from fantasy_helper.ui.utils import (
-    centrize_header,
-    get_stat_from_mathes,
-    lineup_to_formation,
-    plot_coeff_df,
-    plot_free_kicks_stats,
-    plot_lineup,
-    plot_main_players_stats,
-    plot_sports_players,
-)
+from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
+from fantasy_helper.ui.utils.common import centrize_header
+from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
+from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, plot_free_kicks_stats, plot_main_players_stats
+from fantasy_helper.ui.utils.sports_players import plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
@@ -234,6 +229,14 @@ if authentication_status:
         st.write("")
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
+
+    st.multiselect(
+        "Stats columns",
+        options=get_all_stats_columns(players_stats),
+        default=get_default_stats_columns(players_stats),
+        key="stats_columns",
+        label_visibility="visible",
+    )
 
     plot_main_players_stats(
         players_stats,
