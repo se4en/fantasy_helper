@@ -72,6 +72,18 @@ class LeagueScheduleInfo:
 
 
 @dataclass
+class CalendarInfo:
+    league_name: str
+    home_team: str
+    away_team: str
+    tour: int
+    home_points_score: Optional[float]
+    away_points_score: Optional[float]
+    home_xg_score: Optional[float]
+    away_xg_score: Optional[float]
+
+
+@dataclass
 class PlayerStats:
     # common
     name: str

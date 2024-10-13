@@ -735,16 +735,16 @@ class FbrefParser:
     @staticmethod
     def _parse_fbref_date(date_str: str) -> Optional[date]:
         try:
-            return datetime.strptime(date_str, "%d/%m/%Y").date()
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
             return None
 
     def _parse_schedule_row(
         self, table_row: Any, league_name: str
     ) -> Optional[LeagueScheduleInfo]:
-        if table_row.find("td", {"data-stat": "home_team"}) is not None:
+        _home_team = table_row.find("td", {"data-stat": "home_team"})
+        if _home_team is not None and _home_team.text.strip() != "":
             _gameweek = table_row.find("th", {"data-stat": "gameweek"})
-            _home_team = table_row.find("td", {"data-stat": "home_team"})
             _away_team = table_row.find("td", {"data-stat": "away_team"})
             _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})
@@ -758,10 +758,10 @@ class FbrefParser:
 
             return LeagueScheduleInfo(
                 league_name=league_name,
-                gameweek=cast_to_int(_gameweek.text) if _gameweek else None,
+                gameweek=cast_to_int(_gameweek.text) if _gameweek is not None else None,
                 home_team=_home_team.text.strip(),
                 away_team=_away_team.text.strip(),
-                date=self._parse_fbref_date(_date.text.strip()) if _date else None,
+                date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
                 home_goals=_home_goals,
                 away_goals=_away_goals
             )
