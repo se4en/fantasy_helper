@@ -58,8 +58,8 @@ class CoeffDAO:
     def get_coeffs(
         self, league_name: str, tour: Literal["cur", "next"] = "cur"
     ) -> List[MatchInfo]:
-        tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        tour_number = tour_info["number"] if tour == "cur" else tour_info["number"] + 1
+        current_tour = self._sports_parser.get_current_tour(league_name)
+        tour_number = current_tour.number if tour == "cur" else current_tour.number + 1
         db_session: SQLSession = Session()
 
         cur_tour_rows = (
@@ -105,23 +105,28 @@ class CoeffDAO:
         return result
 
     def get_tour_number(self, league_name: str) -> Optional[int]:
-        tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        return tour_info.get("number") if tour_info is not None else None
+        cur_tour = self._sports_parser.get_current_tour(league_name)
+        if cur_tour is None:
+            return None
+        else:
+            return cur_tour.number
 
     def update_coeffs(self, league_name: str) -> None:
-        tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        if tour_info is None:
+        current_tour = self._sports_parser.get_current_tour(league_name)
+        next_tour = self._sports_parser.get_next_tour(league_name)
+        if current_tour is None or next_tour is None:
             return None
         matches = self._xbet_parser.get_league_matches(league_name)
+
         db_session: SQLSession = Session()
 
         for match in matches:
-            if match.start_datetime < tour_info["deadline"]:
-                match_tour = tour_info["number"] - 1
-            elif match.start_datetime < tour_info["next_tour_deadline"]:
-                match_tour = tour_info["number"]
+            if match.start_datetime < current_tour.deadline:
+                match_tour = current_tour.number - 1
+            elif match.start_datetime < next_tour.deadline:
+                match_tour = current_tour.number
             else:
-                match_tour = tour_info["number"] + 1
+                match_tour = next_tour.number
 
             db_session.add(
                 Coeff(
