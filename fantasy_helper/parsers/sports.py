@@ -25,6 +25,9 @@ class SportsParser:
 
         self._leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None and l.is_active}
 
+    def get_leagues(self) -> List[str]:
+        return list(self._leagues.keys())
+
     def _get_query_body(
         self, query_name: Literal["squad", "tournament"]
     ) -> Optional[str]:

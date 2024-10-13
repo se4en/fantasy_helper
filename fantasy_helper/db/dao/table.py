@@ -22,6 +22,9 @@ class TableDao:
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self._fbref_parser = FbrefParser(leagues=self._leagues)
 
+    def get_leagues(self) -> List[str]:
+        return [league.name for league in self._leagues]
+
     def get_table(self, league_name: str) -> List[LeagueTableInfo]:
         db_session: SQLSession = Session()
 
@@ -71,6 +74,7 @@ class TableDao:
             table_rows: List[LeagueTableInfo] = self._fbref_parser.get_league_table(
                 league_name
             )
+
             db_session: SQLSession = Session()
 
             for table_row in table_rows:

@@ -15,6 +15,7 @@ from fantasy_helper.db.models.feature_store.fs_players_free_kicks import (
     FSPlayersFreeKicks,
 )
 from fantasy_helper.db.models.feature_store.fs_sports_players import FSSportsPlayers
+from fantasy_helper.db.models.feature_store.fs_calendars import FSCalendars
 
 
 def create_db():
