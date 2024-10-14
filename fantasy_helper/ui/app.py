@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Literal
 import warnings
 
 import requests
@@ -174,8 +174,6 @@ def calendar_to_df(league_name: str) -> List[CalendarInfo]:
 if authentication_status:
     leagues = get_leagues()
     st.session_state["league"] = list(leagues.values())[0]
-    # calendar
-    st.session_state["calendar_type"] = "points"
     # players stats
     st.session_state["normalize"] = False
     st.session_state["games_count"] = 3
@@ -221,7 +219,17 @@ if authentication_status:
 
     # plot calendar
     centrize_header("Calendar")
-    plot_calendar_df(calendar_df, st.session_state["calendar_type"])
+
+    columns = st.columns([1, 6])
+    with columns[0]:
+        st.selectbox(
+            "Calendar type",
+            options=["points", "goals", "xg"],
+            key="calendar_type",
+            label_visibility="visible",
+        )
+    with columns[1]:
+        plot_calendar_df(calendar_df, st.session_state["calendar_type"])
 
     # plot stats
     centrize_header("Players stats")
