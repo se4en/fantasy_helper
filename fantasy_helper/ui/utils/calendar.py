@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 import numpy as np
 import pandas as pd
@@ -12,8 +12,8 @@ def update_calendar_info(
         calendar_info: dict, 
         team_name: str, 
         tour: int, 
-        type: Literal["points", "xg"], 
-        value: float,
+        type: Literal["points", "goals", "xg"], 
+        color: str,
         opponent_team: str
     ) -> None:
     if f"{tour}_{type}" not in calendar_info[team_name]:
@@ -21,7 +21,7 @@ def update_calendar_info(
     else:
         column_prefix = f"{tour}_double"
     
-    calendar_info[team_name][column_prefix + f"_{type}"] = value
+    calendar_info[team_name][column_prefix + f"_{type}"] = color
     calendar_info[team_name][column_prefix + "_opponent"] = opponent_team
 
 def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
@@ -37,7 +37,15 @@ def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
             calendar_row.home_team, 
             tour, 
             "points", 
-            calendar_row.home_points_score,
+            calendar_row.home_points_color,
+            calendar_row.away_team + " [д]",
+        )
+        update_calendar_info(
+            calendar_info, 
+            calendar_row.home_team, 
+            tour, 
+            "goals", 
+            calendar_row.home_goals_color,
             calendar_row.away_team + " [д]",
         )
         update_calendar_info(
@@ -45,7 +53,7 @@ def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
             calendar_row.home_team, 
             tour, 
             "xg", 
-            calendar_row.home_xg_score,
+            calendar_row.home_xg_color,
             calendar_row.away_team + " [д]",
         )
 
@@ -54,7 +62,15 @@ def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
             calendar_row.away_team, 
             tour, 
             "points", 
-            calendar_row.away_points_score,
+            calendar_row.away_points_color,
+            calendar_row.home_team + " [г]",
+        )
+        update_calendar_info(
+            calendar_info, 
+            calendar_row.away_team, 
+            tour, 
+            "goals", 
+            calendar_row.away_goals_color,
             calendar_row.home_team + " [г]",
         )
         update_calendar_info(
@@ -62,7 +78,7 @@ def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
             calendar_row.away_team, 
             tour, 
             "xg", 
-            calendar_row.away_xg_score,
+            calendar_row.away_xg_color,
             calendar_row.home_team + " [г]",
         )
 
@@ -71,7 +87,7 @@ def get_calendar_df(calendar: List[CalendarInfo]) -> pd.DataFrame:
     for team_name in sorted(unique_teams):
         result["team"].append(team_name)
         for tour in sorted(tours):
-            for type in ["points", "xg", "opponent"]:
+            for type in ["points", "goals", "xg", "opponent"]:
                 result[f"{tour}_{type}"].append(
                     calendar_info.get(team_name, {}).get(f"{tour}_{type}")
                 )
@@ -86,62 +102,45 @@ def rename_column(column_name: str) -> str:
     if column_name == "team":
         return "Команда"
     else: 
-        result = column_name.replace("_points", "").replace("_xg", "").replace("_double", "")
+        result = column_name.replace("_points", "").replace("_goals", "") \
+            .replace("_xg", "").replace("_double", "")
         result += " тур"
         if "double" in column_name:
             result += " доп"
 
         return result
+    
 
-
-def color_value(
-    val: float, q_1: float, q_2: float, q_3: float, q_4: float
-) -> str:
-    if pd.isna(val):
+def format_color(color: Optional[str]) -> str:
+    if color is None or pd.isna(color) or color == "":
         return ""
-    elif val <= q_1:
-        color = "#E06456"
-    elif val <= q_2:
-        color = "#EBA654" # "#E57878"
-    elif val > q_4:
-        color = "#85DE6F"
-    elif val > q_3:
-        color = "#EBE054" # "#85DE6F"
     else:
-        return ""
+        return f"background-color: {color}"
 
-    return f"background-color: {color}"
 
-def color_df(df):
+def color_df(df, type: Literal["points", "goals", "xg"]):
     df_with_colors = pd.DataFrame('', index=df.index, columns=df.columns)
     for column_name in df.columns:
-        if column_name != "team" and not column_name.endswith("_opponent"):
+        if column_name.endswith(f"_{type}"):
             column_prefix = "_".join(column_name.split("_")[:-1])
             opponent_column_name = f"{column_prefix}_opponent"
-
-            # TODO: remove it to backend
-            q1 = np.percentile(df[column_name], q=25)
-            q2 = np.percentile(df[column_name], q=50)
-            q3 = np.percentile(df[column_name], q=75)
-
-            df_with_colors[opponent_column_name] = df[column_name].copy().map(
-                lambda x: color_value(x, q1, q2, q2, q3)
-            )
+            df_with_colors[opponent_column_name] = df[column_name].copy().map(format_color)
 
     return df_with_colors
 
 
-def plot_calendar_df(df: pd.DataFrame, type: Literal["points", "xg"]) -> None:
+def plot_calendar_df(df: pd.DataFrame, type: Literal["points", "goals", "xg"]) -> None:
     df = df.dropna(how='all', axis=1, inplace=False)
+    df.fillna("", inplace=True)
 
-    valid_columns, hide_columns_idxs = [], []
-    for colimn_idx, column_name in enumerate(df.columns):
-        if column_name == "team" or column_name.endswith(f"_{type}"):
-            valid_columns.append(column_name)
+    column_config = {}
+    for column_name in list(df.columns):
+        if column_name != "team" and not column_name.endswith(f"_opponent"):
+            column_config[column_name] = None
         else:
-            hide_columns_idxs.append(colimn_idx)
+            column_config[column_name] = rename_column(column_name)
 
     st.dataframe(
-        df.style.apply(color_df, axis=None)
-        # .hide(hide_columns_idxs).relabel_index(valid_columns)
+        df.style.apply(lambda x: color_df(x, type), axis=None),
+        column_config=column_config
     )
