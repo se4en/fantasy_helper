@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, Dict
 
 import pandas as pd
@@ -26,6 +26,9 @@ class LeagueInfo:
     is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
+    fbref_league_id: Optional[int] = None
+    fbref_table_url: Optional[str] = None
+    fbref_schedule_url: Optional[str] = None
     fbref_playing_time_url: Optional[str] = None
     fbref_shooting_url: Optional[str] = None
     fbref_passing_url: Optional[str] = None
@@ -40,6 +43,46 @@ class TeamLineup:
     team_name: str
     league_name: str
     lineup: str
+
+
+@dataclass
+class LeagueTableInfo:
+    team_name: str
+    league_name: str
+    rank: int
+    wins: int
+    draws: int
+    losses: int
+    points: int
+    goals_for: int
+    goals_against: int
+    xg_for: Optional[float] = None
+    xg_against: Optional[float] = None
+
+
+@dataclass
+class LeagueScheduleInfo:
+    league_name: str
+    home_team: str
+    away_team: str
+    gameweek: int
+    date: Optional[date]
+    home_goals: Optional[int]
+    away_goals: Optional[int]
+
+
+@dataclass
+class CalendarInfo:
+    league_name: str
+    home_team: str
+    away_team: str
+    tour: int
+    home_points_color: Optional[str]
+    away_points_color: Optional[str]
+    home_goals_color: Optional[str]
+    away_goals_color: Optional[str]
+    home_xg_color: Optional[str]
+    away_xg_color: Optional[str]
 
 
 @dataclass
@@ -244,6 +287,13 @@ class SportsPlayerDiff:
     percent_ownership: Optional[float] = None
     percent_ownership_diff: Optional[float] = None
 
+@dataclass
+class SportsTourInfo:
+    league_name: str
+    number: int
+    matches_count: int
+    deadline: datetime
+    status: str
 
 @dataclass
 class PlayersLeagueStats:

@@ -7,7 +7,7 @@ import pytz
 import requests
 import iso8601
 
-from fantasy_helper.utils.dataclasses import LeagueInfo, SportsPlayerStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, SportsPlayerStats, SportsTourInfo
 
 
 class SportsParser:
@@ -24,6 +24,9 @@ class SportsParser:
             self._queries_path = os.path.join(os.path.dirname(__file__), "/queries")
 
         self._leagues = {l.name: l.squad_id for l in leagues if l.squad_id is not None and l.is_active}
+
+    def get_leagues(self) -> List[str]:
+        return list(self._leagues.keys())
 
     def _get_query_body(
         self, query_name: Literal["squad", "tournament"]
@@ -72,24 +75,56 @@ class SportsParser:
         query_id = list(data["data"].keys())[0]  
         return data["data"][query_id]["squads"][0]["season"]["id"]
 
-    def _get_current_tour(
-        self, squad_id: int
-    ) -> Tuple[Optional[dict], Optional[dict]]:
-        cur_tour, next_tour = None, None
+    def _parse_tour_info(self, league_name: str, tour_info: Optional[Dict]) -> Optional[SportsTourInfo]:
+        if tour_info is None:
+            return None
+        return SportsTourInfo(
+            league_name=league_name,
+            number=int(tour_info["name"].split(" ")[0]),
+            matches_count=len(tour_info["matches"]),
+            deadline=iso8601.parse_date(tour_info["startedAt"]).replace(
+                tzinfo=pytz.UTC
+            ),
+            status=tour_info["status"],
+        )
+
+    def get_schedule(self, league_name: str) -> Optional[List[SportsTourInfo]]:
+        if league_name not in self._leagues:
+            return None
+
+        squad_id = self._leagues[league_name]
         data = self._request_for_specific_id(squad_id, "tournament")
         if data is None:
-            return cur_tour, next_tour
+            return None
 
-        # looking for current tour
+        result = []
         query_id = list(data["data"].keys())[0]
-        for tour in data["data"][query_id]["squads"][0]["season"]["tours"]:
-            if cur_tour is not None:
-                next_tour = tour
-                break
-            elif tour["status"] == "OPENED":
-                cur_tour = tour
+        for tour_info in data["data"][query_id]["squads"][0]["season"]["tours"]:
+            result.append(self._parse_tour_info(league_name, tour_info))
 
-        return cur_tour, next_tour
+        return result
+
+    def get_current_tour(self, league_name: str) -> Optional[SportsTourInfo]:
+        schedule = self.get_schedule(league_name)
+        if schedule is None:
+            return None
+
+        for tour in schedule:
+            if tour.status == "OPENED":
+                return tour
+            
+        return None
+
+    def get_next_tour(self, league_name: str) -> Optional[SportsTourInfo]:
+        schedule = self.get_schedule(league_name)
+        if schedule is None:
+            return None
+
+        for tour in schedule:
+            if tour.status == "NOT_STARTED":
+                return tour
+
+        return None
 
     def get_players_stats_info(self, league_name: str) -> Optional[List[SportsPlayerStats]]:
         if league_name not in self._leagues:
@@ -98,8 +133,8 @@ class SportsParser:
 
         season_id = self._get_season_id(self._leagues[league_name])
         players_data = self._request_for_specific_id(season_id, "players", id_type="$seasonID")
-        tour_info = self.get_cur_tour_info(league_name)
-        tour_number = tour_info.get("number") if tour_info is not None else None
+        current_tour = self.get_current_tour(league_name)
+        tour_number = current_tour.number if current_tour is not None else None
 
         result = []
         if "data" not in players_data:
@@ -144,28 +179,6 @@ class SportsParser:
             )
 
         return result
-
-    def get_cur_tour_info(self, league_name: str) -> Optional[Dict[str, Any]]:
-        if league_name not in self._leagues:
-            logging.info(f"Wrong league_name={league_name} in get_deadline")
-            return None
-
-        cur_tour, next_tour = self._get_current_tour(self._leagues[league_name])
-        if cur_tour is not None:
-            result = {
-                "number": int(cur_tour["name"].split(" ")[0]),
-                "matches_count": len(cur_tour["matches"]),
-                "deadline": iso8601.parse_date(cur_tour["startedAt"]).replace(
-                    tzinfo=pytz.UTC
-                ),
-            }
-            if next_tour is not None:
-                result["next_tour_deadline"] = iso8601.parse_date(
-                    next_tour["startedAt"]
-                ).replace(tzinfo=pytz.UTC)
-            return result
-        else:
-            return None
 
     def get_tour_transfers(self, squad_id: int) -> Optional[bool]:
         data = self._request_for_specific_id(squad_id, "squad")

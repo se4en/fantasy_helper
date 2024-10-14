@@ -51,15 +51,14 @@ class SportsPlayerDAO:
         return pd.DataFrame(result)
 
     def get_players(self, league_name) -> List[SportsPlayerDiff]:
-        tour_info = self._sports_parser.get_cur_tour_info(league_name)
-        if tour_info is None or tour_info.get("number") is None:
+        current_tour = self._sports_parser.get_current_tour(league_name)
+        if current_tour is None:
             return None
-        tour_number = tour_info["number"]
         db_session: SQLSession = Session()
         
         cur_tour_rows = db_session.query(SportsPlayer).filter(and_(
             SportsPlayer.league_name == league_name, 
-            SportsPlayer.tour == tour_number, 
+            SportsPlayer.tour == current_tour.number, 
             SportsPlayer.percent_ownership > 0
         ))
 

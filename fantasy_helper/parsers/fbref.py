@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from datetime import date, datetime
 from dataclasses import asdict
 from typing import Any, Callable, Dict, Optional, List, Tuple
 
@@ -11,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import FirefoxOptions
 from bs4 import BeautifulSoup
 
-from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, LeagueTableInfo, PlayerStats
 
 
 def cast_to_float(text: str) -> Optional[float]:
@@ -41,6 +42,19 @@ class FbrefParser:
     def __init__(self, leagues: List[LeagueInfo]):
         leagues = list(filter(lambda x: x.is_active, leagues))
 
+        self._leagues_ids = {
+            l.name: l.fbref_league_id for l in leagues if l.fbref_league_id is not None
+        }
+        self._table_leagues = {
+            l.name: l.fbref_table_url
+            for l in leagues
+            if l.fbref_table_url is not None
+        }
+        self._schedule_leagues = {
+            l.name: l.fbref_schedule_url
+            for l in leagues
+            if l.fbref_schedule_url is not None
+        }
         self.__playing_time_leagues = {
             l.name: l.fbref_playing_time_url
             for l in leagues
@@ -639,6 +653,158 @@ class FbrefParser:
                 parsed_player = parse_func(player, league_name)
                 if parsed_player is not None:
                     result.append(parsed_player)
+            return result
+        finally:
+            if driver is not None:
+                driver.quit()
+
+    
+    def _parse_team_table_row(
+        self, table_row: Any, league_name: str
+    ) -> Optional[LeagueTableInfo]:
+        if table_row.find("td", {"data-stat": "team"}) is not None:
+            _team_name = table_row.find("td", {"data-stat": "team"})
+            _rank = table_row.find("th", {"data-stat": "rank"})
+            _wins = table_row.find("td", {"data-stat": "wins"})
+            _draws = table_row.find("td", {"data-stat": "ties"})
+            _losses = table_row.find("td", {"data-stat": "losses"})
+            _points = table_row.find("td", {"data-stat": "points"})
+            _goals_for = table_row.find("td", {"data-stat": "goals_for"})
+            _goals_against = table_row.find("td", {"data-stat": "goals_against"})
+            _xg_for = table_row.find("td", {"data-stat": "xg_for"})
+            _xg_against = table_row.find("td", {"data-stat": "xg_against"})
+            return LeagueTableInfo(
+                league_name=league_name,
+                team_name=_team_name.text.strip(),
+                rank=cast_to_int(_rank.text) if _rank else None,
+                wins=cast_to_int(_wins.text) if _wins else None,
+                draws=cast_to_int(_draws.text) if _draws else None,
+                losses=cast_to_int(_losses.text) if _losses else None,
+                points=cast_to_int(_points.text) if _points else None,
+                goals_for=cast_to_int(_goals_for.text) if _goals_for else None,
+                goals_against=cast_to_int(_goals_against.text)
+                if _goals_against
+                else None,
+                xg_for=cast_to_float(_xg_for.text) if _xg_for else None,
+                xg_against=cast_to_float(_xg_against.text) if _xg_against else None,
+            )
+        else:
+            return None
+
+    def get_league_table(self, league_name: str) -> List[LeagueTableInfo]:
+        if league_name not in self._table_leagues:
+            return []
+        if league_name not in self._leagues_ids:
+            return []
+        league_id = self._leagues_ids[league_name]
+        driver = None
+
+        try:
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
+            driver = webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+            )
+            driver.get(self._table_leagues[league_name])
+            league_table = WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.ID, f"results2024-2025{league_id}1_overall"))
+            )
+            parsed_league_table = BeautifulSoup(
+                league_table.get_attribute("outerHTML"), "html.parser"
+            )
+            table_rows = parsed_league_table.find_all("tr")[1:]
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logging.warning(f"league_name={league_name}")
+            return []
+        else:
+            result = []
+            for table_row in table_rows:
+                parsed_table_row = self._parse_team_table_row(table_row, league_name)
+                if parsed_table_row is not None:
+                    result.append(parsed_table_row)
+            return result
+        finally:
+            if driver is not None:
+                driver.quit()
+
+    @staticmethod
+    def _parse_fbref_date(date_str: str) -> Optional[date]:
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return None
+
+    def _parse_schedule_row(
+        self, table_row: Any, league_name: str
+    ) -> Optional[LeagueScheduleInfo]:
+        _home_team = table_row.find("td", {"data-stat": "home_team"})
+        if _home_team is not None and _home_team.text.strip() != "":
+            _gameweek = table_row.find("th", {"data-stat": "gameweek"})
+            _away_team = table_row.find("td", {"data-stat": "away_team"})
+            _date = table_row.find("td", {"data-stat": "date"})
+            _score = table_row.find("td", {"data-stat": "score"})
+
+            if _score.text:
+                goals = _score.text.split("–")
+                _home_goals = cast_to_int(goals[0])
+                _away_goals = cast_to_int(goals[1])
+            else:
+                _home_goals, _away_goals = None, None
+
+            return LeagueScheduleInfo(
+                league_name=league_name,
+                gameweek=cast_to_int(_gameweek.text) if _gameweek is not None else None,
+                home_team=_home_team.text.strip(),
+                away_team=_away_team.text.strip(),
+                date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
+                home_goals=_home_goals,
+                away_goals=_away_goals
+            )
+        else:
+            return None
+
+    def get_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
+
+        if league_name not in self._schedule_leagues:
+            return []
+        if league_name not in self._leagues_ids:
+            return []
+        league_id = self._leagues_ids[league_name]
+        driver = None
+
+        try:
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
+            driver = webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+            )
+            driver.get(self._schedule_leagues[league_name])
+            league_schedule = WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.ID, f"sched_2024-2025_{league_id}_1"))
+            )
+            parsed_league_schedule = BeautifulSoup(
+                league_schedule.get_attribute("outerHTML"), "html.parser"
+            )
+            schedule_rows = parsed_league_schedule.find_all("tr")[1:]
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logging.warning(f"league_name={league_name}")
+            return []
+        else:
+            result = []
+            for table_row in schedule_rows:
+                parsed_table_row = self._parse_schedule_row(table_row, league_name)
+                if parsed_table_row is not None:
+                    result.append(parsed_table_row)
             return result
         finally:
             if driver is not None:
