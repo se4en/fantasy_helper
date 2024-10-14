@@ -255,14 +255,6 @@ if authentication_status:
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
 
-    st.multiselect(
-        "Stats columns",
-        options=get_all_stats_columns(players_stats),
-        default=get_default_stats_columns(players_stats),
-        key="stats_columns",
-        label_visibility="visible",
-    )
-
     plot_main_players_stats(
         players_stats,
         games_count=st.session_state["games_count"],
