@@ -98,35 +98,27 @@ class FSCalendarsDAO:
         else:
             return ""
 
-    def _compute_colors_for_table(
+    def _compute_color_for_score(
             self, 
-            table: Dict[str, LeagueTableInfo], 
-            type: Literal["points", "goals", "xg"]
-    ) -> Dict[str, str]:
-        if type == "points":
-            score_func = self._compute_points_score
-        elif type == "goals":
-            score_func = self._compute_goals_score
+            all_scores: Optional[np.ndarray],
+            score: Optional[float],
+            opponent_score: Optional[float],
+    ) -> Optional[str]:
+        if score is None or opponent_score is None or all_scores is None or all_scores.size == 0:
+            return None
+
+        quantile = (all_scores<score).mean()
+        opponent_quantile = (all_scores<opponent_score).mean()
+        diff = quantile - opponent_quantile
+
+        if diff <= -0.5:
+            return "#E06456"
+        elif diff < 0.0:
+            return "#EBA654" # "#E57878"
+        elif diff < 0.5:
+            return "#EBE054" # "#85DE6F"
         else:
-            score_func = self._compute_xg_score
-
-        teams_scores = {
-            team_name: score_func(team)
-            for team_name, team in table.items()
-        }
-        teams_scores_values = list(filter(lambda x: x is not None, teams_scores.values()))
-        if len(teams_scores_values) == 0:
-            return {}
-
-        q1 = np.percentile(teams_scores_values, q=25)
-        q2 = np.percentile(teams_scores_values, q=50)
-        q3 = np.percentile(teams_scores_values, q=75)
-
-        result = {}
-        for team_name, team_score in teams_scores.items():
-            result[team_name] = self._get_value_color(team_score, q1, q2, q2, q3)
-
-        return result
+            return "#85DE6F"
 
     def _compute_new_calendar(self, league_name: str, max_tour_count: int = 5) -> List[CalendarInfo]:
         prepared_schedule = self._prepare_league_schedule(league_name)
@@ -136,9 +128,16 @@ class FSCalendarsDAO:
         if len(prepared_schedule) == 0 or len(prepared_table) == 0 or len(sports_tours) == 0:
             return result
 
-        points_colors_table = self._compute_colors_for_table(prepared_table, type="points")
-        goals_colors_table = self._compute_colors_for_table(prepared_table, type="goals")
-        xg_colors_table = self._compute_colors_for_table(prepared_table, type="xg")
+        points_scores = np.array([self._compute_points_score(team) for team in prepared_table.values()])
+        goals_scores = np.array([self._compute_goals_score(team) for team in prepared_table.values()])
+        xg_scores = np.array(
+            list(
+                filter(
+                    lambda x: x is not None, 
+                    [self._compute_xg_score(team) for team in prepared_table.values()]
+                )
+            )
+        )
 
         schedule_idx = 0
         sports_tour_idx = 0
@@ -154,21 +153,47 @@ class FSCalendarsDAO:
                   (next_sports_tour is None or \
                    prepared_schedule[schedule_idx].date < next_sports_tour.deadline.date()):
                 if prepared_schedule[schedule_idx].date >= cur_sports_tour.deadline.date():
-                    home_team = prepared_schedule[schedule_idx].home_team
-                    away_team = prepared_schedule[schedule_idx].away_team
+                    home_team_name = prepared_schedule[schedule_idx].home_team
+                    away_team_name = prepared_schedule[schedule_idx].away_team
+                    home_team = prepared_table[home_team_name]
+                    away_team = prepared_table[away_team_name]
 
                     result.append(
                         CalendarInfo(
                             league_name=league_name,
-                            home_team=home_team,
-                            away_team=away_team,
+                            home_team=home_team_name,
+                            away_team=away_team_name,
                             tour=cur_sports_tour.number,
-                            home_points_color=points_colors_table.get(home_team),
-                            away_points_color=points_colors_table.get(away_team),
-                            home_goals_color=goals_colors_table.get(home_team),
-                            away_goals_color=goals_colors_table.get(away_team),
-                            home_xg_color=xg_colors_table.get(home_team),
-                            away_xg_color=xg_colors_table.get(away_team)
+                            home_points_color=self._compute_color_for_score(
+                                points_scores,
+                                self._compute_points_score(home_team),
+                                self._compute_points_score(away_team), 
+                            ),
+                            away_points_color=self._compute_color_for_score(
+                                points_scores,
+                                self._compute_points_score(away_team),
+                                self._compute_points_score(home_team),
+                            ),
+                            home_goals_color=self._compute_color_for_score(
+                                goals_scores,
+                                self._compute_goals_score(home_team),
+                                self._compute_goals_score(away_team),
+                            ),
+                            away_goals_color=self._compute_color_for_score(
+                                goals_scores,
+                                self._compute_goals_score(away_team),
+                                self._compute_goals_score(home_team),
+                            ),
+                            home_xg_color=self._compute_color_for_score(
+                                xg_scores,
+                                self._compute_xg_score(home_team),
+                                self._compute_xg_score(away_team),
+                            ),
+                            away_xg_color=self._compute_color_for_score(
+                                xg_scores,
+                                self._compute_xg_score(away_team),
+                                self._compute_xg_score(home_team),
+                            )
                         )
                     )
 
