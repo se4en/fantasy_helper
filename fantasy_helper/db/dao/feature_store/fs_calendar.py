@@ -1,12 +1,7 @@
 import os.path as path
-<<<<<<< HEAD
 from typing import Dict, List, Literal, Optional
 
 import numpy as np
-=======
-from typing import Dict, List, Optional
-
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
 import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
@@ -21,11 +16,7 @@ from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, LeagueInfo, LeagueScheduleInfo, LeagueTableInfo, SportsTourInfo
 
 
-<<<<<<< HEAD
 class FSCalendarsDAO:
-=======
-class FSCalendarDAO:
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
     def __init__(self):
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
@@ -78,7 +69,6 @@ class FSCalendarDAO:
 
         return result
 
-<<<<<<< HEAD
     def _compute_points_score(self, team: LeagueTableInfo) -> float:
         return team.points
 
@@ -138,17 +128,6 @@ class FSCalendarDAO:
 
         return result
 
-=======
-    def _compute_points_score(self, team_1: LeagueTableInfo, team_2: LeagueTableInfo) -> Optional[float]:
-        return team_1.points - team_2.points
-
-    def _compute_xg_score(self, team_1: LeagueTableInfo, team_2: LeagueTableInfo) -> Optional[float]:
-        if team_1.xg_for is None or team_1.xg_against is None or team_2.xg_for is None or team_2.xg_against is None:
-            return None
-        else:
-            return team_1.xg_for - team_1.xg_against - team_2.xg_for + team_2.xg_against
-    
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
     def _compute_new_calendar(self, league_name: str, max_tour_count: int = 5) -> List[CalendarInfo]:
         prepared_schedule = self._prepare_league_schedule(league_name)
         prepared_table = self._prepare_league_table(league_name)
@@ -157,13 +136,10 @@ class FSCalendarDAO:
         if len(prepared_schedule) == 0 or len(prepared_table) == 0 or len(sports_tours) == 0:
             return result
 
-<<<<<<< HEAD
         points_colors_table = self._compute_colors_for_table(prepared_table, type="points")
         goals_colors_table = self._compute_colors_for_table(prepared_table, type="goals")
         xg_colors_table = self._compute_colors_for_table(prepared_table, type="xg")
 
-=======
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
         schedule_idx = 0
         sports_tour_idx = 0
         while sports_tour_idx < len(sports_tours) and sports_tour_idx < max_tour_count:
@@ -180,11 +156,6 @@ class FSCalendarDAO:
                 if prepared_schedule[schedule_idx].date >= cur_sports_tour.deadline.date():
                     home_team = prepared_schedule[schedule_idx].home_team
                     away_team = prepared_schedule[schedule_idx].away_team
-<<<<<<< HEAD
-=======
-                    home_team_table = prepared_table[home_team]
-                    away_team_table = prepared_table[away_team]
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
 
                     result.append(
                         CalendarInfo(
@@ -192,19 +163,12 @@ class FSCalendarDAO:
                             home_team=home_team,
                             away_team=away_team,
                             tour=cur_sports_tour.number,
-<<<<<<< HEAD
                             home_points_color=points_colors_table.get(home_team),
                             away_points_color=points_colors_table.get(away_team),
                             home_goals_color=goals_colors_table.get(home_team),
                             away_goals_color=goals_colors_table.get(away_team),
                             home_xg_color=xg_colors_table.get(home_team),
                             away_xg_color=xg_colors_table.get(away_team)
-=======
-                            home_points_score=self._compute_points_score(home_team_table, away_team_table),
-                            away_points_score=self._compute_points_score(away_team_table, home_team_table),
-                            home_xg_score=self._compute_xg_score(home_team_table, away_team_table),
-                            away_xg_score=self._compute_xg_score(away_team_table, home_team_table)
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
                         )
                     )
 
@@ -229,19 +193,12 @@ class FSCalendarDAO:
                 home_team=calendar_row.home_team,
                 away_team=calendar_row.away_team,
                 tour=calendar_row.tour,
-<<<<<<< HEAD
                 home_points_color=calendar_row.home_points_color,
                 away_points_color=calendar_row.away_points_color,
                 home_goals_color=calendar_row.home_goals_color,
                 away_goals_color=calendar_row.away_goals_color,
                 home_xg_color=calendar_row.home_xg_color,
                 away_xg_color=calendar_row.away_xg_color
-=======
-                home_points_score=calendar_row.home_points_score,
-                away_points_score=calendar_row.away_points_score,
-                home_xg_score=calendar_row.home_xg_score,
-                away_xg_score=calendar_row.away_xg_score
->>>>>>> 4fb80a2c42f3c964d9b4229e27cc1143e9f109ce
             )
             for calendar_row in calendar_rows
         ]
