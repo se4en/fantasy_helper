@@ -15,7 +15,7 @@ from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, LeagueInfo, LeagueScheduleInfo, LeagueTableInfo, SportsTourInfo
 
 
-class FSCalendarDAO:
+class FSCalendarsDAO:
     def __init__(self):
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)

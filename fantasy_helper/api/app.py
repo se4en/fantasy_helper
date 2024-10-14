@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from hydra.utils import instantiate
 import pandas as pd
 
+from fantasy_helper.db.dao.feature_store.fs_calendar import FSCalendarsDAO
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
@@ -15,7 +16,7 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -30,6 +31,7 @@ FS_Coeff_dao = FSCoeffsDAO()
 FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
 FS_Sports_Players_dao = FSSportsPlayersDAO()
+FS_Calendars_dao = FSCalendarsDAO()
 
 
 @app.get("/leagues_names/")
@@ -118,3 +120,17 @@ async def get_lineups(league_name: str) -> List[TeamLineup]:
 @app.get("/sports_players/")
 async def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
     return FS_Sports_Players_dao.get_sports_players(league_name)
+
+
+@app.get("/calendar/")
+async def get_calendar(league_name: str) -> List[CalendarInfo]:
+    """
+    Retrieves the calendars for a specific league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        List[CalendarInfo]: A list of CalendarInfo objects representing the calendars for the league.
+    """
+    return FS_Calendars_dao.get_calendar(league_name)
