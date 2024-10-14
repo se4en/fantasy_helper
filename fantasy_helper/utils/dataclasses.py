@@ -77,10 +77,12 @@ class CalendarInfo:
     home_team: str
     away_team: str
     tour: int
-    home_points_score: Optional[float]
-    away_points_score: Optional[float]
-    home_xg_score: Optional[float]
-    away_xg_score: Optional[float]
+    home_points_color: Optional[str]
+    away_points_color: Optional[str]
+    home_goals_color: Optional[str]
+    away_goals_color: Optional[str]
+    home_xg_color: Optional[str]
+    away_xg_color: Optional[str]
 
 
 @dataclass
