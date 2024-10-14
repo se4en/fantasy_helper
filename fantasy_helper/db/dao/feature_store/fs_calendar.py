@@ -89,11 +89,11 @@ class FSCalendarsDAO:
             return ""
         elif val <= q_1:
             return "#E06456"
-        elif val <= q_2:
+        elif val < q_2:
             return "#EBA654" # "#E57878"
         elif val > q_4:
             return "#85DE6F"
-        elif val > q_3:
+        elif val >= q_3:
             return "#EBE054" # "#85DE6F"
         else:
             return ""

@@ -103,7 +103,7 @@ def rename_column(column_name: str) -> str:
         return "Команда"
     else: 
         result = column_name.replace("_points", "").replace("_goals", "") \
-            .replace("_xg", "").replace("_double", "")
+            .replace("_xg", "").replace("_double", "").replace("_opponent", "")
         result += " тур"
         if "double" in column_name:
             result += " доп"
@@ -142,5 +142,6 @@ def plot_calendar_df(df: pd.DataFrame, type: Literal["points", "goals", "xg"]) -
 
     st.dataframe(
         df.style.apply(lambda x: color_df(x, type), axis=None),
+        hide_index=True,
         column_config=column_config
     )
