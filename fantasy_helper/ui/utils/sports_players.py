@@ -64,5 +64,6 @@ def plot_sports_players(players: SportsPlayerDiff, team_name: str = "All") -> No
     st.dataframe(
         df.style.format("{:.2f}", subset=["Популярность", "Динамика"])
         .format("{:.1f}", subset=["Цена"])
-        .map(lambda x: color_popularity(x, q1, q2, q3, q4), subset=["Динамика"])
+        .map(lambda x: color_popularity(x, q1, q2, q3, q4), subset=["Динамика"]),
+        hide_index=True
     )
