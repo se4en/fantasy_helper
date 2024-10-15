@@ -47,15 +47,15 @@ class FSPlayersStatsDAO:
 
         abs_players_stats_df = pd.read_sql(
             abs_players_stats.statement, abs_players_stats.session.bind
-        ).drop_duplicates(subset=["name", "team"], ignore_index=True)
+        ).drop_duplicates(subset=["name", "team", "games"], ignore_index=True)
 
         norm_players_stats_df = pd.read_sql(
             norm_players_stats.statement, norm_players_stats.session.bind
-        ).drop_duplicates(subset=["name", "team"], ignore_index=True)
+        ).drop_duplicates(subset=["name", "team", "games"], ignore_index=True)
 
         players_free_kicks_df = pd.read_sql(
             players_free_kicks.statement, players_free_kicks.session.bind
-        ).drop_duplicates(subset=["name", "team"], ignore_index=True)
+        ).drop_duplicates(subset=["name", "team", "games"], ignore_index=True)
 
         db_session.commit()
         db_session.close()
