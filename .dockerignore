@@ -15,3 +15,4 @@ venv/
 postgres_data/
 
 *.png
+*.sql

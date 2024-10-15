@@ -69,7 +69,7 @@ def plot_main_players_stats(
         df.reset_index(drop=True, inplace=True)
         df.fillna(0, inplace=True)
 
-    st.dataframe(df)
+    st.dataframe(df, hide_index=True)
 
 
 def get_all_stats_columns(df: pd.DataFrame) -> List[str]:
@@ -106,4 +106,4 @@ def plot_free_kicks_stats(
     df.dropna(axis=1, how="all", inplace=True)
     df.fillna(0, inplace=True)
 
-    st.dataframe(df)
+    st.dataframe(df, hide_index=True)

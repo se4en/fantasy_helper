@@ -88,5 +88,6 @@ def plot_coeff_df(df: pd.DataFrame):
     st.dataframe(
         df.style.format("{:.3}", subset=attack_columns + defend_columns)
         .map(color_coeff, subset=attack_columns)
-        .map(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns)
+        .map(lambda x: color_coeff(x, 2.0, 2.5, 3.5), subset=defend_columns),
+        hide_index=True
     )
