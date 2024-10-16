@@ -59,13 +59,13 @@ def get_tour_number(league_name: str) -> Optional[int]:
 
 
 @st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading coefficients...")
-def coeffs_to_df(league_name: str, tour_number: Optional[int]) -> pd.DataFrame:
+def coeffs_to_df(league_name: str, first_tour_number: Optional[int]) -> pd.DataFrame:
     """
     Function to convert coefficients to a DataFrame.
 
     Args:
         league_name (str): The name of the league.
-        tour_number (Optional[int]): The tour number.
+        first_tour_number (Optional[int]): The tour number.
 
     Returns:
         pd.DataFrame: The DataFrame containing the coefficients information for each team in the league.
@@ -81,13 +81,13 @@ def coeffs_to_df(league_name: str, tour_number: Optional[int]) -> pd.DataFrame:
     team_stats = get_stat_from_mathes(cur_tour_matches, next_tour_matches)
     unique_teams = sorted(team_stats.keys())
 
-    if tour_number is None:
-        tour_number = 0
+    if first_tour_number is None:
+        first_tour_number = 0
 
     coeffs_info = defaultdict(list)
     for team_name in unique_teams:
         coeffs_info["Команда"].append(team_name)
-        for tour_number, tour_type in enumerate(("cur", "next"), start=tour_number):
+        for tour_number, tour_type in enumerate(("cur", "next"), start=first_tour_number):
             coeffs_info[f"Атака {tour_number} тур"].append(
                 team_stats[team_name].get(f"{tour_type}_attack", None)
             )
