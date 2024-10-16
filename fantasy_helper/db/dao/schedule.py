@@ -75,10 +75,7 @@ class ScheduleDao:
             schedule_rows: List[LeagueScheduleInfo] = self._fbref_parser.get_league_schedule(
                 league_name
             )
-            print(f"update {len(schedule_rows)} rows for {league_name}")
-            print(schedule_rows[:3])
-            print(schedule_rows[-3:])
-            print()
+
             db_session: SQLSession = Session()
 
             for table_row in schedule_rows:
@@ -87,9 +84,6 @@ class ScheduleDao:
                         **asdict(table_row), timestamp=datetime.now().replace(tzinfo=utc)
                     )
                 )
-                # print("test", Schedule(
-                #     **asdict(table_row), timestamp=datetime.now().replace(tzinfo=utc)
-                # ))
 
             db_session.commit()
             db_session.close()
