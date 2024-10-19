@@ -27,4 +27,3 @@ def test_empty_matches(leagues: List[LeagueInfo], parser: XbetParser):
                 or match.total_2_over_1_5 is not None
                 or match.total_2_under_0_5 is not None
             )
-            assert False
