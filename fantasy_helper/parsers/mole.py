@@ -35,7 +35,7 @@ class MoleParser:
         soup = BeautifulSoup(response.content, "html.parser")
         result = []
 
-        pattern = r"([a-zA-Z \-\`\']+) possible starting lineup:([a-zA-Z ,;\-\`\']+)"
+        pattern = r"([a-zA-Z \-\`\']+) possible starting lineup:([a-zA-Z ,.;\-\`\']+)"
         matches = re.findall(pattern, soup.text)
 
         for team_name, team_lineup in matches:
