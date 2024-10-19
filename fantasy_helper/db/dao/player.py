@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 import pandas as pd
 import numpy as np
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
@@ -290,6 +290,21 @@ class PlayerDAO:
         db_session.close()
 
         return sorted([team_name[0] for team_name in team_names])
+    
+    def get_players_names(self, league_name: str, team_name: str) -> List[str]:
+        db_session: SQLSession = Session()
+
+        player_names = (
+            db_session.query(Player.name)
+            .filter(and_(Player.league_name == league_name, Player.team_name == team_name))
+            .distinct()
+            .all()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return sorted([player_name[0] for player_name in player_names])
 
     def get_players_stats(self, league_name: str) -> PlayersLeagueStats:
         db_session: SQLSession = Session()

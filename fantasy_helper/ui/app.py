@@ -11,7 +11,7 @@ import streamlit_authenticator as stauth
 from hydra.utils import instantiate
 
 from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
-from fantasy_helper.ui.utils.common import centrize_header
+from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
 from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, plot_free_kicks_stats, plot_main_players_stats
 from fantasy_helper.ui.utils.sports_players import plot_sports_players
@@ -131,6 +131,22 @@ def get_players_stats_teams_names(league_name: str) -> List[str]:
         List[str]: A list of team names in the specified league.
     """
     r = requests.get(api_url + f"/players_stats_teams_names/?league_name={league_name}")
+    return r.json()
+
+
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players stats...")
+def get_players_stats_players_names(league_name: str, team_name: str) -> List[str]:
+    """
+    A function that retrieves the names of players in a given league and team.
+
+    Args:
+        league_name (str): The name of the league for which player names are to be retrieved.
+        team_name (str): The name of the team for which player names are to be retrieved.
+
+    Returns:
+        List[str]: A list of player names in the specified league and team.
+    """
+    r = requests.get(api_url + f"/players_stats_players_names/?league_name={league_name}&team_name={team_name}")
     return r.json()
 
 
@@ -273,6 +289,47 @@ if authentication_status:
         team_name=st.session_state["player_stats_team_name"],
     )
 
+    # player comparison
+    columns = st.columns([4, 4, 1, 4, 4])
+    with columns[0]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + players_stats_team_names,
+            key="player_stats_team_name_left",
+            label_visibility="visible",
+        )
+    with columns[1]:
+        players_stats_players_names_left = get_players_stats_players_names(
+            st.session_state["league"],
+            st.session_state["player_stats_team_name_left"]
+        )
+        st.selectbox(
+            "Player name",
+            options=["All"] + players_stats_players_names_left,
+            key="player_stats_player_name_left",
+            label_visibility="visible",
+        )
+    with columns[2]:
+        st.write("")
+        centrize_text("vs")
+    with columns[3]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + players_stats_team_names,
+            key="player_stats_team_name_right",
+            label_visibility="visible",
+        )
+    with columns[4]:
+        players_stats_players_names_right = get_players_stats_players_names(
+            st.session_state["league"],
+            st.session_state["player_stats_team_name_right"]
+        )
+        st.selectbox(
+            "Player name",
+            options=["All"] + players_stats_players_names_right,
+            key="player_stats_player_name_right",
+            label_visibility="visible",
+        )
 
     columns = st.columns([1, 1])
     with columns[0]:
