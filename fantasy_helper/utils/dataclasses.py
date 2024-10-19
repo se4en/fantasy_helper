@@ -12,10 +12,74 @@ class MatchInfo:
     home_team: str
     away_team: str
     start_datetime: Optional[datetime] = None
+
+    result_1: Optional[float] = None
+    result_x: Optional[float] = None
+    result_2: Optional[float] = None
+
+    both_score_yes: Optional[float] = None
+    both_score_no: Optional[float] = None
+
+    total_over_0_5: Optional[float] = None
+    total_under_0_5: Optional[float] = None
+    total_over_1: Optional[float] = None
+    total_under_1: Optional[float] = None
+    total_over_1_5: Optional[float] = None
+    total_under_1_5: Optional[float] = None
+    total_over_2: Optional[float] = None
+    total_under_2: Optional[float] = None
+    total_over_2_5: Optional[float] = None
+    total_under_2_5: Optional[float] = None
+    total_over_3: Optional[float] = None
+    total_under_3: Optional[float] = None
+    total_over_3_5: Optional[float] = None
+    total_under_3_5: Optional[float] = None
+    total_over_4: Optional[float] = None
+    total_under_4: Optional[float] = None
+    total_over_4_5: Optional[float] = None
+    total_under_4_5: Optional[float] = None
+
+    handicap_1_minus_2_5: Optional[float] = None
+    handicap_1_minus_2: Optional[float] = None
+    handicap_1_minus_1_5: Optional[float] = None
+    handicap_1_minus_1: Optional[float] = None
+    handicap_1_0: Optional[float] = None
+    handicap_1_plus_1: Optional[float] = None
+    handicap_1_plus_1_5: Optional[float] = None
+    handicap_1_plus_2: Optional[float] = None
+    handicap_1_plus_2_5: Optional[float] = None
+
+    handicap_2_minus_2_5: Optional[float] = None
+    handicap_2_minus_2: Optional[float] = None
+    handicap_2_minus_1_5: Optional[float] = None
+    handicap_2_minus_1: Optional[float] = None
+    handicap_2_0: Optional[float] = None
+    handicap_2_plus_1: Optional[float] = None
+    handicap_2_plus_1_5: Optional[float] = None
+    handicap_2_plus_2: Optional[float] = None
+    handicap_2_plus_2_5: Optional[float] = None
+
+    total_1_over_0_5: Optional[float] = None
+    total_1_over_1: Optional[float] = None
     total_1_over_1_5: Optional[float] = None
+    total_1_over_2: Optional[float] = None
+    total_1_over_2_5: Optional[float] = None
     total_1_under_0_5: Optional[float] = None
+    total_1_under_1: Optional[float] = None
+    total_1_under_1_5: Optional[float] = None
+    total_1_under_2: Optional[float] = None
+    total_1_under_2_5: Optional[float] = None
+
+    total_2_over_0_5: Optional[float] = None
+    total_2_over_1: Optional[float] = None
     total_2_over_1_5: Optional[float] = None
+    total_2_over_2: Optional[float] = None
+    total_2_over_2_5: Optional[float] = None
     total_2_under_0_5: Optional[float] = None
+    total_2_under_1: Optional[float] = None
+    total_2_under_1_5: Optional[float] = None
+    total_2_under_2: Optional[float] = None
+    total_2_under_2_5: Optional[float] = None
 
 
 @dataclass
