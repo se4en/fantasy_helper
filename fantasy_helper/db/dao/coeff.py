@@ -59,7 +59,12 @@ class CoeffDAO:
         self, league_name: str, tour: Literal["cur", "next"] = "cur"
     ) -> List[MatchInfo]:
         current_tour = self._sports_parser.get_current_tour(league_name)
-        tour_number = current_tour.number if tour == "cur" else current_tour.number + 1
+        if current_tour is not None and current_tour.number is not None:
+            cur_tour_number = current_tour.number
+        else:
+            cur_tour_number = 0
+        tour_number = cur_tour_number if tour == "cur" else cur_tour_number + 1
+
         db_session: SQLSession = Session()
 
         cur_tour_rows = (
