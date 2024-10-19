@@ -20,6 +20,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/30/Russian-Premier-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/30/schedule/Russian-Premier-League-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
+    fbref_standart_url: https://fbref.com/en/comps/30/stats/Russian-Premier-League-Stats
     fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
     fbref_passing_url: null
     fbref_pass_types_url: null
@@ -37,6 +38,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/9/Premier-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
+    fbref_standart_url: https://fbref.com/en/comps/9/stats/Premier-League-Stats
     fbref_shooting_url: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
     fbref_passing_url: https://fbref.com/en/comps/9/passing/Premier-League-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/9/passing_types/Premier-League-Stats
@@ -54,6 +56,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/12/La-Liga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
+    fbref_standart_url: https://fbref.com/en/comps/12/stats/La-Liga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
     fbref_passing_url: https://fbref.com/en/comps/12/passing/La-Liga-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/12/passing_types/La-Liga-Stats
@@ -71,6 +74,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/13/Ligue-1-Stats
     fbref_schedule_url: https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
+    fbref_standart_url: https://fbref.com/en/comps/13/stats/Ligue-1-Stats
     fbref_shooting_url: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
     fbref_passing_url: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/13/passing_types/Ligue-1-Stats
@@ -88,6 +92,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/32/Primeira-Liga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/32/schedule/Primeira-Liga-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
+    fbref_standart_url: https://fbref.com/en/comps/32/stats/Primeira-Liga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
     fbref_passing_url: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/32/passing_types/Primeira-Liga-Stats
@@ -105,6 +110,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/23/Eredivisie-Stats
     fbref_schedule_url: https://fbref.com/en/comps/23/schedule/Eredivisie-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats
+    fbref_standart_url: https://fbref.com/en/comps/23/stats/Eredivisie-Stats
     fbref_shooting_url: https://fbref.com/en/comps/23/shooting/Eredivisie-Stats
     fbref_passing_url: https://fbref.com/en/comps/23/passing/Eredivisie-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/23/passing_types/Eredivisie-Stats
@@ -122,6 +128,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/26/Super-Lig-Stats
     fbref_schedule_url: https://fbref.com/en/comps/26/schedule/Super-Lig-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats
+    fbref_standart_url: https://fbref.com/en/comps/26/stats/Super-Lig-Stats
     fbref_shooting_url: https://fbref.com/en/comps/26/shooting/Super-Lig-Stats
     fbref_passing_url: null
     fbref_pass_types_url: null
@@ -139,6 +146,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/10/Championship-Stats
     fbref_schedule_url: https://fbref.com/en/comps/10/schedule/Championship-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/10/playingtime/Championship-Stats
+    fbref_standart_url: https://fbref.com/en/comps/10/stats/Championship-Stats
     fbref_shooting_url: https://fbref.com/en/comps/10/shooting/Championship-Stats
     fbref_passing_url: https://fbref.com/en/comps/10/passing/Championship-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/10/passing_types/Championship-Stats
@@ -156,6 +164,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/11/Serie-A-Stats
     fbref_schedule_url: https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
+    fbref_standart_url: https://fbref.com/en/comps/11/stats/Serie-A-Stats
     fbref_shooting_url: https://fbref.com/en/comps/11/shooting/Serie-A-Stats
     fbref_passing_url: https://fbref.com/en/comps/11/passing/Serie-A-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/11/passing_types/Serie-A-Stats
@@ -173,6 +182,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/20/Bundesliga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/20/schedule/Bundesliga-Scores-and-Fixtures
     fbref_playing_time_url: https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats
+    fbref_standart_url: https://fbref.com/en/comps/20/stats/Bundesliga-Stats
     fbref_shooting_url: https://fbref.com/en/comps/20/shooting/Bundesliga-Stats
     fbref_passing_url: https://fbref.com/en/comps/20/passing/Bundesliga-Stats
     fbref_pass_types_url: https://fbref.com/en/comps/20/passing_types/Bundesliga-Stats
@@ -190,6 +200,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/8/Champions-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures
     fbref_playing_time_url: null
+    fbref_standart_url: null
     fbref_shooting_url: null
     fbref_passing_url: null
     fbref_pass_types_url: null
@@ -207,6 +218,7 @@ leagues:
     fbref_table_url: https://fbref.com/en/comps/19/Europa-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures
     fbref_playing_time_url: null
+    fbref_standart_url: null
     fbref_shooting_url: null
     fbref_passing_url: null
     fbref_pass_types_url: null
