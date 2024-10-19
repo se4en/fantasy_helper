@@ -19,6 +19,7 @@ def leagues() -> Generator[List[LeagueInfo], None, None]:
             emoji="🇷🇺",
             squad_id=316902,
             is_active=True,
+            xber_url="https://1xstavka.ru/line/football/225733-russia-premier-league",
             fbref_league_id=30,
             fbref_table_url="https://fbref.com/en/comps/30/Russian-Premier-League-Stats",
             fbref_schedule_url="https://fbref.com/en/comps/30/schedule/Russian-Premier-League-Scores-and-Fixtures",

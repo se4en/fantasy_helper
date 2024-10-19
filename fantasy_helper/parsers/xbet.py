@@ -87,10 +87,74 @@ class XbetParser:
             match_info.start_datetime = XbetParser._parse_start_datetime(driver)
 
             bets_values = XbetParser._parse_bets_values(driver)
+
+            match_info.result_1 = bets_values.get("1X2", {}).get("П1")
+            match_info.result_x = bets_values.get("1X2", {}).get("Ничья")
+            match_info.result_2 = bets_values.get("1X2", {}).get("П2")
+
+            match_info.both_score_yes = bets_values.get("Обе забьют", {}).get("Да")
+            match_info.both_score_no = bets_values.get("Обе забьют", {}).get("Нет")
+
+            match_info.total_over_0_5 = bets_values.get("Тотал", {}).get("0.5 Б")
+            match_info.total_under_0_5 = bets_values.get("Тотал", {}).get("0.5 М")
+            match_info.total_over_1 = bets_values.get("Тотал", {}).get("1 Б")
+            match_info.total_under_1 = bets_values.get("Тотал", {}).get("1 М")
+            match_info.total_over_1_5 = bets_values.get("Тотал", {}).get("1.5 Б")
+            match_info.total_under_1_5 = bets_values.get("Тотал", {}).get("1.5 М")
+            match_info.total_over_2 = bets_values.get("Тотал", {}).get("2 Б")
+            match_info.total_under_2 = bets_values.get("Тотал", {}).get("2 М")
+            match_info.total_over_2_5 = bets_values.get("Тотал", {}).get("2.5 Б")
+            match_info.total_under_2_5 = bets_values.get("Тотал", {}).get("2.5 М")
+            match_info.total_over_3 = bets_values.get("Тотал", {}).get("3 Б")
+            match_info.total_under_3 = bets_values.get("Тотал", {}).get("3 М")
+            match_info.total_over_3_5 = bets_values.get("Тотал", {}).get("3.5 Б")
+            match_info.total_under_3_5 = bets_values.get("Тотал", {}).get("3.5 М")
+            match_info.total_over_4 = bets_values.get("Тотал", {}).get("4 Б")
+            match_info.total_under_4 = bets_values.get("Тотал", {}).get("4 М")
+            match_info.total_over_4_5 = bets_values.get("Тотал", {}).get("4.5 Б")
+            match_info.total_under_4_5 = bets_values.get("Тотал", {}).get("4.5 М")
+
+            match_info.handicap_1_minus_2_5 = bets_values.get("Фора", {}).get("1 -2.5")
+            match_info.handicap_1_minus_2 = bets_values.get("Фора", {}).get("1 -2")
+            match_info.handicap_1_minus_1_5 = bets_values.get("Фора", {}).get("1 -1.5")
+            match_info.handicap_1_minus_1 = bets_values.get("Фора", {}).get("1 -1")
+            match_info.handicap_1_0 = bets_values.get("Фора", {}).get("1 0")
+            match_info.handicap_1_plus_1 = bets_values.get("Фора", {}).get("1 1")
+            match_info.handicap_1_plus_1_5 = bets_values.get("Фора", {}).get("1 1.5")
+            match_info.handicap_1_plus_2 = bets_values.get("Фора", {}).get("1 2")
+            match_info.handicap_1_plus_2_5 = bets_values.get("Фора", {}).get("1 2.5")
+
+            match_info.handicap_2_minus_2_5 = bets_values.get("Фора", {}).get("2 -2.5")
+            match_info.handicap_2_minus_2 = bets_values.get("Фора", {}).get("2 -2")
+            match_info.handicap_2_minus_1_5 = bets_values.get("Фора", {}).get("2 -1.5")
+            match_info.handicap_2_minus_1 = bets_values.get("Фора", {}).get("2 -1")
+            match_info.handicap_2_0 = bets_values.get("Фора", {}).get("2 0")
+            match_info.handicap_2_plus_1 = bets_values.get("Фора", {}).get("2 1")
+            match_info.handicap_2_plus_1_5 = bets_values.get("Фора", {}).get("2 1.5")
+            match_info.handicap_2_plus_2 = bets_values.get("Фора", {}).get("2 2")
+            match_info.handicap_2_plus_2_5 = bets_values.get("Фора", {}).get("2 2.5")
+
+            match_info.total_1_over_0_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("0.5 Б")
+            match_info.total_1_over_1 = bets_values.get("Индивидуальный тотал 1-го", {}).get("1 Б")
             match_info.total_1_over_1_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("1.5 Б")
+            match_info.total_1_over_2 = bets_values.get("Индивидуальный тотал 1-го", {}).get("2 Б")
+            match_info.total_1_over_2_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("2.5 Б")
             match_info.total_1_under_0_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("0.5 М")
+            match_info.total_1_under_1 = bets_values.get("Индивидуальный тотал 1-го", {}).get("1 М")
+            match_info.total_1_under_1_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("1.5 М")
+            match_info.total_1_under_2 = bets_values.get("Индивидуальный тотал 1-го", {}).get("2 М")
+            match_info.total_1_under_2_5 = bets_values.get("Индивидуальный тотал 1-го", {}).get("2.5 М")
+
+            match_info.total_2_over_0_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("0.5 Б")
+            match_info.total_2_over_1 = bets_values.get("Индивидуальный тотал 2-го", {}).get("1 Б")
             match_info.total_2_over_1_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("1.5 Б")
+            match_info.total_2_over_2 = bets_values.get("Индивидуальный тотал 2-го", {}).get("2 Б")
+            match_info.total_2_over_2_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("2.5 Б")
             match_info.total_2_under_0_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("0.5 М")
+            match_info.total_2_under_1 = bets_values.get("Индивидуальный тотал 2-го", {}).get("1 М")
+            match_info.total_2_under_1_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("1.5 М")
+            match_info.total_2_under_2 = bets_values.get("Индивидуальный тотал 2-го", {}).get("2 М")
+            match_info.total_2_under_2_5 = bets_values.get("Индивидуальный тотал 2-го", {}).get("2.5 М")
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -135,7 +199,7 @@ class XbetParser:
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
-            driver.get(self._leagues[league_name])
+            driver.get(self._leagues[league_name])  
 
             all_matches = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "c-events__teams"))

@@ -55,56 +55,64 @@ class FbrefParser:
             for l in leagues
             if l.fbref_schedule_url is not None
         }
-        self.__playing_time_leagues = {
+        self._playing_time_leagues = {
             l.name: l.fbref_playing_time_url
             for l in leagues
             if l.fbref_playing_time_url is not None
         }
-        self.__shooting_leagues = {
+        self._standart_leagues = {
+            l.name: l.fbref_standart_url
+            for l in leagues
+            if l.fbref_standart_url is not None
+        }
+        self._shooting_leagues = {
             l.name: l.fbref_shooting_url
             for l in leagues
             if l.fbref_shooting_url is not None
         }
-        self.__passing_leagues = {
+        self._passing_leagues = {
             l.name: l.fbref_passing_url
             for l in leagues
             if l.fbref_passing_url is not None
         }
-        self.__pass_types_leagues = {
+        self._pass_types_leagues = {
             l.name: l.fbref_pass_types_url
             for l in leagues
             if l.fbref_pass_types_url is not None
         }
-        self.__possession_leagues = {
+        self._possession_leagues = {
             l.name: l.fbref_possesion_url
             for l in leagues
             if l.fbref_possesion_url is not None
         }
-        self.__shot_creation_leagues = {
+        self._shot_creation_leagues = {
             l.name: l.fbref_shot_creation_url
             for l in leagues
             if l.fbref_shot_creation_url is not None
         }
 
     def get_playing_time_leagues(self) -> Dict[str, str]:
-        return self.__playing_time_leagues
+        return self._playing_time_leagues
+    
+    def get_standart_leagues(self) -> Dict[str, str]:
+        return self._standart_leagues
 
     def get_shooting_leagues(self) -> Dict[str, str]:
-        return self.__shooting_leagues
+        return self._shooting_leagues
 
     def get_passing_leagues(self) -> Dict[str, str]:
-        return self.__passing_leagues
+        return self._passing_leagues
 
     def get_pass_types_leagues(self) -> Dict[str, str]:
-        return self.__pass_types_leagues
+        return self._pass_types_leagues
 
     def get_possession_leagues(self) -> Dict[str, str]:
-        return self.__possession_leagues
+        return self._possession_leagues
 
     def get_shot_creation_leagues(self) -> Dict[str, str]:
-        return self.__shot_creation_leagues
+        return self._shot_creation_leagues
 
-    def __parse_player_shooting_stat(
+    def _parse_player_shooting_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -181,7 +189,7 @@ class FbrefParser:
         else:
             return None
 
-    def __parse_player_passing_stat(
+    def _parse_player_passing_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -295,7 +303,7 @@ class FbrefParser:
         else:
             return None
 
-    def __parse_player_pass_types_stat(
+    def _parse_player_pass_types_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -361,7 +369,7 @@ class FbrefParser:
         else:
             return None
 
-    def __parse_player_possession_stat(
+    def _parse_player_possession_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -477,7 +485,7 @@ class FbrefParser:
         else:
             return None
 
-    def __parse_player_shot_creation_stat(
+    def _parse_player_shot_creation_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -532,7 +540,7 @@ class FbrefParser:
         else:
             return None
 
-    def __parse_player_playing_time_stat(
+    def _parse_player_playing_time_stat(
         self, player: Any, league_name: str
     ) -> Optional[PlayerStats]:
         if player.find("td", {"data-stat": "player"}) is not None:
@@ -618,8 +626,37 @@ class FbrefParser:
             )
         else:
             return None
+        
+    def _parse_player_standart_stat(
+        self, player: Any, league_name: str
+    ) -> Optional[PlayerStats]:
+        if player.find("td", {"data-stat": "player"}) is not None:
+            _games = player.find("td", {"data-stat": "games"})
+            _games_starts = player.find("td", {"data-stat": "games_starts"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            _goals = player.find("td", {"data-stat": "goals"})
+            _assists = player.find("td", {"data-stat": "assists"})
+            _yellow_cards = player.find("td", {"data-stat": "cards_yellow"})
+            _red_cards = player.find("td", {"data-stat": "cards_red"})
+            return PlayerStats(
+                # common
+                name=player.find("td", {"data-stat": "player"}).text,
+                league_name=league_name,
+                team_name=player.find("td", {"data-stat": "team"}).text,
+                position=player.find("td", {"data-stat": "position"}).text,
+                # stats
+                games=cast_to_int(_games.text) if _games else None,
+                games_starts=cast_to_int(_games_starts.text) if _games_starts else None,
+                minutes=cast_to_int(_minutes.text) if _minutes else None,
+                goals=cast_to_int(_goals.text) if _goals else None,
+                assists=cast_to_int(_assists.text) if _assists else None,
+                yellow_cards=cast_to_int(_yellow_cards.text) if _yellow_cards else None,
+                red_cards=cast_to_int(_red_cards.text) if _red_cards else None,
+            )
+        else:
+            return None
 
-    def __parse_league_stats(
+    def _parse_league_stats(
         self, league_name: str, url: str, table_name: str, parse_func: Callable
     ) -> List[PlayerStats]:
         driver = None
@@ -810,7 +847,7 @@ class FbrefParser:
             if driver is not None:
                 driver.quit()
 
-    def __update_player_stat(
+    def _update_player_stat(
         self, old_player_stat: PlayerStats, new_player_stat: PlayerStats
     ) -> PlayerStats:
         old_dict_stat = asdict(old_player_stat)
@@ -822,7 +859,7 @@ class FbrefParser:
 
         return PlayerStats(**old_dict_stat)
 
-    def __update_players_stat(
+    def _update_players_stat(
         self,
         players: Dict[Tuple[str, str, str, str], PlayerStats],
         players_stat: List[PlayerStats],
@@ -843,7 +880,7 @@ class FbrefParser:
                     )
                 ]
                 # add new player stats
-                new_player_stat = self.__update_player_stat(old_player_stat, player)
+                new_player_stat = self._update_player_stat(old_player_stat, player)
                 players[
                     (player.name, player.team_name, player.position, player.league_name)
                 ] = PlayerStats(**asdict(new_player_stat))
@@ -856,76 +893,87 @@ class FbrefParser:
     def get_stats_league(self, league_name: str) -> List[PlayerStats]:
         players: Dict[Tuple[str, str, str, str], PlayerStats] = {}
         # playing time stats
-        if league_name in self.__playing_time_leagues:
-            url = self.__playing_time_leagues[league_name]
-            playing_time_players = self.__parse_league_stats(
+        if league_name in self._playing_time_leagues:
+            url = self._playing_time_leagues[league_name]
+            playing_time_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_playing_time",
-                parse_func=self.__parse_player_playing_time_stat,
+                parse_func=self._parse_player_playing_time_stat,
             )
-            players = self.__update_players_stat(players, playing_time_players)
+            players = self._update_players_stat(players, playing_time_players)
+        # standart stats
+        if league_name in self._standart_leagues:
+            url = self._standart_leagues[league_name]
+            standart_players = self._parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_standard",
+                parse_func=self._parse_player_standart_stat,
+            )
+            players = self._update_players_stat(players, standart_players)
         # shooting stats
-        if league_name in self.__shooting_leagues:
-            url = self.__shooting_leagues[league_name]
-            shooting_players = self.__parse_league_stats(
+        if league_name in self._shooting_leagues:
+            url = self._shooting_leagues[league_name]
+            shooting_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_shooting",
-                parse_func=self.__parse_player_shooting_stat,
+                parse_func=self._parse_player_shooting_stat,
             )
-            players = self.__update_players_stat(players, shooting_players)
+            players = self._update_players_stat(players, shooting_players)
         # passing stats
-        if league_name in self.__passing_leagues:
-            url = self.__passing_leagues[league_name]
-            passing_players = self.__parse_league_stats(
+        if league_name in self._passing_leagues:
+            url = self._passing_leagues[league_name]
+            passing_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_passing",
-                parse_func=self.__parse_player_passing_stat,
+                parse_func=self._parse_player_passing_stat,
             )
-            players = self.__update_players_stat(players, passing_players)
+            players = self._update_players_stat(players, passing_players)
         # pass types stats
-        if league_name in self.__pass_types_leagues:
-            url = self.__pass_types_leagues[league_name]
-            pass_types_players = self.__parse_league_stats(
+        if league_name in self._pass_types_leagues:
+            url = self._pass_types_leagues[league_name]
+            pass_types_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_passing_types",
-                parse_func=self.__parse_player_pass_types_stat,
+                parse_func=self._parse_player_pass_types_stat,
             )
-            players = self.__update_players_stat(players, pass_types_players)
+            players = self._update_players_stat(players, pass_types_players)
         # possession stats
-        if league_name in self.__possession_leagues:
-            url = self.__possession_leagues[league_name]
-            possession_players = self.__parse_league_stats(
+        if league_name in self._possession_leagues:
+            url = self._possession_leagues[league_name]
+            possession_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_possession",
-                parse_func=self.__parse_player_possession_stat,
+                parse_func=self._parse_player_possession_stat,
             )
-            players = self.__update_players_stat(players, possession_players)
+            players = self._update_players_stat(players, possession_players)
         # shot creation stats
-        if league_name in self.__shot_creation_leagues:
-            url = self.__shot_creation_leagues[league_name]
-            shot_creation_players = self.__parse_league_stats(
+        if league_name in self._shot_creation_leagues:
+            url = self._shot_creation_leagues[league_name]
+            shot_creation_players = self._parse_league_stats(
                 league_name=league_name,
                 url=url,
                 table_name="stats_gca",
-                parse_func=self.__parse_player_shot_creation_stat,
+                parse_func=self._parse_player_shot_creation_stat,
             )
-            players = self.__update_players_stat(players, shot_creation_players)
+            players = self._update_players_stat(players, shot_creation_players)
         return list(players.values())
 
     def get_all_leagues(self) -> List[str]:
         all_leagues: List[str] = []
         for leagues_dict in [
-            self.__playing_time_leagues,
-            self.__shooting_leagues,
-            self.__passing_leagues,
-            self.__pass_types_leagues,
-            self.__possession_leagues,
-            self.__shot_creation_leagues,
+            self._playing_time_leagues,
+            self._standart_leagues,
+            self._shooting_leagues,
+            self._passing_leagues,
+            self._pass_types_leagues,
+            self._possession_leagues,
+            self._shot_creation_leagues,
         ]:
             all_leagues.extend(league_name for league_name in leagues_dict.keys())
         return list(set(all_leagues))
