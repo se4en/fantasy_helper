@@ -136,6 +136,9 @@ class Player(Base):
     gca_shots = Column(Integer, nullable=True)
     gca_fouled = Column(Integer, nullable=True)
     gca_defense = Column(Integer, nullable=True)
+    # cards
+    yellow_cards = Column(Integer, nullable=True)
+    red_cards = Column(Integer, nullable=True)
 
     def __init__(
         self,
@@ -264,6 +267,9 @@ class Player(Base):
         gca_shots: Optional[int],
         gca_fouled: Optional[int],
         gca_defense: Optional[int],
+        # cards
+        yellow_cards: Optional[int],
+        red_cards: Optional[int],
     ):
         self.name = name
         self.league_name = league_name
@@ -390,6 +396,9 @@ class Player(Base):
         self.gca_shots = gca_shots
         self.gca_fouled = gca_fouled
         self.gca_defense = gca_defense
-
+        # cards
+        self.yellow_cards = yellow_cards
+        self.red_cards = red_cards
+        
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"

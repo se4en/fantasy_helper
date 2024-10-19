@@ -94,6 +94,7 @@ class LeagueInfo:
     fbref_table_url: Optional[str] = None
     fbref_schedule_url: Optional[str] = None
     fbref_playing_time_url: Optional[str] = None
+    fbref_standart_url: Optional[str] = None
     fbref_shooting_url: Optional[str] = None
     fbref_passing_url: Optional[str] = None
     fbref_pass_types_url: Optional[str] = None
@@ -276,6 +277,9 @@ class PlayerStats:
     gca_shots: Optional[int] = None
     gca_fouled: Optional[int] = None
     gca_defense: Optional[int] = None
+    # cards
+    yellow_cards: Optional[int] = None
+    red_cards: Optional[int] = None
 
 
 @dataclass

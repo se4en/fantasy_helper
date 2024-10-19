@@ -60,6 +60,11 @@ class FbrefParser:
             for l in leagues
             if l.fbref_playing_time_url is not None
         }
+        self._standart_leagues = {
+            l.name: l.fbref_standart_url
+            for l in leagues
+            if l.fbref_standart_url is not None
+        }
         self._shooting_leagues = {
             l.name: l.fbref_shooting_url
             for l in leagues
@@ -88,6 +93,9 @@ class FbrefParser:
 
     def get_playing_time_leagues(self) -> Dict[str, str]:
         return self._playing_time_leagues
+    
+    def get_standart_leagues(self) -> Dict[str, str]:
+        return self._standart_leagues
 
     def get_shooting_leagues(self) -> Dict[str, str]:
         return self._shooting_leagues
@@ -618,6 +626,35 @@ class FbrefParser:
             )
         else:
             return None
+        
+    def _parse_player_standart_stat(
+        self, player: Any, league_name: str
+    ) -> Optional[PlayerStats]:
+        if player.find("td", {"data-stat": "player"}) is not None:
+            _games = player.find("td", {"data-stat": "games"})
+            _games_starts = player.find("td", {"data-stat": "games_starts"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            _goals = player.find("td", {"data-stat": "goals"})
+            _assists = player.find("td", {"data-stat": "assists"})
+            _yellow_cards = player.find("td", {"data-stat": "cards_yellow"})
+            _red_cards = player.find("td", {"data-stat": "cards_red"})
+            return PlayerStats(
+                # common
+                name=player.find("td", {"data-stat": "player"}).text,
+                league_name=league_name,
+                team_name=player.find("td", {"data-stat": "team"}).text,
+                position=player.find("td", {"data-stat": "position"}).text,
+                # stats
+                games=cast_to_int(_games.text) if _games else None,
+                games_starts=cast_to_int(_games_starts.text) if _games_starts else None,
+                minutes=cast_to_int(_minutes.text) if _minutes else None,
+                goals=cast_to_int(_goals.text) if _goals else None,
+                assists=cast_to_int(_assists.text) if _assists else None,
+                yellow_cards=cast_to_int(_yellow_cards.text) if _yellow_cards else None,
+                red_cards=cast_to_int(_red_cards.text) if _red_cards else None,
+            )
+        else:
+            return None
 
     def _parse_league_stats(
         self, league_name: str, url: str, table_name: str, parse_func: Callable
@@ -865,6 +902,16 @@ class FbrefParser:
                 parse_func=self._parse_player_playing_time_stat,
             )
             players = self._update_players_stat(players, playing_time_players)
+        # standart stats
+        if league_name in self._standart_leagues:
+            url = self._standart_leagues[league_name]
+            standart_players = self._parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_standard",
+                parse_func=self._parse_player_standart_stat,
+            )
+            players = self._update_players_stat(players, standart_players)
         # shooting stats
         if league_name in self._shooting_leagues:
             url = self._shooting_leagues[league_name]
@@ -921,6 +968,7 @@ class FbrefParser:
         all_leagues: List[str] = []
         for leagues_dict in [
             self._playing_time_leagues,
+            self._standart_leagues,
             self._shooting_leagues,
             self._passing_leagues,
             self._pass_types_leagues,
