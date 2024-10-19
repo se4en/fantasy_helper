@@ -13,7 +13,7 @@ from hydra.utils import instantiate
 from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
 from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
-from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, plot_free_kicks_stats, plot_main_players_stats
+from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff
 from fantasy_helper.ui.utils.sports_players import plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
@@ -330,10 +330,24 @@ if authentication_status:
             key="player_stats_player_name_right",
             label_visibility="visible",
         )
+    
+    left_player = get_player_stats(
+        players_stats,
+        st.session_state["player_stats_team_name_left"],
+        st.session_state["player_stats_player_name_left"],
+        st.session_state["games_count"]
+    )
+    right_player = get_player_stats(
+        players_stats,
+        st.session_state["player_stats_team_name_right"],
+        st.session_state["player_stats_player_name_right"],
+        st.session_state["games_count"]
+    )
+    plot_players_stats_diff(left_player, right_player)
 
     columns = st.columns([1, 1])
+    # plot free kicks stats
     with columns[0]:
-        # plot free kicks stats
         centrize_header("Free kicks stats")
 
         subcolumns = st.columns([1, 2, 1])
@@ -348,9 +362,8 @@ if authentication_status:
         plot_free_kicks_stats(
             players_stats, team_name=st.session_state["free_kicks_stats_team_name"]
         )
-
+    # plot players popularity
     with columns[1]:
-        # plot players popularity
         centrize_header("Players popularity")
 
         subcolumns = st.columns([1, 2, 1])

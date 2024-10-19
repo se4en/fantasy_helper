@@ -3,7 +3,7 @@ from typing import List, Optional
 import pandas as pd
 import streamlit as st
 
-from fantasy_helper.utils.dataclasses import PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats
 
 
 NOT_VISIBLE_COLUMNS = {"id", "type", "league_name"}
@@ -107,3 +107,29 @@ def plot_free_kicks_stats(
     df.fillna(0, inplace=True)
 
     st.dataframe(df, hide_index=True)
+
+
+def get_player_stats(
+    players_stats: PlayersLeagueStats, 
+    team_name: Optional[str], 
+    name: Optional[str],
+    games_count: Optional[int]
+) -> Optional[PlayerStatsInfo]:
+    if players_stats.abs_stats is None or team_name is None or name is None or games_count is None:
+        return None
+
+    for row_ind, row in players_stats.abs_stats.iterrows():
+        if row["name"] == name and row["team"] == team_name:
+            return PlayerStatsInfo(**row)
+
+    return None
+
+
+def plot_players_stats_diff(
+    player_left: Optional[PlayerStatsInfo], 
+    player_right: Optional[PlayerStatsInfo]
+) -> None:
+    if player_left is None or player_right is None:
+        return
+ 
+    st.write(f"Left {player_left.games} vs Right {player_right.games}")
