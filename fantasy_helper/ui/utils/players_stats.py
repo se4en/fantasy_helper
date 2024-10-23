@@ -11,7 +11,8 @@ from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats
 
 
 NOT_VISIBLE_COLUMNS = {"id", "type", "league_name"}
-DEFAULT_COLUMNS = {"name", "team", "position", "games", "minutes"}
+COMMON_COLUMNS = {"name", "team", "position", "games", "minutes"}
+DEFAULT_COLUMNS = {"goals", "assists", "shots", "xg", "xg_xa"}
 
 
 @st.cache_data(ttl=3600, max_entries=100, show_spinner="Loading players stats...")
@@ -61,12 +62,17 @@ def prepare_players_stats_df(
     return df
 
 
-def plot_main_players_stats(players_stats_df: pd.DataFrame, team_name: str = "All") -> None:
+def plot_main_players_stats(
+    players_stats_df: pd.DataFrame, 
+    columns_names: List[str],
+    team_name: str = "All"
+) -> None:
     """
     Plot the main players' stats based on the given parameters.
 
     Args:
         players_stats_df (pd.DataFrame): The DataFrame containing the players' stats.
+        columns_names (List[str]): The names of the columns to plot.
         team_name (str, optional): The name of the team to filter the stats for. Defaults to "All".
 
     Returns:
@@ -75,15 +81,29 @@ def plot_main_players_stats(players_stats_df: pd.DataFrame, team_name: str = "Al
     if team_name != "All":
         players_stats_df = players_stats_df.loc[players_stats_df["team"] == team_name]
 
-    st.dataframe(players_stats_df, hide_index=True)
+    columns = []
+    columns_names_set = set(columns_names)
+    for column_name in players_stats_df.columns:
+        if column_name in COMMON_COLUMNS or column_name in columns_names_set:
+            columns.append(column_name)
+
+    st.dataframe(players_stats_df[columns], hide_index=True)
 
 
-def get_all_stats_columns(df: pd.DataFrame) -> List[str]:
-    pass
+def get_available_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
+    result = []
+    for column in list(players_stats_df.columns):
+        if column not in COMMON_COLUMNS:
+            result.append(column)
+    return result
 
 
-def get_default_stats_columns(df: pd.DataFrame) -> List[str]:
-    pass
+def get_default_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
+    result = []
+    for column in list(players_stats_df.columns):
+        if column not in COMMON_COLUMNS and column in DEFAULT_COLUMNS:
+            result.append(column)
+    return result
 
 
 def plot_free_kicks_stats(
@@ -147,15 +167,20 @@ def get_basic_type(optional_type: Any) -> Any:
 
 def compute_players_stats_diff(
     player_left: Optional[PlayerStatsInfo],
-    player_right: Optional[PlayerStatsInfo]
+    player_right: Optional[PlayerStatsInfo],
+    columns_names: List[str]
 ) -> PlayersStatsDiff:
     titles = []
     left_bars, right_bars = [], []
     left_abs_values, right_abs_values = [], []
+    columns_names_set = set(columns_names)
 
     for field in fields(PlayerStatsInfo):
         left_value = getattr(player_left, field.name)
         right_value = getattr(player_right, field.name)
+
+        if field.name not in COMMON_COLUMNS and field.name not in columns_names_set:
+            continue
 
         if left_value is None or pd.isna(left_value) or \
             (not isinstance(left_value, int) and not isinstance(left_value, float)) \
@@ -207,12 +232,13 @@ def compute_players_stats_diff(
 
 def plot_players_stats_diff(
     player_left: Optional[PlayerStatsInfo], 
-    player_right: Optional[PlayerStatsInfo]
+    player_right: Optional[PlayerStatsInfo],
+    columns_names: List[str]
 ) -> None:
     if player_left is None or player_right is None:
         return
 
-    diff = compute_players_stats_diff(player_left, player_right)
+    diff = compute_players_stats_diff(player_left, player_right, columns_names)
 
     fig = make_subplots(
         rows=1, 

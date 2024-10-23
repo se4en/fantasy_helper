@@ -13,7 +13,7 @@ from hydra.utils import instantiate
 from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
 from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
-from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
+from fantasy_helper.ui.utils.players_stats import get_available_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
 from fantasy_helper.ui.utils.sports_players import plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
@@ -293,7 +293,22 @@ if authentication_status:
         is_abs_stats=True,
         min_minutes=st.session_state["min_minutes"]
     )
-    plot_main_players_stats(players_stats_df, st.session_state["player_stats_team_name"])
+
+    available_stats_columns = get_available_stats_columns(abs_players_stats_df)
+    default_stats_columns = get_default_stats_columns(abs_players_stats_df)
+    st.multiselect(
+        "Statistic columns",
+        options=available_stats_columns,
+        default=default_stats_columns,
+        key="player_stats_column_names",
+        label_visibility="visible",
+    )
+
+    plot_main_players_stats(
+        players_stats_df,
+        st.session_state["player_stats_column_names"],
+        st.session_state["player_stats_team_name"]
+    )
 
     # player comparison
     columns = st.columns([4, 4, 1, 4, 4])
@@ -347,7 +362,11 @@ if authentication_status:
         team_name=st.session_state["player_stats_team_name_right"],
         name=st.session_state["player_stats_player_name_right"]
     )
-    plot_players_stats_diff(left_player, right_player)
+    plot_players_stats_diff(
+        left_player, 
+        right_player,
+        st.session_state["player_stats_column_names"]
+    )
 
     columns = st.columns([1, 1])
     # plot free kicks stats
