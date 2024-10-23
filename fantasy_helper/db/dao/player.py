@@ -61,16 +61,31 @@ class PlayerDAO:
         stats_info.shots_on_target = self._compute_diff_value(
             max_stats["shots_on_target"], min_stats.get("shots_on_target", 0)
         )
-        stats_info.xg = self._compute_diff_value(max_stats["xg"], min_stats.get("xg", 0))
+        stats_info.average_shot_distance = self._compute_diff_value(
+            max_stats["average_shot_distance"], min_stats.get("average_shot_distance", 0)
+        )
+        stats_info.xg = self._compute_diff_value(
+            max_stats["xg"], min_stats.get("xg", 0)
+        )
         stats_info.xg_np = self._compute_diff_value(
             max_stats["npxg"], min_stats.get("npxg", 0)
         )
+        if max_stats.get("pass_xa") is not None:
+            stats_info.xg_xa = self._compute_diff_value(
+                max_stats["xg"] + max_stats["pass_xa"],
+                min_stats.get("xg", 0) + min_stats.get("pass_xa", 0)
+            )
+            stats_info.xg_np_xa = self._compute_diff_value(
+                max_stats["npxg"] + max_stats["pass_xa"], 
+                min_stats.get("npxg", 0) + min_stats.get("pass_xa", 0)
+            )
         return stats_info
 
     def _add_shooting_stats_norm(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
         minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
+
         stats_info.goals = self._compute_diff_value(
             max_stats["goals"], min_stats.get("goals", 0), minutes
         )
@@ -78,7 +93,14 @@ class PlayerDAO:
             max_stats["shots"], min_stats.get("shots", 0), minutes
         )
         stats_info.shots_on_target = self._compute_diff_value(
-            max_stats["shots_on_target"], min_stats.get("shots_on_target", 0), minutes
+            max_stats["shots_on_target"], 
+            min_stats.get("shots_on_target", 0), 
+            minutes
+        )
+        stats_info.average_shot_distance = self._compute_diff_value(
+            max_stats["average_shot_distance"], 
+            min_stats.get("average_shot_distance", 0), 
+            minutes
         )
         stats_info.xg = self._compute_diff_value(
             max_stats["xg"], min_stats.get("xg", 0), minutes
@@ -86,11 +108,25 @@ class PlayerDAO:
         stats_info.xg_np = self._compute_diff_value(
             max_stats["npxg"], min_stats.get("npxg", 0), minutes
         )
+        if max_stats.get("pass_xa") is not None:
+            stats_info.xg_xa = self._compute_diff_value(
+                max_stats["xg"] + max_stats["pass_xa"], 
+                min_stats.get("xg", 0) + min_stats.get("pass_xa", 0), 
+                minutes
+            )
+            stats_info.xg_np_xa = self._compute_diff_value(
+                max_stats["npxg"] + max_stats["pass_xa"], 
+                min_stats.get("npxg", 0) + min_stats.get("pass_xa", 0), 
+                minutes
+            )
         return stats_info
 
     def _add_passing_stats_abs(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
+        stats_info.assists = self._compute_diff_value(
+            max_stats["assists"], min_stats.get("assists", 0)
+        )
         stats_info.xa = self._compute_diff_value(
             max_stats["pass_xa"], min_stats.get("pass_xa", 0)
         )
@@ -98,7 +134,8 @@ class PlayerDAO:
             max_stats["assisted_shots"], min_stats.get("assisted_shots", 0)
         )
         stats_info.passes_into_penalty_area = self._compute_diff_value(
-            max_stats["passes_into_penalty_area"], min_stats.get("passes_into_penalty_area", 0)
+            max_stats["passes_into_penalty_area"], 
+            min_stats.get("passes_into_penalty_area", 0)
         )
         stats_info.crosses_into_penalty_area = self._compute_diff_value(
             max_stats["crosses_into_penalty_area"],
@@ -110,6 +147,10 @@ class PlayerDAO:
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
     ) -> PlayerStatsInfo:
         minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
+
+        stats_info.assists = self._compute_diff_value(
+            max_stats["assists"], min_stats.get("assists", 0), minutes
+        )
         stats_info.xa = self._compute_diff_value(
             max_stats["pass_xa"], min_stats.get("pass_xa", 0), minutes
         )
@@ -174,6 +215,59 @@ class PlayerDAO:
         )
         return stats_info
 
+    def _add_standart_stats_abs(
+        self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
+    ) -> PlayerStatsInfo:
+        if stats_info.assists is None:
+            stats_info.assists = self._compute_diff_value(
+                max_stats["assists"],
+                min_stats.get("assists", 0)
+            )
+        return stats_info
+
+    def _add_standart_stats_norm(
+        self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
+    ) -> PlayerStatsInfo:
+        if stats_info.assists is None:
+            minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
+
+            stats_info.assists = self._compute_diff_value(
+                max_stats["assists"],
+                min_stats.get("assists", 0),
+                minutes
+            )
+        return stats_info
+
+    def _add_shot_creation_stats_abs(
+        self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
+    ) -> PlayerStatsInfo:
+        stats_info.sca = self._compute_diff_value(
+            max_stats["sca"],
+            min_stats.get("sca", 0)
+        )
+        stats_info.gca = self._compute_diff_value(
+            max_stats["gca"],
+            min_stats.get("gca", 0)
+        )
+        return stats_info
+
+    def _add_shot_creation_stats_norm(
+        self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
+    ) -> PlayerStatsInfo:
+        minutes = max_stats["minutes"] - min_stats.get("minutes", 0)
+
+        stats_info.sca = self._compute_diff_value(
+            max_stats["sca"],
+            min_stats.get("sca", 0),
+            minutes
+        )
+        stats_info.gca = self._compute_diff_value(
+            max_stats["gca"],
+            min_stats.get("gca", 0),
+            minutes
+        )
+        return stats_info
+
     def _compute_stats_values(
         self, max_stats: Dict, min_stats: Dict, team_name: str, position: str
     ) -> Tuple[PlayerStatsInfo, PlayerStatsInfo]:
@@ -196,6 +290,7 @@ class PlayerDAO:
                 max_stats["minutes"], min_stats.get("minutes", 0)
             )
             abs_stats_info.minutes, norm_stats_info.minutes = minutes, minutes
+
         if league_name in self.__fbref_parser.get_shooting_leagues():
             abs_stats_info = self._add_shooting_stats_abs(
                 abs_stats_info, max_stats, min_stats
@@ -203,6 +298,7 @@ class PlayerDAO:
             norm_stats_info = self._add_shooting_stats_norm(
                 norm_stats_info, max_stats, min_stats
             )
+
         if league_name in self.__fbref_parser.get_passing_leagues():
             abs_stats_info = self._add_passing_stats_abs(
                 abs_stats_info, max_stats, min_stats
@@ -210,11 +306,28 @@ class PlayerDAO:
             norm_stats_info = self._add_passing_stats_norm(
                 norm_stats_info, max_stats, min_stats
             )
+
         if league_name in self.__fbref_parser.get_possession_leagues():
             abs_stats_info = self._add_possesion_stats_abs(
                 abs_stats_info, max_stats, min_stats
             )
             norm_stats_info = self._add_possesion_stats_norm(
+                norm_stats_info, max_stats, min_stats
+            )
+
+        if league_name in self.__fbref_parser.get_shot_creation_leagues():
+            abs_stats_info = self._add_shot_creation_stats_abs(
+                abs_stats_info, max_stats, min_stats
+            )
+            norm_stats_info = self._add_shot_creation_stats_norm(
+                norm_stats_info, max_stats, min_stats
+            )
+        
+        if league_name in self.__fbref_parser.get_standart_leagues():
+            abs_stats_info = self._add_standart_stats_abs(
+                abs_stats_info, max_stats, min_stats
+            )
+            norm_stats_info = self._add_standart_stats_norm(
                 norm_stats_info, max_stats, min_stats
             )
 

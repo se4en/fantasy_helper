@@ -294,9 +294,13 @@ class PlayerStatsInfo:
     goals: Optional[int] = None
     shots: Optional[int] = None
     shots_on_target: Optional[int] = None
+    average_shot_distance: Optional[float] = None
     xg: Optional[float] = None
     xg_np: Optional[float] = None
+    xg_xa: Optional[float] = None
+    xg_np_xa: Optional[float] = None
     # passing
+    assists: Optional[int] = None
     xa: Optional[float] = None
     key_passes: Optional[int] = None
     passes_into_penalty_area: Optional[int] = None
@@ -306,6 +310,9 @@ class PlayerStatsInfo:
     touches_in_attacking_penalty_area: Optional[int] = None
     carries_in_attacking_third: Optional[int] = None
     carries_in_attacking_penalty_area: Optional[int] = None
+    # shot creation
+    sca: Optional[int] = None
+    gca: Optional[int] = None
 
 
 @dataclass
