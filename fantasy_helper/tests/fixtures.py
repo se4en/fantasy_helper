@@ -44,5 +44,17 @@ def leagues() -> Generator[List[LeagueInfo], None, None]:
             fbref_shot_creation_url="https://fbref.com/en/comps/9/gca/Premier-League-Stats",
             sportsmole_name="Premier League",
         ),
+        LeagueInfo(
+            name="ChampionsLeague",
+            ru_name="Лига Чемпионов",
+            emoji="🇪🇺",
+            squad_id=379313,
+            is_active=True,
+            xber_url="https://1xstavka.ru/en/line/football/118587-uefa-champions-league",
+            fbref_league_id=8,
+            fbref_table_url="https://fbref.com/en/comps/8/Champions-League-Stats",
+            fbref_schedule_url="https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
+            sportsmole_name="Champions League"
+        )
     ]
     yield leagues
