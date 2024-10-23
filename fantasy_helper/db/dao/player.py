@@ -48,6 +48,22 @@ class PlayerDAO:
                     return None
         else:
             return None
+        
+    def _compute_avg_diff_value(
+        self, max_value: Any, min_value: Any, min_games: Any, max_games: Any
+    ) -> Any:
+        if min_games is None or pd.isna(min_games) or max_games is None \
+            or pd.isna(max_games) or max_games == 0 or \
+                min_value is None or pd.isna(min_value):
+            return None
+
+        value_diff = self._compute_diff_value(max_value, min_value * min_games / max_games)
+        games_diff = self._compute_diff_value(max_games, min_games)
+
+        if value_diff is None or games_diff is None or games_diff == 0:
+            return None
+
+        return value_diff * max_games / games_diff
 
     def _add_shooting_stats_abs(
         self, stats_info: PlayerStatsInfo, max_stats: Dict, min_stats: Dict
@@ -61,8 +77,11 @@ class PlayerDAO:
         stats_info.shots_on_target = self._compute_diff_value(
             max_stats["shots_on_target"], min_stats.get("shots_on_target", 0)
         )
-        stats_info.average_shot_distance = self._compute_diff_value(
-            max_stats["average_shot_distance"], min_stats.get("average_shot_distance", 0)
+        stats_info.average_shot_distance = self._compute_avg_diff_value(
+            max_stats["average_shot_distance"], 
+            min_stats.get("average_shot_distance", 0),
+            max_stats["games"], 
+            min_stats.get("games", 0)
         )
         stats_info.xg = self._compute_diff_value(
             max_stats["xg"], min_stats.get("xg", 0)
@@ -97,10 +116,11 @@ class PlayerDAO:
             min_stats.get("shots_on_target", 0), 
             minutes
         )
-        stats_info.average_shot_distance = self._compute_diff_value(
-            max_stats["average_shot_distance"], 
-            min_stats.get("average_shot_distance", 0), 
-            minutes
+        stats_info.average_shot_distance = self._compute_avg_diff_value(
+            max_stats["average_shot_distance"],
+            min_stats.get("average_shot_distance", 0),
+            max_stats["games"], 
+            min_stats.get("games", 0)
         )
         stats_info.xg = self._compute_diff_value(
             max_stats["xg"], min_stats.get("xg", 0), minutes
