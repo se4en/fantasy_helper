@@ -47,7 +47,7 @@ class MoleParser:
         response = requests.get(self._url)
         soup = BeautifulSoup(response.content, "html.parser")
         found_leagues = soup.find_all(
-            "div", class_="l_s_blocks_header l_s_blocks margin"
+            re.compile("div|h2"), class_="l_s_blocks_header l_s_blocks margin"
         )
         all_lineups = []
 

@@ -11,9 +11,9 @@ import streamlit_authenticator as stauth
 from hydra.utils import instantiate
 
 from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
-from fantasy_helper.ui.utils.common import centrize_header
+from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
-from fantasy_helper.ui.utils.players_stats import get_all_stats_columns, get_default_stats_columns, plot_free_kicks_stats, plot_main_players_stats
+from fantasy_helper.ui.utils.players_stats import get_available_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
 from fantasy_helper.ui.utils.sports_players import plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
@@ -131,6 +131,22 @@ def get_players_stats_teams_names(league_name: str) -> List[str]:
         List[str]: A list of team names in the specified league.
     """
     r = requests.get(api_url + f"/players_stats_teams_names/?league_name={league_name}")
+    return r.json()
+
+
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players stats...")
+def get_players_stats_players_names(league_name: str, team_name: str) -> List[str]:
+    """
+    A function that retrieves the names of players in a given league and team.
+
+    Args:
+        league_name (str): The name of the league for which player names are to be retrieved.
+        team_name (str): The name of the team for which player names are to be retrieved.
+
+    Returns:
+        List[str]: A list of player names in the specified league and team.
+    """
+    r = requests.get(api_url + f"/players_stats_players_names/?league_name={league_name}&team_name={team_name}")
     return r.json()
 
 
@@ -265,18 +281,96 @@ if authentication_status:
         st.write("")
         st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
 
-    plot_main_players_stats(
+    players_stats_df = prepare_players_stats_df(
         players_stats,
         games_count=st.session_state["games_count"],
         is_abs_stats=not st.session_state["normalize"],
-        min_minutes=st.session_state["min_minutes"],
-        team_name=st.session_state["player_stats_team_name"],
+        min_minutes=st.session_state["min_minutes"]
+    )
+    abs_players_stats_df = prepare_players_stats_df(
+        players_stats,
+        games_count=st.session_state["games_count"],
+        is_abs_stats=True,
+        min_minutes=st.session_state["min_minutes"]
     )
 
+    available_stats_columns = get_available_stats_columns(abs_players_stats_df)
+    default_stats_columns = get_default_stats_columns(abs_players_stats_df)
+    st.multiselect(
+        "Statistic columns",
+        options=available_stats_columns,
+        default=default_stats_columns,
+        key="player_stats_column_names",
+        label_visibility="visible",
+    )
+
+    plot_main_players_stats(
+        players_stats_df,
+        st.session_state["player_stats_column_names"],
+        st.session_state["player_stats_team_name"]
+    )
+
+    # player comparison
+    columns = st.columns([4, 4, 1, 4, 4])
+    with columns[0]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + players_stats_team_names,
+            key="player_stats_team_name_left",
+            label_visibility="visible",
+        )
+    with columns[1]:
+        players_stats_players_names_left = get_players_stats_players_names(
+            st.session_state["league"],
+            st.session_state["player_stats_team_name_left"]
+        )
+        st.selectbox(
+            "Player name",
+            options=["All"] + players_stats_players_names_left,
+            key="player_stats_player_name_left",
+            label_visibility="visible",
+        )
+    with columns[2]:
+        st.write("")
+        centrize_text("vs")
+    with columns[3]:
+        st.selectbox(
+            "Team name",
+            options=["All"] + players_stats_team_names,
+            key="player_stats_team_name_right",
+            label_visibility="visible",
+        )
+    with columns[4]:
+        players_stats_players_names_right = get_players_stats_players_names(
+            st.session_state["league"],
+            st.session_state["player_stats_team_name_right"]
+        )
+        st.selectbox(
+            "Player name",
+            options=["All"] + players_stats_players_names_right,
+            key="player_stats_player_name_right",
+            label_visibility="visible",
+        )
+    
+    left_player = get_player_stats(
+        abs_players_stats_df,
+        team_name=st.session_state["player_stats_team_name_left"],
+        name=st.session_state["player_stats_player_name_left"]
+    )
+    right_player = get_player_stats(
+        abs_players_stats_df,
+        team_name=st.session_state["player_stats_team_name_right"],
+        name=st.session_state["player_stats_player_name_right"]
+    )
+    plot_players_stats_diff(
+        left_player, 
+        right_player,
+        st.session_state["player_stats_column_names"]
+    )
 
     columns = st.columns([1, 1])
+    # plot free kicks stats
     with columns[0]:
-        # plot free kicks stats
         centrize_header("Free kicks stats")
 
         subcolumns = st.columns([1, 2, 1])
@@ -291,9 +385,8 @@ if authentication_status:
         plot_free_kicks_stats(
             players_stats, team_name=st.session_state["free_kicks_stats_team_name"]
         )
-
+    # plot players popularity
     with columns[1]:
-        # plot players popularity
         centrize_header("Players popularity")
 
         subcolumns = st.columns([1, 2, 1])

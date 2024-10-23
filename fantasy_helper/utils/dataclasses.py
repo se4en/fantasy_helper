@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, date
-from typing import Optional, Dict
+from typing import List, Optional, Dict
 
 import pandas as pd
 
@@ -291,21 +291,37 @@ class PlayerStatsInfo:
     games: Optional[int] = None
     minutes: Optional[int] = None
     # shooting
-    goals: Optional[float] = None
-    shots: Optional[float] = None
-    shots_on_target: Optional[float] = None
+    goals: Optional[int] = None
+    shots: Optional[int] = None
+    shots_on_target: Optional[int] = None
+    average_shot_distance: Optional[float] = None
     xg: Optional[float] = None
     xg_np: Optional[float] = None
+    xg_xa: Optional[float] = None
+    xg_np_xa: Optional[float] = None
     # passing
+    assists: Optional[int] = None
     xa: Optional[float] = None
-    key_passes: Optional[float] = None
-    passes_into_penalty_area: Optional[float] = None
-    crosses_into_penalty_area: Optional[float] = None
+    key_passes: Optional[int] = None
+    passes_into_penalty_area: Optional[int] = None
+    crosses_into_penalty_area: Optional[int] = None
     # possesion
-    touches_in_attacking_third: Optional[float] = None
-    touches_in_attacking_penalty_area: Optional[float] = None
-    carries_in_attacking_third: Optional[float] = None
-    carries_in_attacking_penalty_area: Optional[float] = None
+    touches_in_attacking_third: Optional[int] = None
+    touches_in_attacking_penalty_area: Optional[int] = None
+    carries_in_attacking_third: Optional[int] = None
+    carries_in_attacking_penalty_area: Optional[int] = None
+    # shot creation
+    sca: Optional[int] = None
+    gca: Optional[int] = None
+
+
+@dataclass
+class PlayersStatsDiff:
+    titles: List[str]
+    left_bars: List[float]
+    right_bars: List[float]
+    left_abs_values: List[float]
+    right_abs_values: List[float]
 
 
 @dataclass

@@ -63,7 +63,7 @@ async def get_players_stats(league_name: str) -> Dict:
 @app.get("/players_stats_teams_names/")
 async def get_players_stats_teams_names(league_name: str) -> List[str]:
     """
-    Get the names of all players, teams, and leagues in the database.
+    Get the names of all teams in the database.
 
     Parameters:
         league_name (str): The name of the league.
@@ -72,6 +72,21 @@ async def get_players_stats_teams_names(league_name: str) -> List[str]:
         List[str]: A list of team names in the specified league.
     """
     return Player_dao.get_teams_names(league_name)
+
+
+@app.get("/players_stats_players_names/")
+async def get_players_stats_players_names(league_name: str, team_name: str) -> List[str]:
+    """
+    Get the names of all players in the database.
+
+    Parameters:
+        league_name (str): The name of the league.
+        team_name (str): The name of the team.
+
+    Returns:
+        List[str]: A list of player names in the specified league and team.
+    """
+    return Player_dao.get_players_names(league_name, team_name)
 
 
 @app.get("/coeffs/")
