@@ -275,7 +275,7 @@ def plot_players_stats_diff(
 
     for abs_value, diff_value, label in zip(diff.left_abs_values, diff.left_bars, diff.titles):
         fig.add_annotation(
-            x=diff_value - 0.025,
+            x=diff_value - 0.03,
             y=label,
             text=f"{abs_value:.2f}" if isinstance(abs_value, float) else str(abs_value),
             font=dict(family='Arial', size=12, color='#4472c4'),
@@ -285,7 +285,7 @@ def plot_players_stats_diff(
         )
     for abs_value, diff_value, label in zip(diff.right_abs_values, diff.right_bars, diff.titles):
         fig.add_annotation(
-            x=diff_value + 0.025,
+            x=diff_value + 0.03,
             y=label,
             text=f"{abs_value:.2f}" if isinstance(abs_value, float) else str(abs_value),
             font=dict(family='Arial', size=12, color='#ed7d31'),
