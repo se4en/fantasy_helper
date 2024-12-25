@@ -22,6 +22,7 @@ class TeamName(Base):
         sports_name: Optional[str],
         fbref_name: Optional[str],
         xbet_name: Optional[str],
+        name: Optional[str],
         timestamp: Optional[datetime],
     ):
         self.sports_name = sports_name
@@ -29,7 +30,9 @@ class TeamName(Base):
         self.xbet_name = xbet_name
         self.timestamp = timestamp
 
-        if self.sports_name is not None:
+        if name is not None:
+            self.name = name
+        elif self.sports_name is not None:
             self.name = self.sports_name
         elif self.xbet_name is not None:
             self.name = self.xbet_name

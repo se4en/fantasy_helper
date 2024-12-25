@@ -371,6 +371,7 @@ class SportsPlayerDiff:
     percent_ownership: Optional[float] = None
     percent_ownership_diff: Optional[float] = None
 
+
 @dataclass
 class SportsTourInfo:
     league_name: str
@@ -378,6 +379,22 @@ class SportsTourInfo:
     matches_count: int
     deadline: datetime
     status: str
+
+
+@dataclass
+class TeamName:
+    sports_name: Optional[str] = None
+    fbref_name: Optional[str] = None
+    xbet_name: Optional[str] = None
+    name: Optional[str] = None
+
+
+@dataclass
+class PlayerName:
+    sports_name: Optional[str] = None
+    fbref_name: Optional[str] = None
+    name: Optional[str] = None
+
 
 @dataclass
 class PlayersLeagueStats:
