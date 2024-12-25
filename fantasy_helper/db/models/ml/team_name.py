@@ -11,9 +11,10 @@ class TeamName(Base):
     __tablename__ = "team_names"
 
     id = Column(Integer, primary_key=True)
-    sports_team_name = Column(String, nullable=True)
-    fbref_team_name = Column(String, nullable=True)
-    xbet_team_name = Column(String, nullable=True)
+    sports_team_name = Column(String, nullable=True, index=True)
+    fbref_team_name = Column(String, nullable=True, index=True)
+    xbet_team_name = Column(String, nullable=True, index=True)
+    team_name = Column(String, nullable=True, index=True)
     timestamp = Column(DateTime, nullable=False)
 
     def __init__(
@@ -27,6 +28,13 @@ class TeamName(Base):
         self.fbref_team_name = fbref_team_name
         self.xbet_team_name = xbet_team_name
         self.timestamp = timestamp
+
+        if self.sports_team_name is not None:
+            self.team_name = self.sports_team_name
+        elif self.xbet_team_name is not None:
+            self.team_name = self.xbet_team_name
+        else:
+            self.team_name = self.fbref_team_name
 
     def __repr__(self):
         return f"{self.sports_team_name}|{self.fbref_team_name}|{self.xbet_team_name}"
