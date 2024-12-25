@@ -383,6 +383,7 @@ class SportsTourInfo:
 
 @dataclass
 class TeamName:
+    league_name: Optional[str] = None
     sports_name: Optional[str] = None
     fbref_name: Optional[str] = None
     xbet_name: Optional[str] = None
@@ -391,6 +392,8 @@ class TeamName:
 
 @dataclass
 class PlayerName:
+    league_name: Optional[str] = None
+    team_name: Optional[str] = None
     sports_name: Optional[str] = None
     fbref_name: Optional[str] = None
     name: Optional[str] = None

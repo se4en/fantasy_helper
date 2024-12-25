@@ -11,6 +11,8 @@ class PlayerName(Base):
     __tablename__ = "players_names"
 
     id = Column(Integer, primary_key=True)
+    league_name = Column(String, nullable=True, index=True)
+    team_name = Column(String, nullable=True, index=True)
     sports_name = Column(String, nullable=True, index=True)
     fbref_name = Column(String, nullable=True, index=True)
     name = Column(String, nullable=True, index=True)
@@ -18,11 +20,15 @@ class PlayerName(Base):
 
     def __init__(
         self,
+        league_name: Optional[str],
+        team_name: Optional[str],
         sports_name: Optional[str],
         fbref_name: Optional[str],
         name: Optional[str],
         timestamp: Optional[datetime],
     ):
+        self.league_name = league_name
+        self.team_name = team_name
         self.sports_name = sports_name
         self.fbref_name = fbref_name
         self.timestamp = timestamp
