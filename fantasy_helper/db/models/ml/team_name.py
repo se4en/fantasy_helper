@@ -8,33 +8,33 @@ from fantasy_helper.db.database import Base
 
 
 class TeamName(Base):
-    __tablename__ = "team_names"
+    __tablename__ = "teams_names"
 
     id = Column(Integer, primary_key=True)
-    sports_team_name = Column(String, nullable=True, index=True)
-    fbref_team_name = Column(String, nullable=True, index=True)
-    xbet_team_name = Column(String, nullable=True, index=True)
-    team_name = Column(String, nullable=True, index=True)
+    sports_name = Column(String, nullable=True, index=True)
+    fbref_name = Column(String, nullable=True, index=True)
+    xbet_name = Column(String, nullable=True, index=True)
+    name = Column(String, nullable=True, index=True)
     timestamp = Column(DateTime, nullable=False)
 
     def __init__(
         self,
-        sports_team_name: Optional[str],
-        fbref_team_name: Optional[str],
-        xbet_team_name: Optional[str],
+        sports_name: Optional[str],
+        fbref_name: Optional[str],
+        xbet_name: Optional[str],
         timestamp: Optional[datetime],
     ):
-        self.sports_team_name = sports_team_name
-        self.fbref_team_name = fbref_team_name
-        self.xbet_team_name = xbet_team_name
+        self.sports_name = sports_name
+        self.fbref_name = fbref_name
+        self.xbet_name = xbet_name
         self.timestamp = timestamp
 
-        if self.sports_team_name is not None:
-            self.team_name = self.sports_team_name
-        elif self.xbet_team_name is not None:
-            self.team_name = self.xbet_team_name
+        if self.sports_name is not None:
+            self.name = self.sports_name
+        elif self.xbet_name is not None:
+            self.name = self.xbet_name
         else:
-            self.team_name = self.fbref_team_name
+            self.name = self.fbref_name
 
     def __repr__(self):
-        return f"{self.sports_team_name}|{self.fbref_team_name}|{self.xbet_team_name}"
+        return f"{self.sports_name}|{self.fbref_name}|{self.xbet_name}"
