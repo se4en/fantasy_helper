@@ -23,6 +23,13 @@ class FSPlayersFreeKicks(Base):
     penalty_goals = Column(Float, nullable=True)
     penalty_shots = Column(Float, nullable=True)
     free_kicks_shots = Column(Float, nullable=True)
+    # sports info
+    sports_team = Column(String, nullable=True)
+    sports_name = Column(String, nullable=True)
+    role = Column(String, nullable=True)
+    price = Column(Float, nullable=True)
+    percent_ownership = Column(Float, nullable=True)
+    percent_ownership_diff = Column(Float, nullable=True)
 
     def __init__(
         self,
@@ -39,6 +46,13 @@ class FSPlayersFreeKicks(Base):
         penalty_goals: Optional[float],
         penalty_shots: Optional[float],
         free_kicks_shots: Optional[float],
+        # sports info
+        sports_team: Optional[str] = None,
+        sports_name: Optional[str] = None,
+        role: Optional[str] = None,
+        price: Optional[float] = None,
+        percent_ownership: Optional[float] = None,
+        percent_ownership_diff: Optional[float] = None
     ):
         self.type = type
         self.league_name = league_name
@@ -54,6 +68,13 @@ class FSPlayersFreeKicks(Base):
         self.penalty_goals = penalty_goals
         self.penalty_shots = penalty_shots
         self.free_kicks_shots = free_kicks_shots
+        # sports info
+        self.sports_team = sports_team
+        self.sports_name = sports_name
+        self.role = role
+        self.price = price
+        self.percent_ownership = percent_ownership
+        self.percent_ownership_diff = percent_ownership_diff
 
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"

@@ -1,11 +1,13 @@
+from copy import deepcopy
 from dataclasses import asdict
 from typing import List
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session as SQLSession
+import pandas as pd
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName, PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, SportsPlayerDiff, TeamName, PlayersLeagueStats
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.ml.player_name import PlayerName as DBPlayerName
 from fantasy_helper.db.models.ml.team_name import TeamName as DBTeamName
@@ -60,9 +62,6 @@ class NamingDAO:
             .all()
         )
 
-        db_session.commit()
-        db_session.close()
-
         result = [
             TeamName(
                 league_name=team.league_name,
@@ -73,6 +72,10 @@ class NamingDAO:
             ) 
             for team in teams
         ]
+
+        db_session.commit()
+        db_session.close()
+    
         return result
 
     def get_players(self, league_name: str) -> List[PlayerName]:
@@ -84,9 +87,6 @@ class NamingDAO:
             .all()
         )
 
-        db_session.commit()
-        db_session.close()
-
         result = [
             PlayerName(
                 league_name=player.league_name,
@@ -97,4 +97,53 @@ class NamingDAO:
             ) 
             for player in players
         ]
+
+        db_session.commit()
+        db_session.close()
+
+        return result
+
+    def add_sports_info_to_players_stats(
+            self, 
+            league_name: str, 
+            players_stats: PlayersLeagueStats, 
+            sports_players: List[SportsPlayerDiff]
+        ) -> PlayersLeagueStats:
+        # get teams info
+        teams_names = self.get_teams(league_name)
+        teams_info = pd.DataFrame([
+            {
+                "team": team.fbref_name,
+                "sports_team": team.sports_name,
+            }
+            for team in teams_names
+        ])
+        
+        # get players info
+        players_names = self.get_players(league_name)
+        players_sports_2_fbref = {
+            player.sports_name: player.fbref_name for player in players_names
+        }
+        players_info = pd.DataFrame([
+            {
+                "name": players_sports_2_fbref.get(player.name),
+                "sports_name": player.name,
+                "sports_team": player.team_name,
+                "role": player.role,
+                "price": player.price,
+                "percent_ownership": player.percent_ownership,
+                "percent_ownership_diff": player.percent_ownership_diff
+            }
+            for player in sports_players
+        ])
+
+        # join teams and players info
+        result = deepcopy(players_stats)
+        result.abs_stats = result.abs_stats.merge(teams_info, how="left", on="team")
+        result.norm_stats = result.norm_stats.merge(teams_info, how="left", on="team")
+        result.free_kicks = result.free_kicks.merge(teams_info, how="left", on="team")
+        result.abs_stats = result.abs_stats.merge(players_info, how="left", on=["name", "sports_team"])
+        result.norm_stats = result.norm_stats.merge(players_info, how="left", on=["name", "sports_team"])
+        result.free_kicks = result.free_kicks.merge(players_info, how="left", on=["name", "sports_team"])
+    
         return result

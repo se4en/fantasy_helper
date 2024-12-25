@@ -1,17 +1,25 @@
+from typing import List, Optional
+
 import numpy as np
 import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 
 from fantasy_helper.db.database import Session
-from fantasy_helper.utils.dataclasses import PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import PlayersLeagueStats, SportsPlayerDiff
 from fantasy_helper.db.models.feature_store.fs_players_free_kicks import (
     FSPlayersFreeKicks,
 )
 from fantasy_helper.db.models.feature_store.fs_players_stats import FSPlayersStats
+from fantasy_helper.db.dao.ml.naming import NamingDAO
+from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
 
 class FSPlayersStatsDAO:
+    def __init__(self):
+        self._naming_dao = NamingDAO()
+        self._fs_sports_players_dao = FSSportsPlayersDAO()
+
     def get_players_stats(self, league_name: str) -> PlayersLeagueStats:
         """
         Retrieves the player statistics for a given league.
@@ -69,7 +77,10 @@ class FSPlayersStatsDAO:
         return result
 
     def update_players_stats(
-        self, league_name: str, players_stats: PlayersLeagueStats
+        self, 
+        league_name: str, 
+        players_stats: PlayersLeagueStats, 
+        add_sports_info: bool = True
     ) -> None:
         """
         Updates the player statistics for a given league.
@@ -81,6 +92,12 @@ class FSPlayersStatsDAO:
         Returns:
             None: This function does not return anything.
         """
+        if add_sports_info:
+            sports_players = self._fs_sports_players_dao.get_sports_players(league_name)
+            players_stats = self._naming_dao.add_sports_info_to_players_stats(
+                league_name, players_stats, sports_players
+            )
+
         db_session: SQLSession = Session()
 
         # remove all previous stats
