@@ -389,6 +389,15 @@ class TeamName:
     xbet_name: Optional[str] = None
     name: Optional[str] = None
 
+    def __post_init__(self):
+        if self.name is None:
+            if self.sports_name is not None:
+                self.name = self.sports_name
+            elif self.xbet_name is not None:
+                self.name = self.xbet_name
+            else:
+                self.name = self.fbref_name
+
 
 @dataclass
 class PlayerName:
@@ -398,6 +407,12 @@ class PlayerName:
     fbref_name: Optional[str] = None
     name: Optional[str] = None
 
+    def __post_init__(self):
+        if self.name is None:
+            if self.sports_name is not None:
+                self.name = self.sports_name
+            else:
+                self.name = self.fbref_name
 
 @dataclass
 class PlayersLeagueStats:

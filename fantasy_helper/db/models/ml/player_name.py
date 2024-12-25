@@ -31,14 +31,9 @@ class PlayerName(Base):
         self.team_name = team_name
         self.sports_name = sports_name
         self.fbref_name = fbref_name
+        self.name = name
         self.timestamp = timestamp
 
-        if name is not None:
-            self.name = name
-        elif self.sports_name is not None:
-            self.name = self.sports_name
-        else:
-            self.name = self.fbref_name
 
     def __repr__(self):
         return f"{self.sports_name}|{self.fbref_name}"

@@ -31,16 +31,9 @@ class TeamName(Base):
         self.sports_name = sports_name
         self.fbref_name = fbref_name
         self.xbet_name = xbet_name
+        self.name = name
         self.timestamp = timestamp
 
-        if name is not None:
-            self.name = name
-        elif self.sports_name is not None:
-            self.name = self.sports_name
-        elif self.xbet_name is not None:
-            self.name = self.xbet_name
-        else:
-            self.name = self.fbref_name
 
     def __repr__(self):
         return f"{self.sports_name}|{self.fbref_name}|{self.xbet_name}"

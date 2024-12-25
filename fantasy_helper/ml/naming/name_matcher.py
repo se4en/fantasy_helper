@@ -10,17 +10,13 @@ import httpx
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.models.sports_player import SportsPlayer
-from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.db.database import Session
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENAI_API_KEY
-from fantasy_helper.utils.dataclasses import LeagueInfo
+from fantasy_helper.utils.dataclasses import PlayerName, TeamName
 
 
 class NameMatcher:
     def __init__(self, openai_model: str = "gpt-4o-2024-11-20"):
-        cfg = load_config(config_path="../../conf", config_name="config")
-        self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
-        
         proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
         self._openai_client = OpenAI(
             api_key=OPENAI_API_KEY,
@@ -123,7 +119,10 @@ class NameMatcher:
             model=self._openai_model,
             messages=self._teams_names_prompt + [user_message],
         )
-        return completion.choices[0].message.content
+        try:
+            return json.loads(completion.choices[0].message.content)
+        except json.JSONDecodeError as e:
+            return {}
 
     def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
         user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
@@ -131,26 +130,43 @@ class NameMatcher:
             model=self._openai_model,
             messages=self._players_names_prompt + [user_message],
         )
-        return completion.choices[0].message.content
+        try:
+            return json.loads(completion.choices[0].message.content)
+        except json.JSONDecodeError as e:
+            return {}
 
-    def get_leagues_names(self) -> List[str]:
-        return [league.name for league in self._leagues]
+    def match_teams(self, league_name: str) -> List[TeamName]:
+        sports_teams_names = self.get_sports_teams_names(league_name)
+        fbref_teams_names = self.get_fbref_teams_names(league_name)
+        xbet_teams_names = self.get_xbet_teams_names(league_name)
 
+        sports_2_fbref_teams = self.match_teams_names(sports_teams_names, fbref_teams_names)
+        sports_2_xbet_teams = self.match_teams_names(sports_teams_names, xbet_teams_names)
 
-if __name__ == "__main__":
-    matcher = NameMatcher()
-    
-    # sports_names = matcher.get_sports_teams_names("Russia")
-    # fbref_names = matcher.get_fbref_teams_names("Russia")
-    # xbet_names = matcher.get_xbet_teams_names("Russia")
+        result = []
+        for k, v in sports_2_fbref_teams.items():
+            result.append(TeamName(
+                league_name=league_name,
+                sports_name=k,
+                fbref_name=v,
+                xbet_name=sports_2_xbet_teams.get(k)
+            ))
 
-    team_1 = matcher.get_sports_players_names("England", "Астон Вилла")
-    team_2 = matcher.get_fbref_players_names("England", "Aston Villa")
+        return result
 
-    result = matcher.match_players_names(team_1, team_2)
+    def match_players(self, league_name: str, team_name: TeamName) -> List[PlayerName]:
+        sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
+        fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
 
-    print("list 1", team_1)
-    print("")
-    print("list 2", team_2)
-    print("")
-    print("result", result)
+        sports_2_fbref_players = self.match_players_names(sports_players_names, fbref_players_names)
+
+        result = []
+        for k, v in sports_2_fbref_players.items():
+            result.append(PlayerName(
+                league_name=league_name,
+                team_name=team_name.name,
+                sports_name=k, 
+                fbref_name=v,
+            ))
+
+        return result
