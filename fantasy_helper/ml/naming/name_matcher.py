@@ -16,7 +16,7 @@ from fantasy_helper.utils.dataclasses import PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "gpt-4o-2024-11-20"):
+    def __init__(self, openai_model: str = "gpt-4o-mini-2024-07-18"):
         proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
         self._openai_client = OpenAI(
             api_key=OPENAI_API_KEY,
@@ -113,7 +113,7 @@ class NameMatcher:
 
         return [elem[0] for elem in team_names]
 
-    def match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
+    def _get_match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
         user_message = {"role": "user", "content": f"list 1: {teams_names_1}, list 2: {teams_names_2}"}
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
@@ -124,7 +124,14 @@ class NameMatcher:
         except json.JSONDecodeError as e:
             return {}
 
-    def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
+    def match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
+        result = self._get_match_teams_names(teams_names_1, teams_names_2)
+        teams_names_1_add = list(filter(lambda x: x not in result.keys(), teams_names_1))
+        teams_names_2_add = list(filter(lambda x: x not in result.values(), teams_names_2))
+        result.update(self._get_match_teams_names(teams_names_1_add, teams_names_2_add))
+        return result
+
+    def _get_match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
         user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
@@ -134,6 +141,13 @@ class NameMatcher:
             return json.loads(completion.choices[0].message.content)
         except json.JSONDecodeError as e:
             return {}
+
+    def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
+        result = self._get_match_players_names(players_names_1, players_names_2)
+        players_names_1_add = list(filter(lambda x: x not in result.keys(), players_names_1))
+        players_names_2_add = list(filter(lambda x: x not in result.values(), players_names_2))
+        result.update(self._get_match_players_names(players_names_1_add, players_names_2_add))
+        return result
 
     def match_teams(self, league_name: str) -> List[TeamName]:
         sports_teams_names = self.get_sports_teams_names(league_name)
