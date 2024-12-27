@@ -18,7 +18,7 @@ utc = timezone.utc
 
 
 class NamingDAO:
-    def __init__(self):
+    def __init__(self, logger = None):
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self._name_matcher = NameMatcher()

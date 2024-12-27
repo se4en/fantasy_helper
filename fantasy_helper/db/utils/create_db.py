@@ -8,6 +8,7 @@ from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.models.table import Table
 from fantasy_helper.db.models.schedule import Schedule
+from fantasy_helper.db.models.actual_player import ActualPlayer
 from fantasy_helper.db.models.feature_store.fs_coeffs import FSCoeffs
 from fantasy_helper.db.models.feature_store.fs_lineups import FSLineups
 from fantasy_helper.db.models.feature_store.fs_players_stats import FSPlayersStats

@@ -8,11 +8,11 @@ from openai import OpenAI
 import httpx
 
 from fantasy_helper.db.models.coeff import Coeff
-from fantasy_helper.db.models.player import Player
+from fantasy_helper.db.models.actual_player import ActualPlayer
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.database import Session
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENAI_API_KEY
-from fantasy_helper.utils.dataclasses import PlayerName, TeamName
+from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
@@ -68,11 +68,11 @@ class NameMatcher:
         db_session: SQLSession = Session()
 
         query = (
-            db_session.query(Player.team_name).filter(
-                Player.league_name == league_name
+            db_session.query(ActualPlayer.team_name).filter(
+                ActualPlayer.league_name == league_name
             )
             .distinct()
-            .order_by(Player.team_name)
+            .order_by(ActualPlayer.team_name)
         )
         team_names = query.all()
 
@@ -84,12 +84,12 @@ class NameMatcher:
         db_session: SQLSession = Session()
 
         query = (
-            db_session.query(Player.name).filter(and_(
-                Player.league_name == league_name,
-                Player.team_name == team_name
+            db_session.query(ActualPlayer.name).filter(and_(
+                ActualPlayer.league_name == league_name,
+                ActualPlayer.team_name == team_name
             ))
             .distinct()
-            .order_by(Player.name)
+            .order_by(ActualPlayer.name)
         )
         players_names = query.all()
 
@@ -114,11 +114,15 @@ class NameMatcher:
         return [elem[0] for elem in team_names]
 
     def _get_match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
+        if len(teams_names_1) == 0 or len(teams_names_2) == 0:
+            return {}
+
         user_message = {"role": "user", "content": f"list 1: {teams_names_1}, list 2: {teams_names_2}"}
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
             messages=self._teams_names_prompt + [user_message],
         )
+
         try:
             return json.loads(completion.choices[0].message.content)
         except json.JSONDecodeError as e:
@@ -132,11 +136,15 @@ class NameMatcher:
         return result
 
     def _get_match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
+        if len(players_names_1) == 0 or len(players_names_2) == 0:
+            return {}
+
         user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
             messages=self._players_names_prompt + [user_message],
         )
+
         try:
             return json.loads(completion.choices[0].message.content)
         except json.JSONDecodeError as e:
