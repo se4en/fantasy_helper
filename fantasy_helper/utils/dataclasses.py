@@ -371,6 +371,7 @@ class SportsPlayerDiff:
     percent_ownership: Optional[float] = None
     percent_ownership_diff: Optional[float] = None
 
+
 @dataclass
 class SportsTourInfo:
     league_name: str
@@ -378,6 +379,40 @@ class SportsTourInfo:
     matches_count: int
     deadline: datetime
     status: str
+
+
+@dataclass
+class TeamName:
+    league_name: Optional[str] = None
+    sports_name: Optional[str] = None
+    fbref_name: Optional[str] = None
+    xbet_name: Optional[str] = None
+    name: Optional[str] = None
+
+    def __post_init__(self):
+        if self.name is None:
+            if self.sports_name is not None:
+                self.name = self.sports_name
+            elif self.xbet_name is not None:
+                self.name = self.xbet_name
+            else:
+                self.name = self.fbref_name
+
+
+@dataclass
+class PlayerName:
+    league_name: Optional[str] = None
+    team_name: Optional[str] = None
+    sports_name: Optional[str] = None
+    fbref_name: Optional[str] = None
+    name: Optional[str] = None
+
+    def __post_init__(self):
+        if self.name is None:
+            if self.sports_name is not None:
+                self.name = self.sports_name
+            else:
+                self.name = self.fbref_name
 
 @dataclass
 class PlayersLeagueStats:

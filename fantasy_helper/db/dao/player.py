@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from dataclasses import asdict
 
 import pandas as pd
+from fantasy_helper.db.models.actual_player import ActualPlayer
 import numpy as np
 from sqlalchemy import func, and_
 from sqlalchemy.orm import Session as SQLSession
@@ -499,6 +500,17 @@ class PlayerDAO:
                 db_session.add(
                     Player(
                         **asdict(player), timestamp=datetime.now().replace(tzinfo=utc)
+                    )
+                )
+
+            for player in players_stats:
+                db_session.add(
+                    ActualPlayer(
+                        name=player.name,
+                        league_name=player.league_name,
+                        team_name=player.team_name,
+                        position=player.position,
+                        timestamp=datetime.now().replace(tzinfo=utc)
                     )
                 )
 

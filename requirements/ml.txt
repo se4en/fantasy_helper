@@ -1,0 +1,4 @@
+-r base.txt
+-r conf.txt
+-r db.txt
+openai==1.58.1

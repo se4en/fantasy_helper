@@ -21,6 +21,15 @@ POSTGRES_DB = str(os.getenv("POSTGRES_DB"))
 POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
+# proxy
+PROXY_HOST = str(os.getenv("PROXY_HOST"))
+PROXY_PORT = str(os.getenv("PROXY_PORT"))
+PROXY_USER = str(os.getenv("PROXY_USER"))
+PROXY_PASSWORD = str(os.getenv("PROXY_PASSWORD"))
+
+# open ai
+OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
+
 # load leagues info
 if not GlobalHydra().is_initialized():
     initialize(config_path=".", version_base=None)

@@ -42,6 +42,13 @@ class FSPlayersStats(Base):
     # shot creation
     sca = Column(Float, nullable=True)
     gca = Column(Float, nullable=True)
+    # sports info
+    sports_team = Column(String, nullable=True)
+    sports_name = Column(String, nullable=True)
+    role = Column(String, nullable=True)
+    price = Column(Float, nullable=True)
+    percent_ownership = Column(Float, nullable=True)
+    percent_ownership_diff = Column(Float, nullable=True)
 
     def __init__(
         self,
@@ -77,6 +84,13 @@ class FSPlayersStats(Base):
         # shot creation
         sca: Optional[float],
         gca: Optional[float],
+        # sports info
+        sports_team: Optional[str] = None,
+        sports_name: Optional[str] = None,
+        role: Optional[str] = None,
+        price: Optional[float] = None,
+        percent_ownership: Optional[float] = None,
+        percent_ownership_diff: Optional[float] = None
     ):
         self.type = type
         self.league_name = league_name
@@ -110,6 +124,13 @@ class FSPlayersStats(Base):
         # shot creation
         self.sca = sca
         self.gca = gca
+        # sports info
+        self.sports_team = sports_team
+        self.sports_name = sports_name
+        self.role = role
+        self.price = price
+        self.percent_ownership = percent_ownership
+        self.percent_ownership_diff = percent_ownership_diff
 
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"

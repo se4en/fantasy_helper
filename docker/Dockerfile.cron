@@ -28,12 +28,13 @@ RUN echo "===> Remove build dependencies..." && \
 
 WORKDIR /fantasy_helper
 COPY ./requirements /fantasy_helper/requirements
-RUN pip install --no-cache-dir --upgrade -r requirements/db.txt -r requirements/parsers.txt
+RUN pip install --no-cache-dir --upgrade -r requirements/db.txt -r requirements/parsers.txt -r requirements/ml.txt
 
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
 COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
 COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
+COPY ./fantasy_helper/ml /fantasy_helper/fantasy_helper/ml
 COPY .env /fantasy_helper/.env
 COPY ./fantasy_helper/crontab /etc/cron.d/crontab
 RUN chmod 0644 /etc/cron.d/crontab
