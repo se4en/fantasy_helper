@@ -284,7 +284,7 @@ class PlayerStats:
 
 @dataclass
 class PlayerStatsInfo:
-    name: str
+    name: Optional[str] = None
     team: Optional[str] = None
     position: Optional[str] = None
     # playing time
@@ -313,6 +313,13 @@ class PlayerStatsInfo:
     # shot creation
     sca: Optional[int] = None
     gca: Optional[int] = None
+    # sports info
+    sports_name: Optional[str] = None
+    sports_team: Optional[str] = None
+    role: Optional[str] = None
+    price: Optional[float] = None
+    percent_ownership: Optional[float] = None
+    percent_ownership_diff: Optional[float] = None
 
 
 @dataclass

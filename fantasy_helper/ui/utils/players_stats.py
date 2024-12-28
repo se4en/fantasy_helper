@@ -10,8 +10,8 @@ from plotly.subplots import make_subplots
 from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats, PlayersStatsDiff
 
 
-NOT_VISIBLE_COLUMNS = {"id", "type", "league_name"}
-COMMON_COLUMNS = {"name", "team", "position", "games", "minutes"}
+NOT_VISIBLE_COLUMNS = {"id", "type", "league_name", "name", "team", "position"}
+COMMON_COLUMNS = {"sports_name", "sports_team", "role", "price", "games", "minutes"}
 DEFAULT_COLUMNS = {"goals", "assists", "shots", "xg", "xg_xa"}
 
 
@@ -29,8 +29,6 @@ def prepare_players_stats_df(
 
     if df is None or len(df) == 0:
         return
-
-    df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
 
     df = df.loc[df["games"] <= games_count]
     if min_minutes is not None:
@@ -56,6 +54,8 @@ def prepare_players_stats_df(
 
     if not df.empty:
         df = df.groupby(by=["name"]).apply(_get_max_game_count_row)
+        df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")        
+        df = df.loc[~df["sports_name"].isna()]
         df.reset_index(drop=True, inplace=True)
         df.fillna(0, inplace=True)
 
@@ -79,7 +79,7 @@ def plot_main_players_stats(
         None
     """
     if team_name != "All":
-        players_stats_df = players_stats_df.loc[players_stats_df["team"] == team_name]
+        players_stats_df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
 
     columns = []
     columns_names_set = set(columns_names)
@@ -128,8 +128,9 @@ def plot_free_kicks_stats(
     df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
 
     if team_name != "All":
-        df = df.loc[df["team"] == team_name]
+        df = df.loc[df["sports_team"] == team_name]
     df.dropna(axis=1, how="all", inplace=True)
+    df = df.loc[~df["sports_name"].isna()]
     df.fillna(0, inplace=True)
 
     st.dataframe(df, hide_index=True)
@@ -144,10 +145,10 @@ def get_player_stats(
         team_name is None or name is None:
         return
 
-    df = players_stats_df.loc[players_stats_df["team"] == team_name]
+    df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
 
     for row_ind, row in df.iterrows():
-        if row["name"] == name:
+        if row["sports_name"] == name:
             return PlayerStatsInfo(**row)
 
     return None
