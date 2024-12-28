@@ -38,6 +38,10 @@ jobs:
           echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env
           echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
           echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
+          echo "PROXY_HOST=${{ secrets.PROXY_HOST }}" >> .env
+          echo "PROXY_PORT=${{ secrets.PROXY_PORT }}" >> .env
+          echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
+          echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
 
           echo "IMAGE_REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
@@ -104,6 +108,10 @@ jobs:
           echo "POSTGRES_URI=${{ secrets.POSTGRES_URI }}" >> .env
           echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
           echo "GECKODRIVER_PATH=${{ secrets.GECKODRIVER_PATH }}" >> .env
+          echo "PROXY_HOST=${{ secrets.PROXY_HOST }}" >> .env
+          echo "PROXY_PORT=${{ secrets.PROXY_PORT }}" >> .env
+          echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
+          echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
 
           echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
           echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
