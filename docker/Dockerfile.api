@@ -4,12 +4,13 @@ RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essent
 
 WORKDIR /fantasy_helper
 COPY ./requirements /fantasy_helper/requirements
-RUN pip install --no-cache-dir --upgrade -r requirements/api.txt
+RUN pip install --no-cache-dir --upgrade -r requirements/api.txt -r requirements/ml.txt
 COPY ./fantasy_helper/api /fantasy_helper/fantasy_helper/api
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
 COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
 COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
+COPY ./fantasy_helper/ml /fantasy_helper/fantasy_helper/ml
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
 CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
