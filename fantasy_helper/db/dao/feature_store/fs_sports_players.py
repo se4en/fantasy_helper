@@ -48,3 +48,33 @@ class FSSportsPlayersDAO:
 
         db_session.commit()
         db_session.close()
+
+    def get_min_price(self, league_name: str) -> float:
+        db_session: SQLSession = Session()
+
+        min_price = (
+            db_session.query(FSSportsPlayers.price)
+            .filter(FSSportsPlayers.league_name == league_name)
+            .order_by(FSSportsPlayers.price)
+            .first()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return min_price[0]
+
+    def get_max_price(self, league_name: str) -> float:
+        db_session: SQLSession = Session()
+
+        max_price = (
+            db_session.query(FSSportsPlayers.price)
+            .filter(FSSportsPlayers.league_name == league_name)
+            .order_by(FSSportsPlayers.price.desc())
+            .first()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return max_price[0]

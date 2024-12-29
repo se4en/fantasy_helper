@@ -149,3 +149,31 @@ async def get_calendar(league_name: str) -> List[CalendarInfo]:
         List[CalendarInfo]: A list of CalendarInfo objects representing the calendars for the league.
     """
     return FS_Calendars_dao.get_calendar(league_name)
+
+
+@app.get("/players_stats_min_price/")
+async def get_players_stats_min_price(league_name: str) -> Optional[float]:
+    """
+    Get the minimum price for a given league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        int: The minimum price for the given league.
+    """
+    return FS_Sports_Players_dao.get_min_price(league_name)
+
+
+@app.get("/players_stats_max_price/")
+async def get_players_stats_max_price(league_name: str) -> Optional[float]:
+    """
+    Get the maximum price for a given league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        int: The maximum price for the given league.
+    """
+    return FS_Sports_Players_dao.get_max_price(league_name)

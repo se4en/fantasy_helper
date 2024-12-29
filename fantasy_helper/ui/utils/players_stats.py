@@ -1,6 +1,7 @@
 from typing import Any, List, Optional, Union, get_args, get_origin
 from dataclasses import asdict, dataclass, fields
 
+from fantasy_helper.ui.utils.sports_players import rename_sports_role
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -58,6 +59,7 @@ def prepare_players_stats_df(
         df = df.loc[~df["sports_name"].isna()]
         df.reset_index(drop=True, inplace=True)
         df.fillna(0, inplace=True)
+        df["role"] = df["role"].apply(rename_sports_role)
 
     return df
 
@@ -65,7 +67,10 @@ def prepare_players_stats_df(
 def plot_main_players_stats(
     players_stats_df: pd.DataFrame, 
     columns_names: List[str],
-    team_name: str = "All"
+    team_name: str = "All",
+    position: str = "All",
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None
 ) -> None:
     """
     Plot the main players' stats based on the given parameters.
@@ -80,6 +85,12 @@ def plot_main_players_stats(
     """
     if team_name != "All":
         players_stats_df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
+    if position != "All":
+        players_stats_df = players_stats_df.loc[players_stats_df["role"] == position]
+    if min_price is not None:
+        players_stats_df = players_stats_df.loc[players_stats_df["price"] >= min_price]
+    if max_price is not None:
+        players_stats_df = players_stats_df.loc[players_stats_df["price"] <= max_price]
 
     columns = []
     columns_names_set = set(columns_names)
