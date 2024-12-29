@@ -80,7 +80,7 @@ class FSPlayersStatsDAO:
         self, 
         league_name: str, 
         players_stats: PlayersLeagueStats, 
-        add_sports_info: bool = True
+        add_sports_info: bool = False
     ) -> None:
         """
         Updates the player statistics for a given league.
