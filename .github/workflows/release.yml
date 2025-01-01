@@ -42,6 +42,7 @@ jobs:
           echo "PROXY_PORT=${{ secrets.PROXY_PORT }}" >> .env
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
           echo "IMAGE_REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
@@ -112,6 +113,7 @@ jobs:
           echo "PROXY_PORT=${{ secrets.PROXY_PORT }}" >> .env
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
           echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
           echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
