@@ -151,22 +151,8 @@ async def get_calendar(league_name: str) -> List[CalendarInfo]:
     return FS_Calendars_dao.get_calendar(league_name)
 
 
-@app.get("/players_stats_min_price/")
-async def get_players_stats_min_price(league_name: str) -> Optional[float]:
-    """
-    Get the minimum price for a given league.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        int: The minimum price for the given league.
-    """
-    return FS_Sports_Players_dao.get_min_price(league_name)
-
-
-@app.get("/players_stats_max_price/")
-async def get_players_stats_max_price(league_name: str) -> Optional[float]:
+@app.get("/players_stats_prices/")
+async def get_players_stats_prices(league_name: str) -> List[float]:
     """
     Get the maximum price for a given league.
 
@@ -176,4 +162,4 @@ async def get_players_stats_max_price(league_name: str) -> Optional[float]:
     Returns:
         int: The maximum price for the given league.
     """
-    return FS_Sports_Players_dao.get_max_price(league_name)
+    return FS_Sports_Players_dao.get_players_prices(league_name)

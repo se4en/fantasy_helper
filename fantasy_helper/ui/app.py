@@ -182,14 +182,8 @@ def get_leagues() -> Dict[str, str]:
 
 
 @st.cache_data(ttl=36000, max_entries=10, show_spinner="Loading players prices...")
-def get_players_stats_min_price(league_name: str) -> Optional[float]:
-    r = requests.get(api_url + f"/players_stats_min_price/?league_name={league_name}")
-    return r.json()
-
-
-@st.cache_data(ttl=36000, max_entries=10, show_spinner="Loading players prices...")
-def get_players_stats_max_price(league_name: str) -> Optional[float]:
-    r = requests.get(api_url + f"/players_stats_max_price/?league_name={league_name}")
+def get_players_stats_prices(league_name: str) -> List[float]:
+    r = requests.get(api_url + f"/players_stats_prices/?league_name={league_name}")
     return r.json()
 
 
@@ -230,8 +224,7 @@ if authentication_status:
     players_stats = get_players_league_stats(st.session_state["league"])
     players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
     players_stats_positions = get_available_positions()
-    players_stats_min_price = get_players_stats_min_price(st.session_state["league"])
-    players_stats_max_price = get_players_stats_max_price(st.session_state["league"])
+    players_stats_prices = get_players_stats_prices(st.session_state["league"])
     lineups = get_lineups(st.session_state["league"])
     sports_players = get_sports_players(st.session_state["league"])
     sports_players_team_names = sorted(set([player.team_name for player in sports_players]))
@@ -291,20 +284,20 @@ if authentication_status:
             label_visibility="visible"
         )
     with columns[2]:
-        st.session_state["player_min_price"] = st.number_input(
-            "Min price", 
-            value=players_stats_min_price, 
-            min_value=players_stats_min_price, 
-            max_value=players_stats_max_price, 
-            step=0.5
+        st.selectbox(
+            "Min price",
+            options=players_stats_prices,
+            key="player_min_price",
+            label_visibility="visible",
+            index=0
         )
     with columns[3]:
-        st.session_state["player_max_price"] = st.number_input(
-            "Max price", 
-            value=players_stats_max_price, 
-            min_value=players_stats_min_price, 
-            max_value=players_stats_max_price, 
-            step=0.5
+        st.selectbox(
+            "Max price",
+            options=players_stats_prices,
+            key="player_max_price",
+            label_visibility="visible",
+            index=len(players_stats_prices) - 1
         )
     with columns[4]:
         st.session_state["games_count"] = st.number_input(
