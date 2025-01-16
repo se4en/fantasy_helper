@@ -271,21 +271,21 @@ if authentication_status:
     columns = st.columns([2, 1, 1, 1, 2, 2, 2])
     with columns[0]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name",
             label_visibility="visible"
         )
     with columns[1]:
         st.selectbox(
-            "Position",
+            "Позиция",
             options=["All"] + players_stats_positions,
             key="player_stats_position",
             label_visibility="visible"
         )
     with columns[2]:
         st.selectbox(
-            "Min price",
+            "Мин цена",
             options=players_stats_prices,
             key="player_min_price",
             label_visibility="visible",
@@ -293,7 +293,7 @@ if authentication_status:
         )
     with columns[3]:
         st.selectbox(
-            "Max price",
+            "Макс цена",
             options=players_stats_prices,
             key="player_max_price",
             label_visibility="visible",
@@ -301,16 +301,16 @@ if authentication_status:
         )
     with columns[4]:
         st.session_state["games_count"] = st.number_input(
-            "Games count", value=3, min_value=1, max_value=30, step=1
+            "Матчи", value=3, min_value=1, max_value=30, step=1
         )
     with columns[5]:
         st.session_state["min_minutes"] = st.number_input(
-            "Minimum minutes", value=None, min_value=1, max_value=1000, step=1
+            "Минуты", value=None, min_value=1, max_value=1000, step=1
         )
     with columns[6]:
         st.write("")
         st.write("")
-        st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
+        st.session_state["normalize"] = st.toggle("Нормировать на 90 мин")
 
     players_stats_df = prepare_players_stats_df(
         players_stats,
@@ -328,7 +328,7 @@ if authentication_status:
     available_stats_columns = get_available_stats_columns(abs_players_stats_df)
     default_stats_columns = get_default_stats_columns(abs_players_stats_df)
     st.multiselect(
-        "Statistic columns",
+        "Выбранные опции",
         options=available_stats_columns,
         default=default_stats_columns,
         key="player_stats_column_names",
@@ -348,7 +348,7 @@ if authentication_status:
     columns = st.columns([4, 4, 1, 4, 4])
     with columns[0]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name_left",
             label_visibility="visible",
@@ -359,7 +359,7 @@ if authentication_status:
             st.session_state["player_stats_team_name_left"]
         )
         st.selectbox(
-            "Player name",
+            "Имя",
             options=["All"] + players_stats_players_names_left,
             key="player_stats_player_name_left",
             label_visibility="visible",
@@ -369,7 +369,7 @@ if authentication_status:
         centrize_text("vs")
     with columns[3]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name_right",
             label_visibility="visible",
@@ -380,7 +380,7 @@ if authentication_status:
             st.session_state["player_stats_team_name_right"]
         )
         st.selectbox(
-            "Player name",
+            "Имя",
             options=["All"] + players_stats_players_names_right,
             key="player_stats_player_name_right",
             label_visibility="visible",
@@ -410,7 +410,7 @@ if authentication_status:
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:
             st.selectbox(
-                "Team name",
+                "Команда",
                 options=["All"] + players_stats_team_names,
                 key="free_kicks_stats_team_name",
                 label_visibility="visible",
@@ -426,7 +426,7 @@ if authentication_status:
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:
             st.selectbox(
-                "Team name",
+                "Команда",
                 options=["All"] + sports_players_team_names,
                 key="sports_players_team_name",
                 label_visibility="visible",
