@@ -136,3 +136,33 @@ class FSPlayersStatsDAO:
 
         db_session.commit()
         db_session.close()
+
+    def get_teams_names(self, league_name: str) -> List[str]:
+        db_session: SQLSession = Session()
+
+        team_names = (
+            db_session.query(FSPlayersStats.sports_team)
+            .filter(FSPlayersStats.league_name == league_name)
+            .distinct()
+            .all()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return sorted([team_name[0] for team_name in team_names if team_name[0] is not None])
+
+    def get_players_names(self, league_name: str, team_name: str) -> List[str]:
+        db_session: SQLSession = Session()
+
+        player_names = (
+            db_session.query(FSPlayersStats.sports_name)
+            .filter(and_(FSPlayersStats.league_name == league_name, FSPlayersStats.sports_team == team_name))
+            .distinct()
+            .all()
+        )
+
+        db_session.commit()
+        db_session.close()
+
+        return sorted([player_name[0] for player_name in player_names if player_name[0] is not None])

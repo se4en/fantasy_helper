@@ -48,3 +48,18 @@ class FSSportsPlayersDAO:
 
         db_session.commit()
         db_session.close()
+
+    def get_players_prices(self, league_name: str) -> List[float]:
+        db_session: SQLSession = Session()
+
+        query = (
+            db_session.query(FSSportsPlayers.price)
+            .filter(FSSportsPlayers.league_name == league_name)
+            .distinct()
+            .order_by(FSSportsPlayers.price)
+        )
+        players_prices = query.all()
+
+        db_session.close()
+
+        return [elem[0] for elem in players_prices]

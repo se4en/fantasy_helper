@@ -7,12 +7,57 @@ import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from fantasy_helper.ui.utils.sports_players import rename_sports_role
 from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats, PlayersStatsDiff
 
 
-NOT_VISIBLE_COLUMNS = {"id", "type", "league_name"}
-COMMON_COLUMNS = {"name", "team", "position", "games", "minutes"}
+NOT_VISIBLE_COLUMNS = {"id", "type", "league_name", "name", "team", "position"}
+COMMON_COLUMNS = {"sports_name", "sports_team", "role", "price", "games", "minutes"}
+FREE_KICKS_COLUMNS = {"sports_name", "sports_team", "role", "price", "games", "penalty_shots", "corner_kicks", "free_kicks_shots"}
 DEFAULT_COLUMNS = {"goals", "assists", "shots", "xg", "xg_xa"}
+
+COLUMNS_NAMES = (
+    ("sports_name", "Имя"),
+    ("sports_team", "Команда"),
+    ("role", "Позиция"),
+    ("price", "Цена"),
+    # sports popularity
+    ("percent_ownership", "Популярность"),
+    ("percent_ownership_diff", "Динамика"),
+    # playing time
+    ("games", "Матчи"),
+    ("minutes", "Минуты"),
+    # shooting
+    ("goals", "Голы"),
+    ("shots", "Удары"),
+    ("shots_on_target", "УдСтвор"),
+    ("average_shot_distance", "УдДист"),
+    ("xg", "xG"),
+    ("xg_np", "xGnp"),
+    ("xg_xa", "xG + xA"),
+    ("xg_np_xa", "xGnp + xAnp"),
+    # passing
+    ("assists", "ГолевыеПер"),
+    ("xa", "xA"),
+    ("key_passes", "КлючПасы"),
+    ("passes_into_penalty_area", "ПасыПенЗон"),
+    ("crosses_into_penalty_area", "ПасыШтрЗон"),
+    # possesion
+    ("touches_in_attacking_third", "КасФинТреть"),
+    ("touches_in_attacking_penalty_area", "КасПенЗон"),
+    ("carries_in_attacking_third", "КонтрФинТреть"),
+    ("carries_in_attacking_penalty_area", "КонтрПенЗон"),
+    # shot creation
+    ("sca", "sca"),
+    ("gca", "gca"),
+    # standart shots
+    ("corner_kicks", "Угловые"),
+    ("penalty_goals", "ПенальтиЗаб"),
+    ("penalty_shots", "Пенальти"),
+    ("free_kicks_shots", "Штрафные"),
+)
+COLUMNS_MAPPING = {k: v for k, v in COLUMNS_NAMES}
+COLUMNS_REVERSE_MAPPING = {v: k for k, v in COLUMNS_NAMES}
 
 
 @st.cache_data(ttl=3600, max_entries=100, show_spinner="Loading players stats...")
@@ -29,8 +74,6 @@ def prepare_players_stats_df(
 
     if df is None or len(df) == 0:
         return
-
-    df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
 
     df = df.loc[df["games"] <= games_count]
     if min_minutes is not None:
@@ -54,10 +97,13 @@ def prepare_players_stats_df(
         else:
             return pd.DataFrame()
 
-    if not df.empty:
+    if not df.empty and "sports_name" in df.columns and "role" in df.columns:
         df = df.groupby(by=["name"]).apply(_get_max_game_count_row)
+        df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")        
+        df = df.loc[~df["sports_name"].isna()]
         df.reset_index(drop=True, inplace=True)
         df.fillna(0, inplace=True)
+        df["role"] = df["role"].apply(rename_sports_role)
 
     return df
 
@@ -65,7 +111,10 @@ def prepare_players_stats_df(
 def plot_main_players_stats(
     players_stats_df: pd.DataFrame, 
     columns_names: List[str],
-    team_name: str = "All"
+    team_name: str = "All",
+    position: str = "All",
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None
 ) -> None:
     """
     Plot the main players' stats based on the given parameters.
@@ -78,23 +127,34 @@ def plot_main_players_stats(
     Returns:
         None
     """
-    if team_name != "All":
-        players_stats_df = players_stats_df.loc[players_stats_df["team"] == team_name]
+    df_columns = players_stats_df.columns
+    if team_name != "All" and "sports_team" in df_columns:
+        players_stats_df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
+    if position != "All" and "role" in df_columns:
+        players_stats_df = players_stats_df.loc[players_stats_df["role"] == position]
+    if min_price is not None and "price" in df_columns:
+        players_stats_df = players_stats_df.loc[players_stats_df["price"] >= min_price]
+    if max_price is not None and "price" in df_columns:
+        players_stats_df = players_stats_df.loc[players_stats_df["price"] <= max_price]
 
     columns = []
-    columns_names_set = set(columns_names)
-    for column_name in players_stats_df.columns:
-        if column_name in COMMON_COLUMNS or column_name in columns_names_set:
-            columns.append(column_name)
+    columns_names_set = set(COLUMNS_REVERSE_MAPPING.get(name) for name in columns_names)
+    for column_key, column_name in COLUMNS_NAMES:
+        if column_key in df_columns and \
+            (column_key in COMMON_COLUMNS or column_key in columns_names_set):
+            columns.append(column_key)
 
-    st.dataframe(players_stats_df[columns], hide_index=True)
+    players_stats_df = players_stats_df[columns].rename(columns=COLUMNS_MAPPING)
+    st.dataframe(players_stats_df, hide_index=True)
 
 
 def get_available_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
     result = []
     for column in list(players_stats_df.columns):
         if column not in COMMON_COLUMNS:
-            result.append(column)
+            column_name = COLUMNS_MAPPING.get(column)
+            if column_name is not None:
+                result.append(column_name)
     return result
 
 
@@ -102,7 +162,9 @@ def get_default_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
     result = []
     for column in list(players_stats_df.columns):
         if column not in COMMON_COLUMNS and column in DEFAULT_COLUMNS:
-            result.append(column)
+            column_name = COLUMNS_MAPPING.get(column)
+            if column_name is not None:
+                result.append(column_name)
     return result
 
 
@@ -126,11 +188,22 @@ def plot_free_kicks_stats(
         return
 
     df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")
-
-    if team_name != "All":
-        df = df.loc[df["team"] == team_name]
     df.dropna(axis=1, how="all", inplace=True)
+    df_columns = df.columns
+
+    if team_name != "All" and "sports_team" in df_columns:
+        df = df.loc[df["sports_team"] == team_name]
+    if "sports_name" in df_columns:
+        df = df.loc[~df["sports_name"].isna()]
     df.fillna(0, inplace=True)
+    if "role" in df_columns:
+        df["role"] = df["role"].apply(rename_sports_role)
+
+    columns = []
+    for column_name in df.columns:
+        if column_name in FREE_KICKS_COLUMNS:
+            columns.append(column_name)
+    df = df[columns].rename(columns=COLUMNS_MAPPING)
 
     st.dataframe(df, hide_index=True)
 
@@ -144,10 +217,14 @@ def get_player_stats(
         team_name is None or name is None:
         return
 
-    df = players_stats_df.loc[players_stats_df["team"] == team_name]
+    df_columns = players_stats_df.columns
+    if "sports_team" not in df_columns or "sports_name" not in df_columns:
+        return None
 
-    for row_ind, row in df.iterrows():
-        if row["name"] == name:
+    players_stats_df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
+
+    for row_ind, row in players_stats_df.iterrows():
+        if row["sports_name"] == name:
             return PlayerStatsInfo(**row)
 
     return None

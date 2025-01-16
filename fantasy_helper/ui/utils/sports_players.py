@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -7,13 +7,20 @@ import streamlit as st
 from fantasy_helper.utils.dataclasses import SportsPlayerDiff
 
 
+POSITIONS_MAPPING = {
+    "GOALKEEPER": "вр",
+    "DEFENDER": "зщ",
+    "MIDFIELDER": "пз",
+    "FORWARD": "нп",
+}
+
+
 def rename_sports_role(role: str) -> Optional[str]:
-    return {
-        "GOALKEEPER": "вр",
-        "DEFENDER": "зщ",
-        "MIDFIELDER": "пз",
-        "FORWARD": "нп",
-    }.get(role)
+    return POSITIONS_MAPPING.get(role)
+
+
+def get_available_positions() -> List[str]:
+    return list(POSITIONS_MAPPING.values())
 
 
 def color_popularity(

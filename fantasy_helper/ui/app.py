@@ -14,7 +14,7 @@ from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
 from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
 from fantasy_helper.ui.utils.players_stats import get_available_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
-from fantasy_helper.ui.utils.sports_players import plot_sports_players
+from fantasy_helper.ui.utils.sports_players import get_available_positions, plot_sports_players
 from fantasy_helper.utils.common import load_config
 from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
@@ -181,6 +181,12 @@ def get_leagues() -> Dict[str, str]:
     return r.json()
 
 
+@st.cache_data(ttl=36000, max_entries=10, show_spinner="Loading players prices...")
+def get_players_stats_prices(league_name: str) -> List[float]:
+    r = requests.get(api_url + f"/players_stats_prices/?league_name={league_name}")
+    return r.json()
+
+
 @st.cache_data(ttl=600, max_entries=10, show_spinner="Loading players popularity...")
 def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
     r = requests.get(api_url + f"/sports_players/?league_name={league_name}")
@@ -217,6 +223,8 @@ if authentication_status:
     coeffs_df = coeffs_to_df(st.session_state["league"], cur_tour_number)
     players_stats = get_players_league_stats(st.session_state["league"])
     players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
+    players_stats_positions = get_available_positions()
+    players_stats_prices = get_players_stats_prices(st.session_state["league"])
     lineups = get_lineups(st.session_state["league"])
     sports_players = get_sports_players(st.session_state["league"])
     sports_players_team_names = sorted(set([player.team_name for player in sports_players]))
@@ -260,26 +268,49 @@ if authentication_status:
     # plot stats
     centrize_header("Players stats")
 
-    columns = st.columns([2, 2, 2, 2])
+    columns = st.columns([2, 1, 1, 1, 2, 2, 2])
     with columns[0]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name",
-            label_visibility="visible",
+            label_visibility="visible"
         )
     with columns[1]:
-        st.session_state["games_count"] = st.number_input(
-            "Games count", value=3, min_value=1, max_value=30, step=1
+        st.selectbox(
+            "Позиция",
+            options=["All"] + players_stats_positions,
+            key="player_stats_position",
+            label_visibility="visible"
         )
     with columns[2]:
-        st.session_state["min_minutes"] = st.number_input(
-            "Minimum minutes", value=None, min_value=1, max_value=1000, step=1
+        st.selectbox(
+            "Мин цена",
+            options=players_stats_prices,
+            key="player_min_price",
+            label_visibility="visible",
+            index=0
         )
     with columns[3]:
+        st.selectbox(
+            "Макс цена",
+            options=players_stats_prices,
+            key="player_max_price",
+            label_visibility="visible",
+            index=len(players_stats_prices) - 1
+        )
+    with columns[4]:
+        st.session_state["games_count"] = st.number_input(
+            "Матчи", value=3, min_value=1, max_value=30, step=1
+        )
+    with columns[5]:
+        st.session_state["min_minutes"] = st.number_input(
+            "Минуты", value=None, min_value=1, max_value=1000, step=1
+        )
+    with columns[6]:
         st.write("")
         st.write("")
-        st.session_state["normalize"] = st.toggle("Normalize per 90 minutes")
+        st.session_state["normalize"] = st.toggle("Нормировать на 90 мин")
 
     players_stats_df = prepare_players_stats_df(
         players_stats,
@@ -297,7 +328,7 @@ if authentication_status:
     available_stats_columns = get_available_stats_columns(abs_players_stats_df)
     default_stats_columns = get_default_stats_columns(abs_players_stats_df)
     st.multiselect(
-        "Statistic columns",
+        "Выбранные опции",
         options=available_stats_columns,
         default=default_stats_columns,
         key="player_stats_column_names",
@@ -307,14 +338,17 @@ if authentication_status:
     plot_main_players_stats(
         players_stats_df,
         st.session_state["player_stats_column_names"],
-        st.session_state["player_stats_team_name"]
+        st.session_state["player_stats_team_name"],
+        st.session_state["player_stats_position"],
+        st.session_state["player_min_price"],
+        st.session_state["player_max_price"]
     )
 
     # player comparison
     columns = st.columns([4, 4, 1, 4, 4])
     with columns[0]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name_left",
             label_visibility="visible",
@@ -325,7 +359,7 @@ if authentication_status:
             st.session_state["player_stats_team_name_left"]
         )
         st.selectbox(
-            "Player name",
+            "Имя",
             options=["All"] + players_stats_players_names_left,
             key="player_stats_player_name_left",
             label_visibility="visible",
@@ -335,7 +369,7 @@ if authentication_status:
         centrize_text("vs")
     with columns[3]:
         st.selectbox(
-            "Team name",
+            "Команда",
             options=["All"] + players_stats_team_names,
             key="player_stats_team_name_right",
             label_visibility="visible",
@@ -346,7 +380,7 @@ if authentication_status:
             st.session_state["player_stats_team_name_right"]
         )
         st.selectbox(
-            "Player name",
+            "Имя",
             options=["All"] + players_stats_players_names_right,
             key="player_stats_player_name_right",
             label_visibility="visible",
@@ -376,7 +410,7 @@ if authentication_status:
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:
             st.selectbox(
-                "Team name",
+                "Команда",
                 options=["All"] + players_stats_team_names,
                 key="free_kicks_stats_team_name",
                 label_visibility="visible",
@@ -392,7 +426,7 @@ if authentication_status:
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:
             st.selectbox(
-                "Team name",
+                "Команда",
                 options=["All"] + sports_players_team_names,
                 key="sports_players_team_name",
                 label_visibility="visible",

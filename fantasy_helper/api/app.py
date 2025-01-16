@@ -71,7 +71,7 @@ async def get_players_stats_teams_names(league_name: str) -> List[str]:
     Returns:
         List[str]: A list of team names in the specified league.
     """
-    return Player_dao.get_teams_names(league_name)
+    return FS_Player_dao.get_teams_names(league_name)
 
 
 @app.get("/players_stats_players_names/")
@@ -86,7 +86,7 @@ async def get_players_stats_players_names(league_name: str, team_name: str) -> L
     Returns:
         List[str]: A list of player names in the specified league and team.
     """
-    return Player_dao.get_players_names(league_name, team_name)
+    return FS_Player_dao.get_players_names(league_name, team_name)
 
 
 @app.get("/coeffs/")
@@ -149,3 +149,17 @@ async def get_calendar(league_name: str) -> List[CalendarInfo]:
         List[CalendarInfo]: A list of CalendarInfo objects representing the calendars for the league.
     """
     return FS_Calendars_dao.get_calendar(league_name)
+
+
+@app.get("/players_stats_prices/")
+async def get_players_stats_prices(league_name: str) -> List[float]:
+    """
+    Get the maximum price for a given league.
+
+    Parameters:
+        league_name (str): The name of the league.
+
+    Returns:
+        int: The maximum price for the given league.
+    """
+    return FS_Sports_Players_dao.get_players_prices(league_name)
