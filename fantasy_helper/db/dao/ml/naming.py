@@ -139,8 +139,18 @@ class NamingDAO:
 
         # drop sports columns
         result = deepcopy(players_stats)
-        result.abs_stats.drop(["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"], axis=1, inplace=True)
-        result.norm_stats.drop(["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"], axis=1, inplace=True)    
+        result.abs_stats.drop(
+            labels=["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"],
+            axis=1,
+            inplace=True,
+            errors="raise"
+        )
+        result.norm_stats.drop(
+            labels=["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"],
+            axis=1,
+            inplace=True,
+            errors="raise"
+        )
         # result.free_kicks.drop(["team", "name"], axis=1, inplace=True)
 
         # join teams and players info
