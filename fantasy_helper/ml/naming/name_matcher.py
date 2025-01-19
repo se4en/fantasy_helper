@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import os.path as path
 import json
 
@@ -156,39 +156,99 @@ class NameMatcher:
         players_names_2_add = list(filter(lambda x: x not in result.values(), players_names_2))
         result.update(self._get_match_players_names(players_names_1_add, players_names_2_add))
         return result
+    
+    def _compute_free_and_delete_elements(
+            self, cur_names: List[str], cur_name_2_elem: Dict[str, Any]
+        ) -> Tuple[List[str], List[Any]]:
+        free_names, elems_to_delete = [], []
 
-    def match_teams(self, league_name: str) -> List[TeamName]:
-        sports_teams_names = self.get_sports_teams_names(league_name)
-        fbref_teams_names = self.get_fbref_teams_names(league_name)
-        xbet_teams_names = self.get_xbet_teams_names(league_name)
+        for cur_name in cur_names:
+            if cur_name in cur_name_2_elem:
+                del cur_name_2_elem[cur_name]
+            else:
+                free_names.append(cur_name)
+        for name, elem in cur_name_2_elem.items():
+            elems_to_delete.append(elem)
+        
+        return free_names, elems_to_delete
 
-        sports_2_fbref_teams = self.match_teams_names(sports_teams_names, fbref_teams_names)
-        sports_2_xbet_teams = self.match_teams_names(sports_teams_names, xbet_teams_names)
+    def match_teams(self, league_name: str, teams_names: List[TeamName]) -> Tuple[List[TeamName], List[TeamName]]:
+        cur_sports_teams_names = self.get_sports_teams_names(league_name)
+        cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
+        cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
 
-        result = []
-        for k, v in sports_2_fbref_teams.items():
-            result.append(TeamName(
-                league_name=league_name,
-                sports_name=k,
-                fbref_name=v,
-                xbet_name=sports_2_xbet_teams.get(k)
+        free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names = [], [], []
+        teams_to_add, teams_to_delete = [], []
+
+        cur_sports_name_2_team = {team_name.sports_name: team_name for team_name in teams_names}
+        cur_fbref_name_2_team = {team_name.fbref_name: team_name for team_name in teams_names}
+        cur_xbet_name_2_team = {team_name.xbet_name: team_name for team_name in teams_names}
+
+        free_sports_teams_names, sports_teams_to_delete = self._compute_free_and_delete_elements(
+            cur_sports_teams_names, cur_sports_name_2_team
+        )
+        free_fbref_teams_names, fbref_teams_to_delete = self._compute_free_and_delete_elements(
+            cur_fbref_teams_names, cur_fbref_name_2_team
+        )
+        free_xbet_teams_names, xbet_teams_to_delete = self._compute_free_and_delete_elements(
+            cur_xbet_teams_names, cur_xbet_name_2_team
+        )
+
+        # remove dublicated teams
+        if sports_teams_to_delete or fbref_teams_to_delete or xbet_teams_to_delete:
+            teams_to_delete = list(dict.fromkeys(
+                sports_teams_to_delete + fbref_teams_to_delete + xbet_teams_to_delete
             ))
 
-        return result
+        # compute new teams names
+        if free_sports_teams_names or free_fbref_teams_names or free_xbet_teams_names:
+            sports_2_fbref_teams = self.match_teams_names(free_sports_teams_names, free_fbref_teams_names)
+            sports_2_xbet_teams = self.match_teams_names(free_sports_teams_names, free_xbet_teams_names)
 
-    def match_players(self, league_name: str, team_name: TeamName) -> List[PlayerName]:
-        sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
-        fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
+            for k, v in sports_2_fbref_teams.items():
+                teams_to_add.append(TeamName(
+                    league_name=league_name,
+                    sports_name=k,
+                    fbref_name=v,
+                    xbet_name=sports_2_xbet_teams.get(k)
+                ))
 
-        sports_2_fbref_players = self.match_players_names(sports_players_names, fbref_players_names)
+        return teams_to_add, teams_to_delete
 
-        result = []
-        for k, v in sports_2_fbref_players.items():
-            result.append(PlayerName(
-                league_name=league_name,
-                team_name=team_name.name,
-                sports_name=k, 
-                fbref_name=v,
+    def match_players(
+            self, league_name: str, team_name: TeamName, players_names: List[PlayerName]
+        ) -> Tuple[List[PlayerName], List[PlayerName]]:
+        cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
+        cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
+        free_sports_players_names, free_fbref_players_names = [], []
+        players_to_add, players_to_delete = [], []
+
+        cur_sports_name_2_player = {player_name.sports_name: player_name for player_name in players_names}
+        cur_fbref_name_2_player = {player_name.fbref_name: player_name for player_name in players_names}
+
+        free_sports_players_names, sports_players_to_delete = self._compute_free_and_delete_elements(
+            cur_sports_players_names, cur_sports_name_2_player
+        )
+        free_fbref_players_names, fbref_players_to_delete = self._compute_free_and_delete_elements(
+            cur_fbref_players_names, cur_fbref_name_2_player
+        )
+
+        # remove dublicated players
+        if sports_players_to_delete or fbref_players_to_delete:
+            players_to_delete = list(dict.fromkeys(
+                sports_players_to_delete + fbref_players_to_delete
             ))
 
-        return result
+        # compute new players names
+        if free_sports_players_names or free_fbref_players_names:
+            sports_2_fbref_players = self.match_players_names(free_sports_players_names, free_fbref_players_names)
+
+            for k, v in sports_2_fbref_players.items():
+                players_to_add.append(PlayerName(
+                    league_name=league_name,
+                    team_name=team_name.name,
+                    sports_name=k, 
+                    fbref_name=v,
+                ))
+
+        return players_to_add, players_to_delete

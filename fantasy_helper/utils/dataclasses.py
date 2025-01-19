@@ -344,6 +344,13 @@ class FreeKicksInfo:
     penalty_goals: Optional[float] = None  # pens_made
     penalty_shots: Optional[float] = None  # pens_att
     free_kicks_shots: Optional[float] = None  # shots_free_kicks
+    # sports info
+    sports_name: Optional[str] = None
+    sports_team: Optional[str] = None
+    role: Optional[str] = None
+    price: Optional[float] = None
+    percent_ownership: Optional[float] = None
+    percent_ownership_diff: Optional[float] = None
 
 
 @dataclass
@@ -405,6 +412,9 @@ class TeamName:
             else:
                 self.name = self.fbref_name
 
+    def __hash__(self):
+        return hash((self.league_name, self.sports_name, self.fbref_name, self.xbet_name, self.name))
+
 
 @dataclass
 class PlayerName:
@@ -420,6 +430,10 @@ class PlayerName:
                 self.name = self.sports_name
             else:
                 self.name = self.fbref_name
+
+    def __hash__(self):
+        return hash((self.league_name, self.team_name, self.sports_name, self.fbref_name, self.name))
+
 
 @dataclass
 class PlayersLeagueStats:

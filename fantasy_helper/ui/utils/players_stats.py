@@ -200,9 +200,9 @@ def plot_free_kicks_stats(
         df["role"] = df["role"].apply(rename_sports_role)
 
     columns = []
-    for column_name in df.columns:
-        if column_name in FREE_KICKS_COLUMNS:
-            columns.append(column_name)
+    for column_key, column_name in COLUMNS_NAMES:
+        if column_key in df_columns and column_key in FREE_KICKS_COLUMNS:
+            columns.append(column_key)
     df = df[columns].rename(columns=COLUMNS_MAPPING)
 
     st.dataframe(df, hide_index=True)
@@ -250,7 +250,7 @@ def compute_players_stats_diff(
     titles = []
     left_bars, right_bars = [], []
     left_abs_values, right_abs_values = [], []
-    columns_names_set = set(columns_names)
+    columns_names_set = set(COLUMNS_REVERSE_MAPPING.get(name) for name in columns_names)
 
     for field in fields(PlayerStatsInfo):
         left_value = getattr(player_left, field.name)
@@ -269,7 +269,7 @@ def compute_players_stats_diff(
         left_value = field_type(left_value)
         right_value = field_type(right_value)
 
-        titles.append(field.name)
+        titles.append(COLUMNS_MAPPING.get(field.name) or field.name)
         if left_value > right_value:
             if left_value > 0:
                 left_bars.append(max(-(left_value - right_value) / left_value, -0.85))
@@ -324,7 +324,7 @@ def plot_players_stats_diff(
         shared_xaxes=True,
         shared_yaxes=True, 
         horizontal_spacing=0,
-        subplot_titles=(player_left.name, player_right.name)
+        subplot_titles=(player_left.sports_name, player_right.sports_name)
     )
 
     fig.append_trace(go.Bar(
@@ -335,8 +335,7 @@ def plot_players_stats_diff(
         orientation='h', 
         width=0.8, 
         showlegend=False, 
-        marker_color='#4472c4',
-        # name=player_left.name
+        marker_color='#4472c4'
     ), 1, 1)
     fig.append_trace(go.Bar(
         y=diff.titles,
@@ -346,8 +345,7 @@ def plot_players_stats_diff(
         orientation='h', 
         width=0.8, 
         showlegend=False, 
-        marker_color='#ed7d31',
-        # name=player_right.name
+        marker_color='#ed7d31'
     ), 1, 2)
 
     for abs_value, diff_value, label in zip(diff.left_abs_values, diff.left_bars, diff.titles):
