@@ -412,6 +412,9 @@ class TeamName:
             else:
                 self.name = self.fbref_name
 
+    def __hash__(self):
+        return hash((self.league_name, self.sports_name, self.fbref_name, self.xbet_name, self.name))
+
 
 @dataclass
 class PlayerName:
@@ -427,6 +430,10 @@ class PlayerName:
                 self.name = self.sports_name
             else:
                 self.name = self.fbref_name
+
+    def __hash__(self):
+        return hash((self.league_name, self.team_name, self.sports_name, self.fbref_name, self.name))
+
 
 @dataclass
 class PlayersLeagueStats:
