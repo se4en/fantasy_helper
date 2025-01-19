@@ -200,9 +200,9 @@ def plot_free_kicks_stats(
         df["role"] = df["role"].apply(rename_sports_role)
 
     columns = []
-    for column_name in df.columns:
-        if column_name in FREE_KICKS_COLUMNS:
-            columns.append(column_name)
+    for column_key, column_name in COLUMNS_NAMES:
+        if column_key in df_columns and column_key in FREE_KICKS_COLUMNS:
+            columns.append(column_key)
     df = df[columns].rename(columns=COLUMNS_MAPPING)
 
     st.dataframe(df, hide_index=True)
