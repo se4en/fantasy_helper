@@ -248,19 +248,19 @@ class NamingDAO:
             labels=["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"],
             axis=1,
             inplace=True,
-            errors="raise"
+            errors="ignore"
         )
         result.norm_stats.drop(
             labels=["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"],
             axis=1,
             inplace=True,
-            errors="raise"
+            errors="ignore"
         )
         result.free_kicks.drop(
             labels=["sports_team", "sports_name", "role", "price", "percent_ownership", "percent_ownership_diff"],
             axis=1,
             inplace=True,
-            errors="raise"
+            errors="ignore"
         )
 
         # join teams and players info
