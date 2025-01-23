@@ -10,23 +10,12 @@ from fantasy_helper.utils.dataclasses import MatchInfo
 
 class FSCoeffsDAO:
     def get_coeffs(
-        self, league_name: str, tour: Literal["cur", "next"]
-    ) -> List[MatchInfo]:
-        """
-        Retrieves the coefficients for a given league and tour.
-
-        Args:
-            league_name (str): The name of the league.
-            tour (Literal["cur", "next"]): The tour, either "cur" for the current tour or "next" for the next tour.
-
-        Returns:
-            List[MatchInfo]: A list of MatchInfo objects representing the coefficients for the given league and tour.
-        """
+        self, league_name: str) -> List[MatchInfo]:
         db_session: SQLSession = Session()
 
         cur_tour_matches = (
             db_session.query(FSCoeffs)
-            .filter(and_(FSCoeffs.league_name == league_name, FSCoeffs.tour == tour))
+            .filter(FSCoeffs.league_name == league_name)
             .all()
         )
 
@@ -37,6 +26,7 @@ class FSCoeffsDAO:
                 home_team=match.home_team,
                 away_team=match.away_team,
                 start_datetime=match.start_datetime,
+                tour_number=match.tour_number,
                 total_1_over_1_5=match.total_1_over_1_5,
                 total_2_over_1_5=match.total_2_over_1_5,
                 total_1_under_0_5=match.total_1_under_0_5,
@@ -51,24 +41,13 @@ class FSCoeffsDAO:
         return result
 
     def update_coeffs(
-        self, league_name: str, tour: Literal["cur", "next"], matches: List[MatchInfo]
+        self, league_name: str, matches: List[MatchInfo]
     ) -> None:
-        """
-        Update the coefficients for a given league and tour with new matches.
-
-        Args:
-            league_name (str): The name of the league.
-            tour (Literal["cur", "next"]): The tour to update the coefficients for.
-            matches (List[MatchInfo]): The list of new matches.
-
-        Returns:
-            None: This function does not return anything.
-        """
         db_session: SQLSession = Session()
 
         # remove all previous matches
         db_session.query(FSCoeffs).filter(
-            and_(FSCoeffs.league_name == league_name, FSCoeffs.tour == tour)
+            FSCoeffs.league_name == league_name
         ).delete()
 
         # add new matches
@@ -78,8 +57,8 @@ class FSCoeffsDAO:
                     home_team=match.home_team,
                     away_team=match.away_team,
                     league_name=league_name,
-                    tour=tour,
                     start_datetime=match.start_datetime,
+                    tour_number=match.tour_number,
                     url=match.url,
                     total_1_over_1_5=match.total_1_over_1_5,
                     total_2_over_1_5=match.total_2_over_1_5,

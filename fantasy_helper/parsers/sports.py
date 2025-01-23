@@ -3,11 +3,12 @@ import os
 import logging
 import json
 import pytz
+from datetime import datetime
 
 import requests
 import iso8601
 
-from fantasy_helper.utils.dataclasses import LeagueInfo, SportsPlayerStats, SportsTourInfo
+from fantasy_helper.utils.dataclasses import LeagueInfo, SportsMatchInfo, SportsPlayerStats, SportsTourInfo
 
 
 class SportsParser:
@@ -78,10 +79,25 @@ class SportsParser:
     def _parse_tour_info(self, league_name: str, tour_info: Optional[Dict]) -> Optional[SportsTourInfo]:
         if tour_info is None:
             return None
+        
+        tour_matches = []
+        for match in tour_info.get("matches", []):
+            tour_matches.append(
+                SportsMatchInfo(
+                    id=match["id"],
+                    match_status=match["matchStatus"],
+                    scheduled_at_stamp=match["scheduledAtStamp"],
+                    date_only=match["dateOnly"],
+                    home_team=match.get("home", {}).get("team", {}).get("name", {}),
+                    away_team=match.get("away", {}).get("team", {}).get("name", {}),
+                    scheduled_at_datetime=datetime.fromtimestamp(match["scheduledAtStamp"])
+                )
+            )
+
         return SportsTourInfo(
             league_name=league_name,
             number=int(tour_info["name"].split(" ")[0]),
-            matches_count=len(tour_info["matches"]),
+            matches=tour_matches,
             deadline=iso8601.parse_date(tour_info["startedAt"]).replace(
                 tzinfo=pytz.UTC
             ),
@@ -101,6 +117,26 @@ class SportsParser:
         query_id = list(data["data"].keys())[0]
         for tour_info in data["data"][query_id]["squads"][0]["season"]["tours"]:
             result.append(self._parse_tour_info(league_name, tour_info))
+
+        return result
+    
+    def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[SportsMatchInfo]]:
+        schedule = self.get_schedule(league_name)
+        if schedule is None:
+            return None
+
+        tour_index = 0
+        while tour_index < len(schedule) and schedule[tour_index].status != "OPENED":
+            tour_index += 1
+
+        result = []
+        added_tours = 0
+        while tour_index < len(schedule) and added_tours < tour_count:
+            for match in schedule[tour_index].matches:
+                match.tour_number = schedule[tour_index].number
+                result.append(match)
+            tour_index += 1
+            added_tours += 1
 
         return result
 

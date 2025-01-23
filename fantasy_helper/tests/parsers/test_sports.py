@@ -21,7 +21,6 @@ def test_basic_current_tour_info(leagues: List[LeagueInfo], parser: SportsParser
     for league in leagues:
         current_tour = parser.get_current_tour(league.name)
         assert current_tour is not None and current_tour.number > 0
-        assert current_tour.matches_count is not None and current_tour.matches_count > 0
         assert isinstance(current_tour.deadline, datetime.datetime)
 
 

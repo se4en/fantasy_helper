@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session as SQLSession
 import pandas as pd
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, SportsPlayerDiff, TeamName, PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo, PlayerName, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.ml.player_name import PlayerName as DBPlayerName
 from fantasy_helper.db.models.ml.team_name import TeamName as DBTeamName
@@ -270,5 +270,36 @@ class NamingDAO:
         result.abs_stats = result.abs_stats.merge(players_info, how="left", on=["name", "sports_team"])
         result.norm_stats = result.norm_stats.merge(players_info, how="left", on=["name", "sports_team"])
         result.free_kicks = result.free_kicks.merge(players_info, how="left", on=["name", "sports_team"])
+
+        return result
+
+    def add_sports_info_to_coeffs(
+            self,
+            league_name: str,
+            coeffs: List[MatchInfo],
+            sports_matches: List[SportsMatchInfo]
+        ) -> List[MatchInfo]:
+        teams_names = self.get_teams(league_name)
+        xbet_team_2_sports = {
+            team.xbet_name: team.sports_name
+            for team in teams_names
+        }
+
+        teams_2_coeffs = {
+            (
+                xbet_team_2_sports.get(coeff.home_team), 
+                xbet_team_2_sports.get(coeff.away_team)
+            ): coeff
+            for coeff in coeffs
+        }
+
+        result = []
+        for match in sports_matches:
+            coeff_match = teams_2_coeffs.get((match.home_team, match.away_team))
+            if coeff_match is not None:
+                coeff_match.home_team = match.home_team
+                coeff_match.away_team = match.away_team
+                coeff_match.tour_number = match.tour_number
+                result.append(coeff_match)
 
         return result

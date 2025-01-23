@@ -14,7 +14,7 @@ class FSCoeffs(Base):
     home_team = Column(String, nullable=False)
     away_team = Column(String, nullable=False)
     league_name = Column(String, nullable=False)
-    tour = Column(String, nullable=False)
+    tour_number = Column(Integer, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
     url = Column(String, nullable=True)
     total_1_over_1_5 = Column(Float, nullable=True)
@@ -27,7 +27,7 @@ class FSCoeffs(Base):
         home_team: str,
         away_team: str,
         league_name: str,
-        tour: str,
+        tour_number: int,
         start_datetime: datetime,
         url: t.Optional[str],
         total_1_over_1_5: t.Optional[float],
@@ -38,7 +38,7 @@ class FSCoeffs(Base):
         self.home_team = home_team
         self.away_team = away_team
         self.league_name = league_name
-        self.tour = tour
+        self.tour_number = tour_number
         self.start_datetime = start_datetime
         self.url = url
         self.total_1_over_1_5 = total_1_over_1_5
