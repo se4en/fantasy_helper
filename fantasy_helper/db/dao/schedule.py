@@ -1,16 +1,17 @@
 from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import List
+import os.path as path
 
 from sqlalchemy.orm import Session as SQLSession
-from sqlalchemy import func
+from sqlalchemy import and_, func
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.schedule import Schedule
 from fantasy_helper.db.models.table import Table
-from fantasy_helper.parsers.fbref import FbrefParser
+from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo
+from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, SportsMatchInfo
 
 
 utc = timezone.utc
@@ -21,17 +22,25 @@ class ScheduleDao:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
-        self._fbref_parser = FbrefParser(leagues=self._leagues)
+        self._sports_parser = SportsParser(
+            leagues=self._leagues,
+            queries_path=path.join(path.dirname(__file__), "../../parsers/queries"),
+        )
 
     def get_leagues(self) -> List[str]:
         return [league.name for league in self._leagues]
 
     def get_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
+        current_datetime = datetime.now()
+
         db_session: SQLSession = Session()
 
         all_league_schedules = (
             db_session.query(Schedule)
-            .filter(Schedule.league_name == league_name)
+            .filter(and_(
+                Schedule.league_name == league_name,
+                Schedule.date >= current_datetime.date()
+            ))
             .subquery()
         )
 
@@ -71,17 +80,22 @@ class ScheduleDao:
         return result
 
     def update_schedules_all_leagues(self) -> None:
-        for league_name in self._fbref_parser.get_all_leagues():
-            schedule_rows: List[LeagueScheduleInfo] = self._fbref_parser.get_league_schedule(
-                league_name
+        for league_name in self._sports_parser.get_leagues():
+            schedule_rows: List[SportsMatchInfo] = self._sports_parser.get_next_matches(
+                league_name=league_name, tour_count=5
             )
 
             db_session: SQLSession = Session()
 
-            for table_row in schedule_rows:
+            for match in schedule_rows:
                 db_session.add(
                     Schedule(
-                        **asdict(table_row), timestamp=datetime.now().replace(tzinfo=utc)
+                        league_name=league_name,
+                        home_team=match.home_team,
+                        away_team=match.away_team,
+                        gameweek=match.tour_number,
+                        date=match.scheduled_at_datetime.date() if match.scheduled_at_datetime else None,
+                        timestamp=datetime.now().replace(tzinfo=utc)
                     )
                 )
 

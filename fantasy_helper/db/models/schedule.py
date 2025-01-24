@@ -27,9 +27,9 @@ class Schedule(Base):
         home_team: str,
         away_team: str,
         gameweek: int,
-        date: Optional[datetime.date],
-        home_goals: Optional[int],
-        away_goals: Optional[int],
+        date: Optional[datetime.date] = None,
+        home_goals: Optional[int] = None,
+        away_goals: Optional[int] = None,
     ):
         self.league_name = league_name
         self.timestamp = timestamp
