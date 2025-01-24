@@ -10,11 +10,12 @@ from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
+from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
+from fantasy_helper.db.dao.ml.naming import NamingDAO
 from fantasy_helper.parsers.xbet import XbetParser
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
-from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 
 
 utc = timezone.utc
@@ -33,59 +34,35 @@ class CoeffDAO:
             leagues=self._leagues,
             queries_path=path.join(path.dirname(__file__), "../../parsers/queries"),
         )
+        self._naming_dao = NamingDAO()
 
-    def get_coeffs_message(
-        self, league: str, is_cur_tour: bool = True
-    ) -> Optional[str]:
-        # get current tour
-        cur_tour = self._sports_parser.get_cur_tour(league)
-        if cur_tour is None:
-            # TODO logging
-            return None
-        if not is_cur_tour:
-            cur_tour += 1
-
-        db_session: SQLSession = Session()
-        coeffs = db_session.query(Coeff).filter(
-            and_(Coeff.league == league, Coeff.tour == cur_tour)
-        )
-        if not coeffs:
-            return None
-        db_session.close()
-
-        return self.__coeffs_to_str(coeffs, is_cur_tour)
-
-    def get_coeffs(
-        self, league_name: str, tour: Literal["cur", "next"] = "cur"
-    ) -> List[MatchInfo]:
-        current_tour = self._sports_parser.get_current_tour(league_name)
-        if current_tour is not None and current_tour.number is not None:
-            cur_tour_number = current_tour.number
-        else:
-            cur_tour_number = 0
-        tour_number = cur_tour_number if tour == "cur" else cur_tour_number + 1
+    def get_actual_coeffs(self, league_name: str) -> List[MatchInfo]:
+        current_datetime = datetime.now()
 
         db_session: SQLSession = Session()
 
-        cur_tour_rows = (
+        actual_coeffs_rows = (
             db_session.query(Coeff)
-            .filter(and_(Coeff.league_name == league_name, Coeff.tour == tour_number))
+            .filter(and_(
+                Coeff.league_name == league_name, 
+                Coeff.start_datetime >= current_datetime
+            ))
             .subquery()
         )
 
-        grouped_by_matches = db_session.query(
-            cur_tour_rows,
+        actual_coeffs_matches = db_session.query(
+            actual_coeffs_rows,
             func.rank()
             .over(
-                order_by=cur_tour_rows.c.timestamp.desc(),
-                partition_by=(cur_tour_rows.c.home_team, cur_tour_rows.c.away_team),
+                order_by=actual_coeffs_rows.c.timestamp.desc(),
+                partition_by=(actual_coeffs_rows.c.home_team, actual_coeffs_rows.c.away_team),
             )
             .label("rnk"),
         ).subquery()
 
-        cur_tour_matches = (
-            db_session.query(grouped_by_matches)
-            .filter(grouped_by_matches.c.rnk == 1)
+        actual_coeffs = (
+            db_session.query(actual_coeffs_matches)
+            .filter(actual_coeffs_matches.c.rnk == 1)
             .all()
         )
 
@@ -101,7 +78,7 @@ class CoeffDAO:
                 total_1_under_0_5=match.total_1_under_0_5,
                 total_2_under_0_5=match.total_2_under_0_5,
             )
-            for match in cur_tour_matches
+            for match in actual_coeffs
         ]
 
         db_session.commit()
@@ -117,26 +94,14 @@ class CoeffDAO:
             return cur_tour.number
 
     def update_coeffs(self, league_name: str) -> None:
-        current_tour = self._sports_parser.get_current_tour(league_name)
-        next_tour = self._sports_parser.get_next_tour(league_name)
-        if current_tour is None or next_tour is None:
-            return None
         matches = self._xbet_parser.get_league_matches(league_name)
 
         db_session: SQLSession = Session()
 
         for match in matches:
-            if match.start_datetime < current_tour.deadline:
-                match_tour = current_tour.number - 1
-            elif match.start_datetime < next_tour.deadline:
-                match_tour = current_tour.number
-            else:
-                match_tour = next_tour.number
-
             db_session.add(
                 Coeff(
                     **match.__dict__,
-                    tour=match_tour,
                     timestamp=datetime.now().replace(tzinfo=utc),
                 )
             )
@@ -152,7 +117,11 @@ class CoeffDAO:
         feature_store = FSCoeffsDAO()
 
         for league in self._leagues:
-            cur_tour_matches = self.get_coeffs(league.name, "cur")
-            next_tour_matches = self.get_coeffs(league.name, "next")
-            feature_store.update_coeffs(league.name, "cur", cur_tour_matches)
-            feature_store.update_coeffs(league.name, "next", next_tour_matches)
+            actual_coeffs = self.get_actual_coeffs(league.name)
+            sports_matches = self._sports_parser.get_next_matches(
+                league.name, 2
+            )
+            sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
+                league.name, actual_coeffs, sports_matches
+            )
+            feature_store.update_coeffs(league.name, sports_coeffs)

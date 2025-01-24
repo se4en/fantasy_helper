@@ -14,7 +14,7 @@ class Coeff(Base):
     home_team = Column(String, nullable=False)
     away_team = Column(String, nullable=False)
     league_name = Column(String, nullable=False)
-    tour = Column(Integer, nullable=False)
+    tour_number = Column(Integer, nullable=True)
     start_datetime = Column(DateTime, nullable=False)
     url = Column(String, nullable=True)
     timestamp = Column(DateTime, nullable=False)
@@ -92,8 +92,8 @@ class Coeff(Base):
         home_team: str,
         away_team: str,
         league_name: str,
-        tour: int,
         start_datetime: datetime,
+        tour_number: Optional[int],
         url: Optional[str],
         timestamp: Optional[datetime],
         result_1: Optional[float],
@@ -161,7 +161,7 @@ class Coeff(Base):
         self.home_team = home_team
         self.away_team = away_team
         self.league_name = league_name
-        self.tour = tour
+        self.tour_number = tour_number
         self.url = url
         self.start_datetime = start_datetime
         self.timestamp = timestamp

@@ -12,6 +12,7 @@ class MatchInfo:
     home_team: str
     away_team: str
     start_datetime: Optional[datetime] = None
+    tour_number: Optional[int] = None
 
     result_1: Optional[float] = None
     result_x: Optional[float] = None
@@ -387,10 +388,22 @@ class SportsPlayerDiff:
 
 
 @dataclass
+class SportsMatchInfo:
+    id: int
+    match_status: str
+    scheduled_at_stamp: int
+    date_only: bool
+    home_team: Optional[str] = None
+    away_team: Optional[str] = None
+    scheduled_at_datetime: Optional[datetime] = None
+    tour_number: Optional[int] = None
+
+
+@dataclass
 class SportsTourInfo:
     league_name: str
     number: int
-    matches_count: int
+    matches: List[SportsMatchInfo]
     deadline: datetime
     status: str
 
