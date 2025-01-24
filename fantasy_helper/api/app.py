@@ -90,18 +90,17 @@ async def get_players_stats_players_names(league_name: str, team_name: str) -> L
 
 
 @app.get("/coeffs/")
-async def get_coeffs(league_name: str, tour: Literal["cur", "next"]) -> List[MatchInfo]:
+async def get_coeffs(league_name: str) -> List[MatchInfo]:
     """
     Retrieve the coefficients for a given league and tour.
 
     Parameters:
         league_name (str): The name of the league.
-        tour (Literal["cur", "next"]): The tour to retrieve coefficients for.
 
     Returns:
         List[MatchInfo]: The list of coefficients for the given league and tour.
     """
-    return FS_Coeff_dao.get_coeffs(league_name, tour)
+    return FS_Coeff_dao.get_coeffs(league_name)
 
 
 @app.get("/tour_number/")

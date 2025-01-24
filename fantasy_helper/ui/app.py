@@ -10,7 +10,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from hydra.utils import instantiate
 
-from fantasy_helper.ui.utils.coeffs import get_stat_from_mathes, plot_coeff_df
+from fantasy_helper.ui.utils.coeffs import get_coeffs_info_from_mathes, get_unique_teams, plot_coeff_df
 from fantasy_helper.ui.utils.common import centrize_header, centrize_text
 from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
 from fantasy_helper.ui.utils.players_stats import get_available_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
@@ -49,54 +49,21 @@ except KeyError:
     authentication_status = False
 
 
-@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading tour number...")
-def get_tour_number(league_name: str) -> Optional[int]:
-    cur_tour_number_r = requests.get(
-        api_url + f"/tour_number/?league_name={league_name}"
-    )
-    cur_tour_number = cur_tour_number_r.json()
-    return cur_tour_number
-
-
 @st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading coefficients...")
-def coeffs_to_df(league_name: str, first_tour_number: Optional[int]) -> pd.DataFrame:
+def coeffs_to_df(league_name: str) -> pd.DataFrame:
     """
     Function to convert coefficients to a DataFrame.
 
     Args:
         league_name (str): The name of the league.
-        first_tour_number (Optional[int]): The tour number.
 
     Returns:
         pd.DataFrame: The DataFrame containing the coefficients information for each team in the league.
     """
-    cur_tour_r = requests.get(api_url + f"/coeffs/?league_name={league_name}&tour=cur")
-    next_tour_r = requests.get(
-        api_url + f"/coeffs/?league_name={league_name}&tour=next"
-    )
-
-    cur_tour_matches = [MatchInfo(**match) for match in cur_tour_r.json()]
-    next_tour_matches = [MatchInfo(**match) for match in next_tour_r.json()]
-
-    team_stats = get_stat_from_mathes(cur_tour_matches, next_tour_matches)
-    unique_teams = sorted(team_stats.keys())
-
-    if first_tour_number is None:
-        first_tour_number = 0
-
-    coeffs_info = defaultdict(list)
-    for team_name in unique_teams:
-        coeffs_info["Команда"].append(team_name)
-        for tour_number, tour_type in enumerate(("cur", "next"), start=first_tour_number):
-            coeffs_info[f"Атака {tour_number} тур"].append(
-                team_stats[team_name].get(f"{tour_type}_attack", None)
-            )
-            coeffs_info[f"Защита {tour_number} тур"].append(
-                team_stats[team_name].get(f"{tour_type}_defend", None)
-            )
-            coeffs_info[f"Соперник {tour_number} тур"].append(
-                team_stats[team_name].get(f"{tour_type}_vs_name", None)
-            )
+    matches_r = requests.get(api_url + f"/coeffs/?league_name={league_name}")
+    matches = [MatchInfo(**match) for match in matches_r.json()]
+    unique_teams = get_unique_teams(matches)
+    coeffs_info = get_coeffs_info_from_mathes(matches, unique_teams)
 
     return pd.DataFrame(coeffs_info)
 
@@ -211,7 +178,7 @@ if authentication_status:
     st.session_state["min_minutes"] = 5
 
     with st.columns(3)[1]:
-        centrize_header("League name")
+        centrize_header("Чемпионат")
         st.session_state["league"] = leagues[
             st.selectbox(
                 "League name", sorted(leagues.keys()), label_visibility="collapsed"
@@ -219,8 +186,7 @@ if authentication_status:
         ]
     st.write("")
 
-    cur_tour_number = get_tour_number(st.session_state["league"])
-    coeffs_df = coeffs_to_df(st.session_state["league"], cur_tour_number)
+    coeffs_df = coeffs_to_df(st.session_state["league"])
     players_stats = get_players_league_stats(st.session_state["league"])
     players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
     players_stats_positions = get_available_positions()
@@ -233,15 +199,15 @@ if authentication_status:
     left, right = st.columns([4, 2])
     # plot coeffs
     with left:
-        centrize_header("Coefficients")
+        centrize_header("Котировки")
         plot_coeff_df(coeffs_df)
 
     # plot lineup
     with right:
-        centrize_header("Lineups")
+        centrize_header("Составы")
         lineups = {lineup.team_name: lineup.lineup for lineup in lineups}
         team_name = st.selectbox(
-            "Team", sorted(list(lineups.keys())), label_visibility="visible"
+            "Команда", sorted(list(lineups.keys())), label_visibility="visible"
         )
         if team_name is not None:
             formation, positions, names = lineup_to_formation(lineups[team_name])
@@ -252,12 +218,12 @@ if authentication_status:
                 st.write(lineups[team_name])
 
     # plot calendar
-    centrize_header("Calendar")
+    centrize_header("Календарь")
 
     columns = st.columns([1, 6])
     with columns[0]:
         st.selectbox(
-            "Calendar type",
+            "Тип календаря",
             options=["points", "goals", "xg"],
             key="calendar_type",
             label_visibility="visible",
@@ -266,7 +232,7 @@ if authentication_status:
         plot_calendar_df(calendar_df, st.session_state["calendar_type"])
 
     # plot stats
-    centrize_header("Players stats")
+    centrize_header("Статистика игроков")
 
     columns = st.columns([2, 1, 1, 1, 2, 2, 2])
     with columns[0]:
@@ -405,7 +371,7 @@ if authentication_status:
     columns = st.columns([1, 1])
     # plot free kicks stats
     with columns[0]:
-        centrize_header("Free kicks stats")
+        centrize_header("Исполнители стандартов")
 
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:
@@ -421,7 +387,7 @@ if authentication_status:
         )
     # plot players popularity
     with columns[1]:
-        centrize_header("Players popularity")
+        centrize_header("Популярность игроков")
 
         subcolumns = st.columns([1, 2, 1])
         with subcolumns[1]:

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List
 
 import pandas as pd
@@ -6,40 +7,67 @@ import streamlit as st
 from fantasy_helper.utils.dataclasses import MatchInfo
 
 
-def get_stat_from_mathes(
-    cur_tour_matches: List[MatchInfo], next_tour_matches: List[MatchInfo]
-) -> dict:
-    """
-    Generate a dictionary containing statistical information for each team based on the given lists of current tour matches and next tour matches.
-
-    Args:
-        cur_tour_matches (List[MatchInfo]): A list of MatchInfo objects representing the matches in the current tour.
-        next_tour_matches (List[MatchInfo]): A list of MatchInfo objects representing the matches in the next tour.
-
-    Returns:
-        dict: A dictionary with team names as keys and nested dictionaries as values. Each nested dictionary contains statistical information for the corresponding team, including the opponent's name in the current and next tour, attack and defense statistics for the current tour, and attack and defense statistics for the next tour.
-    """
+def get_unique_teams(matches: List[MatchInfo]) -> List[str]:
     unique_teams = set(
-        [match.home_team for match in cur_tour_matches + next_tour_matches]
-        + [match.away_team for match in cur_tour_matches + next_tour_matches]
+        [match.home_team for match in matches] + [match.away_team for match in matches]
     )
-    result = {team_name: {} for team_name in unique_teams}
+    return sorted(unique_teams)
 
-    for matches, tour_type in zip(
-        (cur_tour_matches, next_tour_matches), ("cur", "next")
-    ):
-        for match in matches:
-            result[match.home_team][f"{tour_type}_vs_name"] = match.away_team + " [д]"
-            # result[match.home_team][f"{tour_type}_vs_loc"] = ""
-            result[match.home_team][f"{tour_type}_attack"] = match.total_1_over_1_5
-            result[match.home_team][f"{tour_type}_defend"] = match.total_2_under_0_5
 
-            result[match.away_team][f"{tour_type}_vs_name"] = match.home_team + " [г]"
-            # result[match.away_team][f"{tour_type}_vs_loc"] = "away"
-            result[match.away_team][f"{tour_type}_attack"] = match.total_2_over_1_5
-            result[match.away_team][f"{tour_type}_defend"] = match.total_1_under_0_5
+def get_coeffs_info_from_mathes(matches: List[MatchInfo], unique_teams: List[str]) -> dict:
+    team_2_matches = dict()
+    for team_name in unique_teams:
+        team_2_matches[team_name] = dict()
 
-    return result
+    unique_tours = set()
+    for match in matches:
+        if str(match.tour_number) in match.home_team:
+            home_tour_name = str(match.tour_number) + " тур доп"
+        else:
+            home_tour_name = str(match.tour_number) + " тур"
+        team_2_matches[match.home_team][home_tour_name] = match
+        unique_tours.add(home_tour_name)
+
+        if str(match.tour_number) in match.away_team:
+            away_tour_name = str(match.tour_number) + " тур доп"
+        else:
+            away_tour_name = str(match.tour_number) + " тур"
+        team_2_matches[match.away_team][away_tour_name] = match
+        unique_tours.add(away_tour_name)
+    unique_tours = sorted(unique_tours)
+
+    coeffs_info = defaultdict(list)
+    for team_name, matches in team_2_matches.items():
+        coeffs_info["Команда"].append(team_name)
+        for tour_name in unique_tours:
+            if tour_name in matches:
+                tour_match = matches[tour_name]
+                if team_name == tour_match.home_team:
+                    coeffs_info[f"Атака {tour_name}"].append(
+                        tour_match.total_1_over_1_5
+                    )
+                    coeffs_info[f"Защита {tour_name}"].append(
+                        tour_match.total_2_under_0_5
+                    )
+                    coeffs_info[f"Соперник {tour_name}"].append(
+                        tour_match.away_team + " [д]"
+                    )
+                else:
+                    coeffs_info[f"Атака {tour_name}"].append(
+                        tour_match.total_2_over_1_5
+                    )
+                    coeffs_info[f"Защита {tour_name}"].append(
+                        tour_match.total_1_under_0_5
+                    )
+                    coeffs_info[f"Соперник {tour_name}"].append(
+                        tour_match.home_team + " [г]"
+                    )
+            else:
+                coeffs_info[f"Атака {tour_name}"].append(None)
+                coeffs_info[f"Защита {tour_name}"].append(None)
+                coeffs_info[f"Соперник {tour_name}"].append(None)
+
+    return coeffs_info
 
 
 def color_coeff(
