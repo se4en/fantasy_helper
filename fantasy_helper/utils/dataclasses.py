@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, date
+import datetime
 from typing import List, Optional, Dict
 
 import pandas as pd
@@ -11,7 +11,7 @@ class MatchInfo:
     league_name: str
     home_team: str
     away_team: str
-    start_datetime: Optional[datetime] = None
+    start_datetime: Optional[datetime.datetime] = None
     tour_number: Optional[int] = None
 
     result_1: Optional[float] = None
@@ -132,9 +132,14 @@ class LeagueScheduleInfo:
     home_team: str
     away_team: str
     gameweek: int
-    date: Optional[date]
-    home_goals: Optional[int]
-    away_goals: Optional[int]
+    date: Optional[datetime.date] = None
+    home_goals: Optional[int] = None
+    away_goals: Optional[int] = None
+    match_url: Optional[str] = None
+    match_parsed: bool = False
+
+    def __hash__(self):
+        return hash((self.league_name, self.home_team, self.away_team, self.gameweek))
 
 
 @dataclass
@@ -395,7 +400,7 @@ class SportsMatchInfo:
     date_only: bool
     home_team: Optional[str] = None
     away_team: Optional[str] = None
-    scheduled_at_datetime: Optional[datetime] = None
+    scheduled_at_datetime: Optional[datetime.datetime] = None
     tour_number: Optional[int] = None
 
 
@@ -404,7 +409,7 @@ class SportsTourInfo:
     league_name: str
     number: int
     matches: List[SportsMatchInfo]
-    deadline: datetime
+    deadline: datetime.datetime
     status: str
 
 

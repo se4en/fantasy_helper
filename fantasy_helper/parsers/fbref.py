@@ -111,6 +111,9 @@ class FbrefParser:
 
     def get_shot_creation_leagues(self) -> Dict[str, str]:
         return self._shot_creation_leagues
+    
+    def get_schedule_leagues(self) -> Dict[str, str]:
+        return self._schedule_leagues
 
     def _parse_player_shooting_stat(
         self, player: Any, league_name: str
@@ -790,8 +793,10 @@ class FbrefParser:
                 goals = _score.text.split("–")
                 _home_goals = cast_to_int(goals[0])
                 _away_goals = cast_to_int(goals[1])
+                _match_url = _score.find("a").get("href")
             else:
                 _home_goals, _away_goals = None, None
+                _match_url = None
 
             return LeagueScheduleInfo(
                 league_name=league_name,
@@ -800,7 +805,8 @@ class FbrefParser:
                 away_team=_away_team.text.strip(),
                 date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
                 home_goals=_home_goals,
-                away_goals=_away_goals
+                away_goals=_away_goals,
+                match_url=_match_url
             )
         else:
             return None
