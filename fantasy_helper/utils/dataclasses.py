@@ -244,28 +244,6 @@ class PlayerStats:
     passes_offsides: Optional[int] = None
     passes_blocked: Optional[int] = None
     # possesion
-    touches: Optional[int] = None
-    touches_def_pen_area: Optional[int] = None
-    touches_def_3rd: Optional[int] = None
-    touches_mid_3rd: Optional[int] = None
-    touches_att_3rd: Optional[int] = None
-    touches_att_pen_area: Optional[int] = None
-    touches_live_ball: Optional[int] = None
-    take_ons: Optional[int] = None
-    take_ons_won: Optional[int] = None
-    take_ons_won_pct: Optional[float] = None
-    take_ons_tackled: Optional[int] = None
-    take_ons_tackled_pct: Optional[float] = None
-    carries: Optional[int] = None
-    carries_distance: Optional[int] = None
-    carries_progressive_distance: Optional[int] = None
-    progressive_carries: Optional[int] = None
-    carries_into_final_third: Optional[int] = None
-    carries_into_penalty_area: Optional[int] = None
-    miscontrols: Optional[int] = None
-    dispossessed: Optional[int] = None
-    passes_received: Optional[int] = None
-    progressive_passes_received: Optional[int] = None
     # shot creation
     sca: Optional[int] = None
     sca_per90: Optional[float] = None
@@ -286,6 +264,182 @@ class PlayerStats:
     # cards
     yellow_cards: Optional[int] = None
     red_cards: Optional[int] = None
+
+
+@dataclass
+class PlayerMatchStats:
+    # common
+    name: str
+    player_id: str
+    league_name: str
+    team_name: str
+    minutes: Optional[int] = None
+    player_url: Optional[str] = None
+    shirt_number: Optional[int] = None
+    position: Optional[str] = None
+    nationality: Optional[str] = None
+    # match info
+    home_team: Optional[str] = None
+    away_team: Optional[str] = None
+    gameweek: Optional[int] = None
+    date: Optional[datetime.date] = None
+    match_url: Optional[str] = None
+
+    # summary
+    # performance
+    goals: Optional[int] = None
+    pens_made: Optional[int] = None
+    pens_att: Optional[int] = None
+    shots: Optional[int] = None
+    shots_on_target: Optional[int] = None
+    # expected
+    xg: Optional[float] = None
+    xg_np: Optional[float] = None
+    # sca
+    sca: Optional[int] = None
+    gca: Optional[int] = None
+
+    # passing
+    # total
+    passes_completed: Optional[int] = None
+    passes: Optional[int] = None
+    passes_pct: Optional[float] = None
+    passes_total_distance: Optional[int] = None
+    passes_progressive_distance: Optional[int] = None
+    # short
+    passes_completed_short: Optional[int] = None
+    passes_short: Optional[int] = None
+    passes_pct_short: Optional[float] = None
+    # medium
+    passes_completed_medium: Optional[int] = None
+    passes_medium: Optional[int] = None
+    passes_pct_medium: Optional[float] = None
+    # long
+    passes_completed_long: Optional[int] = None
+    passes_long: Optional[int] = None
+    passes_pct_long: Optional[float] = None
+    # assists
+    assists: Optional[int] = None
+    xg_assist: Optional[float] = None
+    pass_xa: Optional[float] = None
+    assisted_shots: Optional[int] = None
+    passes_into_final_third: Optional[int] = None
+    passes_into_penalty_area: Optional[int] = None
+    crosses_into_penalty_area: Optional[int] = None
+    progressive_passes: Optional[int] = None
+
+    # pass types
+    # pass types
+    passes_live: Optional[int] = None
+    passes_dead: Optional[int] = None
+    passes_free_kicks: Optional[int] = None
+    through_balls: Optional[int] = None
+    passes_switches: Optional[int] = None
+    crosses: Optional[int] = None
+    throw_ins: Optional[int] = None
+    corner_kicks: Optional[int] = None
+    # corner kicks
+    corner_kicks_in: Optional[int] = None
+    corner_kicks_out: Optional[int] = None
+    corner_kicks_straight: Optional[int] = None
+    # outcomes
+    passes_offsides: Optional[int] = None
+    passes_blocked: Optional[int] = None
+
+    # defensive actions
+    # tackles
+    tackles: Optional[int] = None
+    tackles_won: Optional[int] = None
+    tackles_def_3rd: Optional[int] = None
+    tackles_mid_3rd: Optional[int] = None
+    tackles_att_3rd: Optional[int] = None
+    # challenges
+    challenge_tackles: Optional[int] = None
+    challenges: Optional[int] = None
+    challenge_tackles_pct: Optional[float] = None
+    challenges_lost: Optional[int] = None
+    # blocks
+    blocks: Optional[int] = None
+    blocked_shots: Optional[int] = None
+    blocked_passes: Optional[int] = None
+    # interceptions
+    interceptions: Optional[int] = None
+    tackles_interceptions: Optional[int] = None
+    clearances: Optional[int] = None
+    errors: Optional[int] = None
+
+    # possession
+    # touches
+    touches: Optional[int] = None
+    touches_def_pen_area: Optional[int] = None
+    touches_def_3rd: Optional[int] = None
+    touches_mid_3rd: Optional[int] = None
+    touches_att_3rd: Optional[int] = None
+    touches_att_pen_area: Optional[int] = None
+    touches_live_ball: Optional[int] = None
+    # take-ons
+    take_ons: Optional[int] = None
+    take_ons_won: Optional[int] = None
+    take_ons_won_pct: Optional[float] = None
+    take_ons_tackled: Optional[int] = None
+    take_ons_tackled_pct: Optional[float] = None
+    # carries
+    carries: Optional[int] = None
+    carries_distance: Optional[int] = None
+    carries_progressive_distance: Optional[int] = None
+    progressive_carries: Optional[int] = None
+    carries_into_final_third: Optional[int] = None
+    carries_into_penalty_area: Optional[int] = None
+    miscontrols: Optional[int] = None
+    dispossessed: Optional[int] = None
+    # receiving
+    passes_received: Optional[int] = None
+    progressive_passes_received: Optional[int] = None
+
+    # miscellaneous
+    # performance
+    yellow_cards: Optional[int] = None
+    red_cards: Optional[int] = None
+    yellow_red_cards: Optional[int] = None
+    fouls: Optional[int] = None
+    fouled: Optional[int] = None
+    offsides: Optional[int] = None
+    pens_won: Optional[int] = None
+    pens_conceded: Optional[int] = None
+    own_goals: Optional[int] = None
+    ball_recoveries: Optional[int] = None
+    # aerial duels
+    aerials_won: Optional[int] = None
+    aerials_lost: Optional[int] = None
+    aerials_won_pct: Optional[float] = None
+
+    # goalkeeping
+    # shot stopping
+    gk_shots_on_target_against: Optional[int] = None
+    gk_goals_against: Optional[int] = None
+    gk_saves: Optional[int] = None
+    gk_save_pct: Optional[float] = None
+    gk_psxg: Optional[float] = None
+    # launched
+    gk_passes_completed_launched: Optional[int] = None
+    gk_passes_launched: Optional[int] = None
+    gk_passes_pct_launched: Optional[float] = None
+    # passes
+    gk_passes: Optional[int] = None
+    gk_passes_throws: Optional[int] = None
+    gk_pct_passes_launched: Optional[float] = None
+    gk_passes_length_avg: Optional[float] = None
+    # goals kicks
+    gk_goal_kicks: Optional[int] = None
+    gk_pct_goal_kicks_launched: Optional[float] = None
+    gk_goal_kick_length_avg: Optional[float] = None
+    # crosses
+    gk_crosses: Optional[int] = None
+    gk_crosses_stopped: Optional[int] = None
+    gk_crosses_stopped_pct: Optional[float] = None
+    # sweeper
+    gk_def_actions_outside_pen_area: Optional[int] = None
+    gk_avg_distance_def_actions: Optional[float] = None
 
 
 @dataclass

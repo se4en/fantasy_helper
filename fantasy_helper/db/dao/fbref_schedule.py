@@ -3,15 +3,15 @@ from datetime import datetime, timezone
 from typing import List
 import os.path as path
 
-from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_, func, or_
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.fbref_schedule import FbrefSchedule
+from fantasy_helper.db.dao.players_match import PlayersMatchDao
 from fantasy_helper.parsers.fbref import FbrefParser
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-
+from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo
 
 utc = timezone.utc
 
@@ -22,6 +22,7 @@ class FbrefScheduleDao:
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         self._fbref_parser = FbrefParser(leagues=self._leagues)
+        self._players_match_dao = PlayersMatchDao()
 
     def get_leagues(self) -> List[str]:
         return [league.name for league in self._leagues]
@@ -63,9 +64,6 @@ class FbrefScheduleDao:
             .all()
         )
 
-        db_session.commit()
-        db_session.close()
-
         result = [
             LeagueScheduleInfo(
                 league_name=schedule_row.league_name,
@@ -80,6 +78,10 @@ class FbrefScheduleDao:
             ) 
             for schedule_row in parsed_matches
         ]
+
+        db_session.commit()
+        db_session.close()
+
         return result
 
     def update_schedules_all_leagues(self) -> None:
@@ -89,6 +91,7 @@ class FbrefScheduleDao:
             )
 
             parsed_matches = set(self.get_parsed_matches(league_name=league_name))
+
             matches_2_parse, matches_2_add = [], []
             for schedule_row in schedule_rows:
                 if hash(schedule_row) not in parsed_matches:
@@ -97,5 +100,9 @@ class FbrefScheduleDao:
                     else:
                         matches_2_add.append(schedule_row)
 
+            matches_after_parse = self._players_match_dao.parse_matches(
+                league_name, matches_2_parse
+            )
+
             self.remove_unparsed_matches(league_name=league_name)
-            self.add_new_matches(matches_2_parse + matches_2_add)
+            self.add_new_matches(matches_after_parse + matches_2_add)

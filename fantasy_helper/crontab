@@ -4,5 +4,6 @@
 0 3 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_calendars.py > /proc/1/fd/1 2>/proc/1/fd/2
 0 */6 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_sports_players.py > /proc/1/fd/1 2>/proc/1/fd/2
 0,30 * * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_lineups.py > /proc/1/fd/1 2>/proc/1/fd/2
-0 4 * * 4 source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_naming.py > /proc/1/fd/1 2>/proc/1/fd/2
+30 3 * * 4 source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_naming.py > /proc/1/fd/1 2>/proc/1/fd/2
+0 4 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_fbref_schedule.py > /proc/1/fd/1 2>/proc/1/fd/2
 # END CRON JOB
