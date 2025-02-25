@@ -135,6 +135,8 @@ class LeagueScheduleInfo:
     date: Optional[datetime.date] = None
     home_goals: Optional[int] = None
     away_goals: Optional[int] = None
+    home_xg: Optional[float] = None
+    away_xg: Optional[float] = None
     match_url: Optional[str] = None
     match_parsed: bool = False
 

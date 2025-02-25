@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 
 from sqlalchemy import Column
-from sqlalchemy import Integer, String, DateTime, Date, Boolean
+from sqlalchemy import Integer, String, DateTime, Date, Boolean, Float
 
 from fantasy_helper.db.database import Base
 
@@ -19,6 +19,8 @@ class FbrefSchedule(Base):
     date = Column(Date, nullable=True)
     home_goals = Column(Integer, nullable=True)
     away_goals = Column(Integer, nullable=True)
+    home_xg = Column(Float, nullable=True)
+    away_xg = Column(Float, nullable=True)
     match_url = Column(String, nullable=True)
     match_parsed = Column(Boolean, nullable=True)
 
@@ -32,6 +34,8 @@ class FbrefSchedule(Base):
         date: Optional[datetime.date] = None,
         home_goals: Optional[int] = None,
         away_goals: Optional[int] = None,
+        home_xg: Optional[float] = None,
+        away_xg: Optional[float] = None,
         match_url: Optional[str] = None,
         match_parsed: Optional[bool] = None
     ):
@@ -43,6 +47,8 @@ class FbrefSchedule(Base):
         self.date = date
         self.home_goals = home_goals
         self.away_goals = away_goals
+        self.home_xg = home_xg
+        self.away_xg = away_xg
         self.match_url = match_url
         self.match_parsed = match_parsed
 

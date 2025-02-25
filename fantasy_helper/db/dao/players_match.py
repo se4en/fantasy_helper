@@ -51,7 +51,6 @@ class PlayersMatchDao:
         for match in matches:
             if match.match_url is not None:
                 match_players = self._fbref_parser.parse_match_stats(match.match_url, league_name)
-
             else:
                 match_players = None
 

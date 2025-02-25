@@ -936,6 +936,8 @@ class FbrefParser:
             _away_team = table_row.find("td", {"data-stat": "away_team"})
             _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})
+            _home_xg = table_row.find("td", {"data-stat": "home_xg"})
+            _away_xg = table_row.find("td", {"data-stat": "away_xg"})
 
             if _score.text:
                 goals = _score.text.split("–")
@@ -954,6 +956,8 @@ class FbrefParser:
                 date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
                 home_goals=_home_goals,
                 away_goals=_away_goals,
+                home_xg=cast_to_float(_home_xg.text) if _home_xg is not None else None,
+                away_xg=cast_to_float(_away_xg.text) if _away_xg is not None else None,
                 match_url=_match_url
             )
         else:
