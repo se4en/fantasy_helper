@@ -3,16 +3,17 @@ import os
 import sys
 from datetime import date, datetime
 from dataclasses import asdict
-from typing import Any, Callable, Dict, Optional, List, Tuple
+from typing import Any, Callable, Dict, Literal, Optional, List, Tuple
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver import FirefoxOptions
 from bs4 import BeautifulSoup
 
-from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, LeagueTableInfo, PlayerStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, LeagueTableInfo, PlayerMatchStats, PlayerStats
 
 
 def cast_to_float(text: str) -> Optional[float]:
@@ -111,11 +112,130 @@ class FbrefParser:
 
     def get_shot_creation_leagues(self) -> Dict[str, str]:
         return self._shot_creation_leagues
+    
+    def get_schedule_leagues(self) -> Dict[str, str]:
+        return self._schedule_leagues
+
+    def _parse_player_summary_stat(
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
+    ) -> Optional[PlayerStats]:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
+            return PlayerStats(
+                # common
+                name=player.find(player_tag, {"data-stat": "player"}).text,
+                league_name=league_name,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
+                position=player.find("td", {"data-stat": "position"}).text,
+                minutes=cast_to_int(player.find("td", {"data-stat": "minutes"}).text)
+                if player.find("td", {"data-stat": "minutes"}) is not None
+                else None,
+                # performance
+                goals=cast_to_int(player.find("td", {"data-stat": "goals"}).text)
+                if player.find("td", {"data-stat": "goals"}) is not None
+                else None,
+                assists=cast_to_int(player.find("td", {"data-stat": "assists"}).text)
+                if player.find("td", {"data-stat": "assists"}) is not None
+                else None,
+                pens_made=cast_to_int(player.find("td", {"data-stat": "pens_made"}).text)
+                if player.find("td", {"data-stat": "pens_made"}) is not None
+                else None,
+                pens_att=cast_to_int(player.find("td", {"data-stat": "pens_att"}).text)
+                if player.find("td", {"data-stat": "pens_att"}) is not None
+                else None,
+                shots=cast_to_int(player.find("td", {"data-stat": "shots"}).text)
+                if player.find("td", {"data-stat": "shots"}) is not None
+                else None,
+                shots_on_target=cast_to_int(
+                    player.find("td", {"data-stat": "shots_on_target"}).text
+                )
+                if player.find("td", {"data-stat": "shots_on_target"}) is not None
+                else None,
+                yellow_cards=cast_to_int(
+                    player.find("td", {"data-stat": "cards_yellow"}).text
+                )
+                if player.find("td", {"data-stat": "cards_yellow"}) is not None
+                else None,
+                red_cards=cast_to_int(player.find("td", {"data-stat": "cards_red"}).text)
+                if player.find("td", {"data-stat": "cards_red"}) is not None
+                else None,
+                touches=cast_to_int(player.find("td", {"data-stat": "touches"}).text)
+                if player.find("td", {"data-stat": "touches"}) is not None
+                else None,
+                # expected
+                xg=cast_to_float(player.find("td", {"data-stat": "xg"}).text)
+                if player.find("td", {"data-stat": "xg"}) is not None
+                else None,
+                xg_np=cast_to_float(player.find("td", {"data-stat": "npxg"}).text)
+                if player.find("td", {"data-stat": "npxg"}) is not None
+                else None,
+                xg_assist=cast_to_float(
+                    player.find("td", {"data-stat": "xg_assist"}).text
+                )
+                if player.find("td", {"data-stat": "xg_assist"}) is not None
+                else None,
+                # sca
+                sca=cast_to_int(player.find("td", {"data-stat": "sca"}).text)
+                if player.find("td", {"data-stat": "sca"}) is not None
+                else None,
+                gca=cast_to_int(player.find("td", {"data-stat": "gca"}).text)
+                if player.find("td", {"data-stat": "gca"}) is not None
+                else None,
+                # passes
+                passes_completed=cast_to_int(
+                    player.find("td", {"data-stat": "passes_completed"}).text
+                )
+                if player.find("td", {"data-stat": "passes_completed"}) is not None
+                else None,
+                passes=cast_to_int(player.find("td", {"data-stat": "passes"}).text)
+                if player.find("td", {"data-stat": "passes"}) is not None
+                else None,
+                passes_pct=cast_to_float(
+                    player.find("td", {"data-stat": "passes_pct"}).text
+                )
+                if player.find("td", {"data-stat": "passes_pct"}) is not None
+                else None,
+                progressive_passes=cast_to_int(
+                    player.find("td", {"data-stat": "progressive_passes"}).text
+                )
+                if player.find("td", {"data-stat": "progressive_passes"}) is not None
+                else None,
+                # carries
+                carries=cast_to_int(player.find("td", {"data-stat": "carries"}).text)
+                if player.find("td", {"data-stat": "carries"}) is not None
+                else None,
+                progressive_carries=cast_to_int(
+                    player.find("td", {"data-stat": "progressive_carries"}).text
+                )
+                if player.find("td", {"data-stat": "progressive_carries"}) is not None
+                else None,
+                # take-ons
+                take_ons=cast_to_int(
+                    player.find("td", {"data-stat": "take_ons"}).text
+                )
+                if player.find("td", {"data-stat": "take_ons"}) is not None
+                else None,
+                take_ons_won=cast_to_int(
+                    player.find("td", {"data-stat": "take_ons_won"}).text
+                )
+                if player.find("td", {"data-stat": "take_ons_won"}) is not None
+                else None
+            )
+        else:
+            return None
 
     def _parse_player_shooting_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             # shots
             _goals = player.find("td", {"data-stat": "goals"})
             _shots = player.find("td", {"data-stat": "shots"})
@@ -146,9 +266,10 @@ class FbrefParser:
             _npxg_net = player.find("td", {"data-stat": "npxg_net"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 goals=cast_to_int(_goals.text) if _goals else None,
@@ -190,9 +311,13 @@ class FbrefParser:
             return None
 
     def _parse_player_passing_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             # all passes
             _passes_completed = player.find("td", {"data-stat": "passes_completed"})
             _passes = player.find("td", {"data-stat": "passes"})
@@ -237,9 +362,10 @@ class FbrefParser:
             _progressive_passes = player.find("td", {"data-stat": "progressive_passes"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 passes_completed=cast_to_int(_passes_completed.text)
@@ -304,9 +430,13 @@ class FbrefParser:
             return None
 
     def _parse_player_pass_types_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             # all passes
             _passes_live = player.find("td", {"data-stat": "passes_live"})
             _passes_dead = player.find("td", {"data-stat": "passes_dead"})
@@ -328,9 +458,10 @@ class FbrefParser:
             _passes_blocked = player.find("td", {"data-stat": "passes_blocked"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 passes_live=cast_to_int(_passes_live.text) if _passes_live else None,
@@ -370,9 +501,13 @@ class FbrefParser:
             return None
 
     def _parse_player_possession_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             # touches
             _touches = player.find("td", {"data-stat": "touches"})
             _touches_def_pen_area = player.find(
@@ -410,15 +545,17 @@ class FbrefParser:
             )
             _miscontrols = player.find("td", {"data-stat": "miscontrols"})
             _dispossessed = player.find("td", {"data-stat": "dispossessed"})
+            # receiving
             _passes_received = player.find("td", {"data-stat": "passes_received"})
             _progressive_passes_received = player.find(
                 "td", {"data-stat": "progressive_passes_received"}
             )
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 touches=cast_to_int(_touches.text) if _touches else None,
@@ -486,9 +623,13 @@ class FbrefParser:
             return None
 
     def _parse_player_shot_creation_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             _sca = player.find("td", {"data-stat": "sca"})
             _sca_per90 = player.find("td", {"data-stat": "sca_per90"})
             _sca_passes_live = player.find("td", {"data-stat": "sca_passes_live"})
@@ -507,9 +648,10 @@ class FbrefParser:
             _gca_defense = player.find("td", {"data-stat": "gca_defense"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 sca=cast_to_int(_sca.text) if _sca else None,
@@ -541,9 +683,13 @@ class FbrefParser:
             return None
 
     def _parse_player_playing_time_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             _games = player.find("td", {"data-stat": "games"})
             _minutes = player.find("td", {"data-stat": "minutes"})
             _minutes_per_game = player.find("td", {"data-stat": "minutes_per_game"})
@@ -572,9 +718,10 @@ class FbrefParser:
             _xg_plus_minus_wowy = player.find("td", {"data-stat": "xg_plus_minus_wowy"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 games=cast_to_int(_games.text) if _games else None,
@@ -628,9 +775,13 @@ class FbrefParser:
             return None
         
     def _parse_player_standart_stat(
-        self, player: Any, league_name: str
+        self, 
+        player: Any, 
+        league_name: str, 
+        team_name: Optional[str] = None,
+        player_tag: Literal["td", "th"] = "td"
     ) -> Optional[PlayerStats]:
-        if player.find("td", {"data-stat": "player"}) is not None:
+        if player.find(player_tag, {"data-stat": "player"}) is not None:
             _games = player.find("td", {"data-stat": "games"})
             _games_starts = player.find("td", {"data-stat": "games_starts"})
             _minutes = player.find("td", {"data-stat": "minutes"})
@@ -640,9 +791,10 @@ class FbrefParser:
             _red_cards = player.find("td", {"data-stat": "cards_red"})
             return PlayerStats(
                 # common
-                name=player.find("td", {"data-stat": "player"}).text,
+                name=player.find(player_tag, {"data-stat": "player"}).text,
                 league_name=league_name,
-                team_name=player.find("td", {"data-stat": "team"}).text,
+                team_name=team_name if team_name is not None 
+                else player.find("td", {"data-stat": "team"}).text,
                 position=player.find("td", {"data-stat": "position"}).text,
                 # stats
                 games=cast_to_int(_games.text) if _games else None,
@@ -695,7 +847,6 @@ class FbrefParser:
             if driver is not None:
                 driver.quit()
 
-    
     def _parse_team_table_row(
         self, table_row: Any, league_name: str
     ) -> Optional[LeagueTableInfo]:
@@ -785,13 +936,17 @@ class FbrefParser:
             _away_team = table_row.find("td", {"data-stat": "away_team"})
             _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})
+            _home_xg = table_row.find("td", {"data-stat": "home_xg"})
+            _away_xg = table_row.find("td", {"data-stat": "away_xg"})
 
             if _score.text:
                 goals = _score.text.split("–")
                 _home_goals = cast_to_int(goals[0])
                 _away_goals = cast_to_int(goals[1])
+                _match_url = "https://fbref.com" + _score.find("a").get("href")
             else:
                 _home_goals, _away_goals = None, None
+                _match_url = None
 
             return LeagueScheduleInfo(
                 league_name=league_name,
@@ -800,7 +955,10 @@ class FbrefParser:
                 away_team=_away_team.text.strip(),
                 date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
                 home_goals=_home_goals,
-                away_goals=_away_goals
+                away_goals=_away_goals,
+                home_xg=cast_to_float(_home_xg.text) if _home_xg is not None else None,
+                away_xg=cast_to_float(_away_xg.text) if _away_xg is not None else None,
+                match_url=_match_url
             )
         else:
             return None
@@ -859,6 +1017,18 @@ class FbrefParser:
 
         return PlayerStats(**old_dict_stat)
 
+    def _update_player_match_stat(
+        self, old_player_stat: PlayerMatchStats, new_player_stat: PlayerMatchStats
+    ) -> PlayerStats:
+        old_dict_stat = asdict(old_player_stat)
+        new_dict_stat = asdict(new_player_stat)
+
+        for key in old_dict_stat:
+            if key in new_dict_stat and new_dict_stat[key] is not None:
+                old_dict_stat[key] = new_dict_stat[key]
+
+        return PlayerMatchStats(**old_dict_stat)
+
     def _update_players_stat(
         self,
         players: Dict[Tuple[str, str, str, str], PlayerStats],
@@ -889,6 +1059,1089 @@ class FbrefParser:
                     (player.name, player.team_name, player.position, player.league_name)
                 ] = player
         return players
+
+    def _update_players_match_stat(
+        self,
+        players: Dict[str, PlayerMatchStats],
+        players_stat: List[PlayerMatchStats]
+    ) -> Dict[str, PlayerMatchStats]:
+        for player in players_stat:
+            if player.player_id in players:
+                old_player_stat = players[player.player_id]
+                new_player_stat = self._update_player_match_stat(old_player_stat, player)
+                players[player.player_id] = PlayerMatchStats(**asdict(new_player_stat))
+            else:
+                players[player.player_id] = player
+
+        return players
+
+    def _parse_player_match_summary_stat(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # performance
+            _goals = player.find("td", {"data-stat": "goals"})
+            _assists = player.find("td", {"data-stat": "assists"})
+            _pens_made = player.find("td", {"data-stat": "pens_made"})
+            _pens_att = player.find("td", {"data-stat": "pens_att"})
+            _shots = player.find("td", {"data-stat": "shots"})
+            _shots_on_target = player.find("td", {"data-stat": "shots_on_target"})
+            _yellow_cards = player.find("td", {"data-stat": "cards_yellow"})
+            _red_cards = player.find("td", {"data-stat": "cards_red"})
+            _touches = player.find("td", {"data-stat": "touches"})
+            _tackles = player.find("td", {"data-stat": "tackles"})
+            _interceptions = player.find("td", {"data-stat": "interceptions"})
+            _blocks = player.find("td", {"data-stat": "blocks"})
+            # expected
+            _xg = player.find("td", {"data-stat": "xg"})
+            _npxg = player.find("td", {"data-stat": "npxg"})
+            _xg_assist = player.find("td", {"data-stat": "xg_assist"})
+            _sca = player.find("td", {"data-stat": "sca"})
+            _gca = player.find("td", {"data-stat": "gca"})
+            # passes
+            _passes_completed = player.find("td", {"data-stat": "passes_completed"})
+            _passes = player.find("td", {"data-stat": "passes"})
+            _passes_pct = player.find("td", {"data-stat": "passes_pct"})
+            _progressive_passes = player.find("td", {"data-stat": "progressive_passes"})
+            # carries
+            _carries = player.find("td", {"data-stat": "carries"})
+            _progressive_carries = player.find("td", {"data-stat": "progressive_carries"})
+            # take-ons
+            _take_ons = player.find("td", {"data-stat": "take_ons"})
+            _take_ons_won = player.find("td", {"data-stat": "take_ons_won"})
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text,
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text) if _shirt_number is not None else None,
+                nationality=_nationality.text.split(" ")[-1] if _nationality is not None else None,
+                position=_position.text if _position is not None else None,
+                minutes=cast_to_int(_minutes.text) if _minutes is not None else None,
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # performance
+                goals=cast_to_int(_goals.text) if _goals is not None else None,
+                assists=cast_to_int(_assists.text) if _assists is not None else None,
+                pens_made=cast_to_int(_pens_made.text) if _pens_made is not None else None,
+                pens_att=cast_to_int(_pens_att.text) if _pens_att is not None else None,
+                shots=cast_to_int(_shots.text) if _shots is not None else None,
+                shots_on_target=cast_to_int(_shots_on_target.text)
+                if _shots_on_target is not None
+                else None,
+                yellow_cards=cast_to_int(_yellow_cards.text)
+                if _yellow_cards is not None
+                else None,
+                red_cards=cast_to_int(_red_cards.text) if _red_cards is not None else None,
+                touches=cast_to_int(_touches.text) if _touches is not None else None,
+                tackles=cast_to_int(_tackles.text) if _tackles is not None else None,
+                interceptions=cast_to_int(_interceptions.text)
+                if _interceptions is not None
+                else None,
+                blocks=cast_to_int(_blocks.text) if _blocks is not None else None,
+                # expected
+                xg=cast_to_float(_xg.text) if _xg is not None else None,
+                xg_np=cast_to_float(_npxg.text) if _npxg is not None else None,
+                xg_assist=cast_to_float(_xg_assist.text)
+                if _xg_assist is not None
+                else None,
+                sca=cast_to_float(_sca.text) if _sca is not None else None,
+                gca=cast_to_float(_gca.text) if _gca is not None else None,
+                # passes
+                passes_completed=cast_to_int(_passes_completed.text)
+                if _passes_completed is not None
+                else None,
+                passes=cast_to_int(_passes.text) if _passes is not None else None,
+                passes_pct=cast_to_float(_passes_pct.text)
+                if _passes_pct is not None
+                else None,
+                progressive_passes=cast_to_int(_progressive_passes.text)
+                if _progressive_passes is not None
+                else None,
+                # carries
+                carries=cast_to_int(_carries.text) if _carries is not None else None,
+                progressive_carries=cast_to_int(_progressive_carries.text)
+                if _progressive_carries is not None
+                else None,
+                # take-ons
+                take_ons=cast_to_int(_take_ons.text) if _take_ons is not None else None,
+                take_ons_won=cast_to_int(_take_ons_won.text)
+                if _take_ons_won is not None
+                else None
+            )
+        else:
+            return None
+
+    def _parse_player_match_passing_stat(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            # else:
+            #     print("process player passing", _player.text)
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # all passes
+            _passes_completed = player.find("td", {"data-stat": "passes_completed"})
+            _passes = player.find("td", {"data-stat": "passes"})
+            _passes_pct = player.find("td", {"data-stat": "passes_pct"})
+            _passes_total_distance = player.find(
+                "td", {"data-stat": "passes_total_distance"}
+            )
+            _passes_progressive_distance = player.find(
+                "td", {"data-stat": "passes_progressive_distance"}
+            )
+            # short/medium/long passes
+            _passes_completed_short = player.find(
+                "td", {"data-stat": "passes_completed_short"}
+            )
+            _passes_short = player.find("td", {"data-stat": "passes_short"})
+            _passes_pct_short = player.find("td", {"data-stat": "passes_pct_short"})
+            _passes_completed_medium = player.find(
+                "td", {"data-stat": "passes_completed_medium"}
+            )
+            _passes_medium = player.find("td", {"data-stat": "passes_medium"})
+            _passes_pct_medium = player.find("td", {"data-stat": "passes_pct_medium"})
+            _passes_completed_long = player.find(
+                "td", {"data-stat": "passes_completed_long"}
+            )
+            _passes_long = player.find("td", {"data-stat": "passes_long"})
+            _passes_pct_long = player.find("td", {"data-stat": "passes_pct_long"})
+            # assists
+            _assists = player.find("td", {"data-stat": "assists"})
+            _xg_assist = player.find("td", {"data-stat": "xg_assist"})
+            _pass_xa = player.find("td", {"data-stat": "pass_xa"})
+            _assisted_shots = player.find("td", {"data-stat": "assisted_shots"})
+            _passes_into_final_third = player.find(
+                "td", {"data-stat": "passes_into_final_third"}
+            )
+            _passes_into_penalty_area = player.find(
+                "td", {"data-stat": "passes_into_penalty_area"}
+            )
+            _crosses_into_penalty_area = player.find(
+                "td", {"data-stat": "crosses_into_penalty_area"}
+            )
+            _progressive_passes = player.find("td", {"data-stat": "progressive_passes"})
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text),
+                nationality=_nationality.text.split(" ")[-1],
+                position=_position.text,
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # stats
+                passes_completed=cast_to_int(_passes_completed.text)
+                if _passes_completed
+                else None,
+                passes=cast_to_int(_passes.text) if _passes else None,
+                passes_pct=cast_to_float(_passes_pct.text) if _passes_pct else None,
+                passes_total_distance=cast_to_int(_passes_total_distance.text)
+                if _passes_total_distance
+                else None,
+                passes_progressive_distance=cast_to_int(
+                    _passes_progressive_distance.text
+                )
+                if _passes_progressive_distance
+                else None,
+                passes_short=cast_to_int(_passes_short.text) if _passes_short else None,
+                passes_completed_short=cast_to_int(_passes_completed_short.text)
+                if _passes_completed_short
+                else None,
+                passes_pct_short=cast_to_float(_passes_pct_short.text)
+                if _passes_pct_short
+                else None,
+                passes_medium=cast_to_int(_passes_medium.text)
+                if _passes_medium
+                else None,
+                passes_completed_medium=cast_to_int(_passes_completed_medium.text)
+                if _passes_completed_medium
+                else None,
+                passes_pct_medium=cast_to_float(_passes_pct_medium.text)
+                if _passes_pct_medium
+                else None,
+                passes_long=cast_to_int(_passes_long.text) if _passes_long else None,
+                passes_completed_long=cast_to_int(_passes_completed_long.text)
+                if _passes_completed_long
+                else None,
+                passes_pct_long=cast_to_float(_passes_pct_long.text)
+                if _passes_pct_long
+                else None,
+                assists=cast_to_int(_assists.text) if _assists else None,
+                xg_assist=cast_to_float(_xg_assist.text) if _xg_assist else None,
+                pass_xa=cast_to_float(_pass_xa.text) if _pass_xa else None,
+                assisted_shots=cast_to_int(_assisted_shots.text)
+                if _assisted_shots
+                else None,
+                passes_into_final_third=cast_to_int(_passes_into_final_third.text)
+                if _passes_into_final_third
+                else None,
+                passes_into_penalty_area=cast_to_int(_passes_into_penalty_area.text)
+                if _passes_into_penalty_area
+                else None,
+                crosses_into_penalty_area=cast_to_int(_crosses_into_penalty_area.text)
+                if _crosses_into_penalty_area
+                else None,
+                progressive_passes=cast_to_int(_progressive_passes.text)
+                if _progressive_passes
+                else None,
+            )
+        else:
+            return None
+
+    def _parse_player_match_pass_types(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # pass types
+            _passes_live = player.find("td", {"data-stat": "passes_live"})
+            _passes_dead = player.find("td", {"data-stat": "passes_dead"})
+            _passes_free_kicks = player.find("td", {"data-stat": "passes_free_kicks"})
+            _through_balls = player.find("td", {"data-stat": "through_balls"})
+            _passes_switches = player.find("td", {"data-stat": "passes_switches"})
+            _crosses = player.find("td", {"data-stat": "crosses"})
+            _throw_ins = player.find("td", {"data-stat": "throw_ins"})
+            # corner kicks
+            _corner_kicks = player.find("td", {"data-stat": "corner_kicks"})
+            _corner_kicks_in = player.find("td", {"data-stat": "corner_kicks_in"})
+            _corner_kicks_out = player.find("td", {"data-stat": "corner_kicks_out"})
+            _corner_kicks_straight = player.find(
+                "td", {"data-stat": "corner_kicks_straight"}
+            )
+            # passes
+            _passes_completed = player.find("td", {"data-stat": "passes_completed"})
+            _passes_offsides = player.find("td", {"data-stat": "passes_offsides"})
+            _passes_blocked = player.find("td", {"data-stat": "passes_blocked"})
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text),
+                nationality=_nationality.text.split(" ")[-1],
+                position=_position.text,
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # pass types
+                passes_live=cast_to_int(_passes_live.text) if _passes_live else None,
+                passes_dead=cast_to_int(_passes_dead.text) if _passes_dead else None,
+                passes_free_kicks=cast_to_int(_passes_free_kicks.text)
+                if _passes_free_kicks
+                else None,
+                through_balls=cast_to_int(_through_balls.text)
+                if _through_balls
+                else None,
+                passes_switches=cast_to_int(_passes_switches.text)
+                if _passes_switches
+                else None,
+                crosses=cast_to_int(_crosses.text) if _crosses else None,
+                throw_ins=cast_to_int(_throw_ins.text) if _throw_ins else None,
+                # corner kicks
+                corner_kicks=cast_to_int(_corner_kicks.text) if _corner_kicks else None,
+                corner_kicks_in=cast_to_int(_corner_kicks_in.text)
+                if _corner_kicks_in
+                else None,
+                corner_kicks_out=cast_to_int(_corner_kicks_out.text)
+                if _corner_kicks_out
+                else None,
+                corner_kicks_straight=cast_to_int(_corner_kicks_straight.text)
+                if _corner_kicks_straight
+                else None,
+                # outcomes
+                passes_completed=cast_to_int(_passes_completed.text)
+                if _passes_completed
+                else None,
+                passes_offsides=cast_to_int(_passes_offsides.text)
+                if _passes_offsides
+                else None,
+                passes_blocked=cast_to_int(_passes_blocked.text)
+                if _passes_blocked
+                else None,
+            )
+        else:
+            return None
+
+    def _parse_player_match_defensive_actions(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # tackles
+            _tackles = player.find("td", {"data-stat": "tackles"})
+            _tackles_won = player.find("td", {"data-stat": "tackles_won"})
+            _tackles_def_3rd = player.find("td", {"data-stat": "tackles_def_3rd"})
+            _tackles_mid_3rd = player.find("td", {"data-stat": "tackles_mid_3rd"})
+            _tackles_att_3rd = player.find("td", {"data-stat": "tackles_att_3rd"})
+            # challenges
+            _challenge_tackles = player.find("td", {"data-stat": "challenge_tackles"})
+            _challenges = player.find("td", {"data-stat": "challenges"})
+            _challenge_tackles_pct = player.find(
+                "td", {"data-stat": "challenge_tackles_pct"}
+            )
+            _challenges_lost = player.find("td", {"data-stat": "challenges_lost"})
+            # blocks
+            _blocks = player.find("td", {"data-stat": "blocks"})
+            _blocked_shots = player.find("td", {"data-stat": "blocked_shots"})
+            _blocked_passes = player.find("td", {"data-stat": "blocked_passes"})
+            # interceptions
+            _interceptions = player.find("td", {"data-stat": "interceptions"})
+            _tackles_interceptions = player.find(
+                "td", {"data-stat": "tackles_interceptions"}
+            )
+            _clearances = player.find("td", {"data-stat": "clearances"})
+            _errors = player.find("td", {"data-stat": "errors"})
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text),
+                nationality=_nationality.text.split(" ")[-1],
+                position=_position.text,
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # tackles
+                tackles=cast_to_int(_tackles.text) if _tackles else None,
+                tackles_won=cast_to_int(_tackles_won.text) if _tackles_won else None,
+                tackles_def_3rd=cast_to_int(_tackles_def_3rd.text)
+                if _tackles_def_3rd
+                else None,
+                tackles_mid_3rd=cast_to_int(_tackles_mid_3rd.text)
+                if _tackles_mid_3rd
+                else None,
+                tackles_att_3rd=cast_to_int(_tackles_att_3rd.text)
+                if _tackles_att_3rd
+                else None,
+                # challenges
+                challenge_tackles=cast_to_int(_challenge_tackles.text)
+                if _challenge_tackles
+                else None,
+                challenges=cast_to_int(_challenges.text) if _challenges else None,
+                challenge_tackles_pct=cast_to_float(_challenge_tackles_pct.text)
+                if _challenge_tackles_pct
+                else None,
+                challenges_lost=cast_to_int(_challenges_lost.text)
+                if _challenges_lost
+                else None,
+                # blocks
+                blocks=cast_to_int(_blocks.text) if _blocks else None,
+                blocked_shots=cast_to_int(_blocked_shots.text)
+                if _blocked_shots
+                else None,
+                blocked_passes=cast_to_int(_blocked_passes.text)
+                if _blocked_passes
+                else None,
+                # interceptions
+                interceptions=cast_to_int(_interceptions.text)
+                if _interceptions
+                else None,
+                tackles_interceptions=cast_to_int(_tackles_interceptions.text)
+                if _tackles_interceptions
+                else None,
+                clearances=cast_to_int(_clearances.text) if _clearances else None,
+                errors=cast_to_int(_errors.text) if _errors else None,
+            )
+        else:
+            return None
+
+    def _parse_player_match_possession(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # touches
+            _touches = player.find("td", {"data-stat": "touches"})
+            _touches_def_pen_area = player.find(
+                "td", {"data-stat": "touches_def_pen_area"}
+            )
+            _touches_def_3rd = player.find("td", {"data-stat": "touches_def_3rd"})
+            _touches_mid_3rd = player.find("td", {"data-stat": "touches_mid_3rd"})
+            _touches_att_3rd = player.find("td", {"data-stat": "touches_att_3rd"})
+            _touches_att_pen_area = player.find(
+                "td", {"data-stat": "touches_att_pen_area"}
+            )
+            _touches_live_ball = player.find("td", {"data-stat": "touches_live_ball"})
+            # take_ons
+            _take_ons = player.find("td", {"data-stat": "take_ons"})
+            _take_ons_won = player.find("td", {"data-stat": "take_ons_won"})
+            _take_ons_won_pct = player.find("td", {"data-stat": "take_ons_won_pct"})
+            _take_ons_tackled = player.find("td", {"data-stat": "take_ons_tackled"})
+            _take_ons_tackled_pct = player.find(
+                "td", {"data-stat": "take_ons_tackled_pct"}
+            )
+            # carries
+            _carries = player.find("td", {"data-stat": "carries"})
+            _carries_distance = player.find("td", {"data-stat": "carries_distance"})
+            _carries_progressive_distance = player.find(
+                "td", {"data-stat": "carries_progressive_distance"}
+            )
+            _progressive_carries = player.find(
+                "td", {"data-stat": "progressive_carries"}
+            )
+            _carries_into_final_third = player.find(
+                "td", {"data-stat": "carries_into_final_third"}
+            )
+            _carries_into_penalty_area = player.find(
+                "td", {"data-stat": "carries_into_penalty_area"}
+            )
+            _miscontrols = player.find("td", {"data-stat": "miscontrols"})
+            _dispossessed = player.find("td", {"data-stat": "dispossessed"})
+            # receiving
+            _passes_received = player.find("td", {"data-stat": "passes_received"})
+            _progressive_passes_received = player.find(
+                "td", {"data-stat": "progressive_passes_received"}
+            )
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text),
+                nationality=_nationality.text.split(" ")[-1],
+                position=_position.text,
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # touches
+                touches=cast_to_int(_touches.text) if _touches else None,
+                touches_def_pen_area=cast_to_int(_touches_def_pen_area.text)
+                if _touches_def_pen_area
+                else None,
+                touches_def_3rd=cast_to_int(_touches_def_3rd.text)
+                if _touches_def_3rd
+                else None,
+                touches_mid_3rd=cast_to_int(_touches_mid_3rd.text)
+                if _touches_mid_3rd
+                else None,
+                touches_att_3rd=cast_to_int(_touches_att_3rd.text)
+                if _touches_att_3rd
+                else None,
+                touches_att_pen_area=cast_to_int(_touches_att_pen_area.text)
+                if _touches_att_pen_area
+                else None,
+                touches_live_ball=cast_to_int(_touches_live_ball.text)
+                if _touches_live_ball
+                else None,
+                # take_ons
+                take_ons=cast_to_int(_take_ons.text) if _take_ons else None,
+                take_ons_won=cast_to_int(_take_ons_won.text)
+                if _take_ons_won
+                else None,
+                take_ons_won_pct=cast_to_float(_take_ons_won_pct.text)
+                if _take_ons_won_pct
+                else None,
+                take_ons_tackled=cast_to_int(_take_ons_tackled.text)
+                if _take_ons_tackled
+                else None,
+                take_ons_tackled_pct=cast_to_float(_take_ons_tackled_pct.text)
+                if _take_ons_tackled_pct
+                else None,
+                # carries
+                carries=cast_to_int(_carries.text) if _carries else None,
+                carries_distance=cast_to_int(_carries_distance.text)
+                if _carries_distance
+                else None,
+                carries_progressive_distance=cast_to_int(
+                    _carries_progressive_distance.text
+                )
+                if _carries_progressive_distance
+                else None,
+                progressive_carries=cast_to_int(_progressive_carries.text)
+                if _progressive_carries
+                else None,
+                carries_into_final_third=cast_to_int(_carries_into_final_third.text)
+                if _carries_into_final_third
+                else None,
+                carries_into_penalty_area=cast_to_int(_carries_into_penalty_area.text)
+                if _carries_into_penalty_area
+                else None,
+                miscontrols=cast_to_int(_miscontrols.text) if _miscontrols else None,
+                dispossessed=cast_to_int(_dispossessed.text) if _dispossessed else None,
+                # receiving
+                passes_received=cast_to_int(_passes_received.text)
+                if _passes_received
+                else None,
+                progressive_passes_received=cast_to_int(
+                    _progressive_passes_received.text
+                )
+                if _progressive_passes_received
+                else None,
+            )
+        else:
+            return None
+
+    def _parse_player_match_miscellaneous(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _position = player.find("td", {"data-stat": "position"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # performance
+            _yellow_cards = player.find("td", {"data-stat": "cards_yellow"})
+            _red_cards = player.find("td", {"data-stat": "cards_red"})
+            _yellow_red_cards = player.find("td", {"data-stat": "cards_yellow_red"})
+            _fouls = player.find("td", {"data-stat": "fouls"})
+            _fouled = player.find("td", {"data-stat": "fouled"})
+            _offsides = player.find("td", {"data-stat": "offsides"})
+            _crosses = player.find("td", {"data-stat": "crosses"})
+            _interceptions = player.find("td", {"data-stat": "interceptions"})
+            _tackles_won = player.find("td", {"data-stat": "tackles_won"})
+            _pens_won = player.find("td", {"data-stat": "pens_won"})
+            _pens_conceded = player.find("td", {"data-stat": "pens_conceded"})
+            _own_goals = player.find("td", {"data-stat": "own_goals"})
+            _ball_recoveries = player.find("td", {"data-stat": "ball_recoveries"})
+            # aerial duels
+            _aerials_won = player.find("td", {"data-stat": "aerials_won"})
+            _aerials_lost = player.find("td", {"data-stat": "aerials_lost"})
+            _aerials_won_pct = player.find("td", {"data-stat": "aerials_won_pct"})
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                shirt_number=cast_to_int(_shirt_number.text),
+                nationality=_nationality.text.split(" ")[-1],
+                position=_position.text,
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # performance
+                yellow_cards=cast_to_int(_yellow_cards.text) if _yellow_cards else None,
+                red_cards=cast_to_int(_red_cards.text) if _red_cards else None,
+                yellow_red_cards=cast_to_int(_yellow_red_cards.text)
+                if _yellow_red_cards
+                else None,
+                fouls=cast_to_int(_fouls.text) if _fouls else None,
+                fouled=cast_to_int(_fouled.text) if _fouled else None,
+                offsides=cast_to_int(_offsides.text) if _offsides else None,
+                crosses=cast_to_int(_crosses.text) if _crosses else None,
+                interceptions=cast_to_int(_interceptions.text)
+                if _interceptions
+                else None,
+                tackles_won=cast_to_int(_tackles_won.text) if _tackles_won else None,
+                pens_won=cast_to_int(_pens_won.text) if _pens_won else None,
+                pens_conceded=cast_to_int(_pens_conceded.text)
+                if _pens_conceded
+                else None,
+                own_goals=cast_to_int(_own_goals.text) if _own_goals else None,
+                ball_recoveries=cast_to_int(_ball_recoveries.text)
+                if _ball_recoveries
+                else None,
+                # aerial duels
+                aerials_won=cast_to_int(_aerials_won.text) if _aerials_won else None,
+                aerials_lost=cast_to_int(_aerials_lost.text) if _aerials_lost else None,
+                aerials_won_pct=cast_to_float(_aerials_won_pct.text)
+                if _aerials_won_pct
+                else None,
+            )
+        else:
+            return None
+
+    def _parse_player_match_goalkeeper(
+        self,
+        player: Any,
+        league_name: str,
+        team_name: str
+    ) -> Optional[PlayerMatchStats]:
+        if player.find("th", {"data-stat": "player"}) is not None:
+            # common
+            _player = player.find("th", {"data-stat": "player"})
+            if _player is None or _player.get("data-append-csv") is None:
+                return None
+            _nationality = player.find("td", {"data-stat": "nationality"})
+            _minutes = player.find("td", {"data-stat": "minutes"})
+            # shot stopping
+            _gk_shots_on_target_against = player.find(
+                "td", {"data-stat": "gk_shots_on_target_against"}
+            )
+            _gk_goals_against = player.find("td", {"data-stat": "gk_goals_against"})
+            _gk_saves = player.find("td", {"data-stat": "gk_saves"})
+            _gk_save_pct = player.find("td", {"data-stat": "gk_save_pct"})
+            _gk_psxg = player.find("td", {"data-stat": "gk_psxg"})
+            # launched
+            _gk_passes_completed_launched = player.find(
+                "td", {"data-stat": "gk_passes_completed_launched"}
+            )
+            _gk_passes_launched = player.find("td", {"data-stat": "gk_passes_launched"})
+            _gk_passes_pct_launched = player.find(
+                "td", {"data-stat": "gk_passes_pct_launched"}
+            )
+            # passes
+            _gk_passes = player.find("td", {"data-stat": "gk_passes"})
+            _gk_passes_throws = player.find("td", {"data-stat": "gk_passes_throws"})
+            _gk_pct_passes_launched = player.find(
+                "td", {"data-stat": "gk_pct_passes_launched"}
+            )
+            _gk_passes_length_avg = player.find(
+                "td", {"data-stat": "gk_passes_length_avg"}
+            )
+            # goals kicks
+            _gk_goal_kicks = player.find("td", {"data-stat": "gk_goal_kicks"})
+            _gk_pct_goal_kicks_launched = player.find(
+                "td", {"data-stat": "gk_pct_goal_kicks_launched"}
+            )
+            _gk_goal_kick_length_avg = player.find(
+                "td", {"data-stat": "gk_goal_kick_length_avg"}
+            )
+            # crosses
+            _gk_crosses = player.find("td", {"data-stat": "gk_crosses"})
+            _gk_crosses_stopped = player.find("td", {"data-stat": "gk_crosses_stopped"})
+            _gk_crosses_stopped_pct = player.find(
+                "td", {"data-stat": "gk_crosses_stopped_pct"}
+            )
+            # sweeper
+            _gk_def_actions_outside_pen_area = player.find(
+                "td", {"data-stat": "gk_def_actions_outside_pen_area"}
+            )
+            _gk_avg_distance_def_actions = player.find(
+                "td", {"data-stat": "gk_avg_distance_def_actions"}
+            )
+
+            return PlayerMatchStats(
+                # common
+                name=_player.text.strip(),
+                player_id=_player["data-append-csv"],
+                nationality=_nationality.text.split(" ")[-1],
+                minutes=cast_to_int(_minutes.text),
+                player_url= "https://fbref.com" + _player.find("a").get("href")
+                if _player.find("a") is not None and _player.find("a").get("href") is not None
+                else None,
+                league_name=league_name,
+                team_name=team_name,
+                # shot stopping
+                gk_shots_on_target_against=cast_to_int(
+                    _gk_shots_on_target_against.text
+                )
+                if _gk_shots_on_target_against
+                else None,
+                gk_goals_against=cast_to_int(_gk_goals_against.text)
+                if _gk_goals_against
+                else None,
+                gk_saves=cast_to_int(_gk_saves.text) if _gk_saves else None,
+                gk_save_pct=cast_to_float(_gk_save_pct.text)
+                if _gk_save_pct
+                else None,
+                gk_psxg=cast_to_float(_gk_psxg.text) if _gk_psxg else None,
+                # launched
+                gk_passes_completed_launched=cast_to_int(
+                    _gk_passes_completed_launched.text
+                )
+                if _gk_passes_completed_launched
+                else None,
+                gk_passes_launched=cast_to_int(_gk_passes_launched.text)
+                if _gk_passes_launched
+                else None,
+                gk_passes_pct_launched=cast_to_float(
+                    _gk_passes_pct_launched.text
+                )
+                if _gk_passes_pct_launched
+                else None,
+                # passes
+                gk_passes=cast_to_int(_gk_passes.text) if _gk_passes else None,
+                gk_passes_throws=cast_to_int(_gk_passes_throws.text)
+                if _gk_passes_throws
+                else None,
+                gk_pct_passes_launched=cast_to_float(
+                    _gk_pct_passes_launched.text
+                )
+                if _gk_pct_passes_launched
+                else None,
+                gk_passes_length_avg=cast_to_float(_gk_passes_length_avg.text)
+                if _gk_passes_length_avg
+                else None,
+                # goals kicks
+                gk_goal_kicks=cast_to_int(_gk_goal_kicks.text)
+                if _gk_goal_kicks
+                else None,
+                gk_pct_goal_kicks_launched=cast_to_float(
+                    _gk_pct_goal_kicks_launched.text
+                )
+                if _gk_pct_goal_kicks_launched
+                else None,
+                gk_goal_kick_length_avg=cast_to_float(
+                    _gk_goal_kick_length_avg.text
+                )
+                if _gk_goal_kick_length_avg
+                else None,
+                # crosses
+                gk_crosses=cast_to_int(_gk_crosses.text) if _gk_crosses else None,
+                gk_crosses_stopped=cast_to_int(_gk_crosses_stopped.text)
+                if _gk_crosses_stopped
+                else None,
+                gk_crosses_stopped_pct=cast_to_float(
+                    _gk_crosses_stopped_pct.text
+                )
+                if _gk_crosses_stopped_pct
+                else None,
+                # sweeper
+                gk_def_actions_outside_pen_area=cast_to_int(
+                    _gk_def_actions_outside_pen_area.text
+                )
+                if _gk_def_actions_outside_pen_area
+                else None,
+                gk_avg_distance_def_actions=cast_to_float(
+                    _gk_avg_distance_def_actions.text
+                )
+                if _gk_avg_distance_def_actions
+                else None
+            )
+        else:
+            return None
+
+    def _parse_match_summary_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_summary"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        summary_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_summary"})
+
+        if summary_table is not None:
+            summary_rows = summary_table.find_all("tr")
+            if len(summary_rows) > 2:
+                for row in summary_rows[2:]:
+                    player_stats = self._parse_player_match_summary_stat(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_passing_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_passing"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        passing_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_passing"})
+
+        if passing_table is not None:
+            passing_rows = passing_table.find_all("tr")
+            if len(passing_rows) > 2:
+                for row in passing_rows[2:]:
+                    player_stats = self._parse_player_match_passing_stat(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_pass_types_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_passing_types"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        pass_types_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_passing_types"})
+    
+        if pass_types_table is not None:
+            passing_rows = pass_types_table.find_all("tr")
+            if len(passing_rows) > 2:
+                for row in passing_rows[2:]:
+                    player_stats = self._parse_player_match_pass_types(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_defensive_actions_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_defense"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        defensive_actions_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_defense"})
+    
+        if defensive_actions_table is not None:
+            defensive_actions_rows = defensive_actions_table.find_all("tr")
+            if len(defensive_actions_rows) > 2:
+                for row in defensive_actions_rows[2:]:
+                    player_stats = self._parse_player_match_defensive_actions(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_possesions_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_possession"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        possessions_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_possession"})
+    
+        if possessions_table is not None:
+            possessions_rows = possessions_table.find_all("tr")
+            if len(possessions_rows) > 2:
+                for row in possessions_rows[2:]:
+                    player_stats = self._parse_player_match_possession(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_miscellaneous_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_misc"})
+        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        miscellaneous_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_misc"})
+    
+        if miscellaneous_table is not None:
+            miscellaneous_rows = miscellaneous_table.find_all("tr")
+            if len(miscellaneous_rows) > 2:
+                for row in miscellaneous_rows[2:]:
+                    player_stats = self._parse_player_match_miscellaneous(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_goalkeeper_stats(
+        self, parsed_table: Any, team_id: str, league_name: str
+    ) -> List[PlayerMatchStats]:
+        result = []
+
+        section_anchor = parsed_table.find("div", {"class": f"assoc_keeper_stats_{team_id}"})
+        team_name = section_anchor.text.replace(" Goalkeeper Stats", "").strip()
+        goalkeeper_table = parsed_table.find("div", {"id": f"div_keeper_stats_{team_id}"})
+    
+        if goalkeeper_table is not None:
+            goalkeeper_rows = goalkeeper_table.find_all("tr")
+            if len(goalkeeper_rows) > 2:
+                for row in goalkeeper_rows[2:]:
+                    player_stats = self._parse_player_match_goalkeeper(
+                        player=row,
+                        league_name=league_name,
+                        team_name=team_name
+                    )
+                    if player_stats is not None:
+                        result.append(player_stats)
+
+        return result
+
+    def _parse_match_stats_tables(
+        self, 
+        league_name: str, 
+        main_table: WebElement,
+        goalkeeper_table: WebElement
+    ) -> List[PlayerStats]:
+        table_id = main_table.get_attribute("id")
+        team_id = table_id.split("_")[-1]
+        parsed_main_table = BeautifulSoup(
+            main_table.get_attribute("outerHTML"), "html.parser"
+        )
+        if not parsed_main_table:
+            return []
+
+        players = {}
+        # summary stats
+        players_stats = self._parse_match_summary_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+        # passing stats
+        players_stats = self._parse_match_passing_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+        # pass types stats
+        players_stats = self._parse_match_pass_types_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+        # defensive actions stats
+        players_stats = self._parse_match_defensive_actions_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+        # possession stats
+        players_stats = self._parse_match_possesions_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+        # miscellaneous stats
+        players_stats = self._parse_match_miscellaneous_stats(
+            parsed_main_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+
+        parsed_goalkeeper_table = BeautifulSoup(
+            goalkeeper_table.get_attribute("outerHTML"), "html.parser"
+        )
+        if not parsed_goalkeeper_table:
+            return list(players.values())
+        
+        players_stats = self._parse_match_goalkeeper_stats(
+            parsed_goalkeeper_table, 
+            team_id,
+            league_name
+        )
+        players = self._update_players_match_stat(players, players_stats)
+
+        return list(players.values())
+
+    def parse_match_stats(self, match_url: str, league_name: str) -> List[PlayerMatchStats]:
+        driver = None
+        try:
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument("--disable-blink-features=AutomationControlled")
+
+            driver = webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+            )
+            driver.get(match_url)
+            all_stats_tables: List[WebElement] = WebDriverWait(driver, 3).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "table_wrapper"))
+            )
+            if len(all_stats_tables) < 4:
+                return []
+
+            players = []
+            players += self._parse_match_stats_tables(
+                league_name, 
+                all_stats_tables[0],
+                all_stats_tables[1]
+            )
+            players += self._parse_match_stats_tables(
+                league_name, 
+                all_stats_tables[2],
+                all_stats_tables[3]
+            )
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logging.warning(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logging.warning(f"match_url={match_url}")
+            return []
+        else:
+            return players
+        finally:
+            if driver is not None:
+                driver.quit()
 
     def get_stats_league(self, league_name: str) -> List[PlayerStats]:
         players: Dict[Tuple[str, str, str, str], PlayerStats] = {}

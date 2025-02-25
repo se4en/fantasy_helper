@@ -22,5 +22,7 @@ def test_league_table_basic(leagues: List[LeagueInfo], parser: FbrefParser):
 
 def test_league_schedule_basic(leagues: List[LeagueInfo], parser: FbrefParser):
     for league in leagues:
-        league_schedule = parser._parse_league_schedule(league.name)
+        league_schedule = parser.get_league_schedule(league.name)
+        print(league_schedule)
+        assert False
         assert len(league_schedule) > 0
