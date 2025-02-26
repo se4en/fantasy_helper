@@ -49,7 +49,7 @@ class PlayerDAO:
                     return None
         else:
             return None
-        
+
     def _compute_avg_diff_value(
         self, max_value: Any, min_value: Any, min_games: Any, max_games: Any
     ) -> Any:
