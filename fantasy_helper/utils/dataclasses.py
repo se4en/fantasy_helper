@@ -131,7 +131,7 @@ class LeagueScheduleInfo:
     league_name: str
     home_team: str
     away_team: str
-    gameweek: int
+    gameweek: Optional[int] = None
     date: Optional[datetime.date] = None
     home_goals: Optional[int] = None
     away_goals: Optional[int] = None
