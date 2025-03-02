@@ -451,6 +451,7 @@ class PlayerStatsInfo:
     position: Optional[str] = None
     # playing time
     games: Optional[int] = None
+    games_all: Optional[int] = None
     minutes: Optional[int] = None
     # shooting
     goals: Optional[int] = None
