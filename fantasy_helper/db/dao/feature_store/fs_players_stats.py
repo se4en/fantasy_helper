@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
+from dataclasses import asdict
 from typing import List, Literal, Optional
 
 import numpy as np
@@ -76,11 +77,7 @@ class FSPlayersStatsDAO:
 
         return result
 
-    def get_players_stats_info(
-        self, 
-        league_name: str, 
-        type: Literal["abs, norm"] = "abs"
-    ) -> List[PlayerStatsInfo]:
+    def get_players_stats_info(self, league_name: str) -> List[PlayerStatsInfo]:
         db_session: SQLSession = Session()
 
         # get all teams matches
@@ -269,6 +266,32 @@ class FSPlayersStatsDAO:
 
         return result
 
+    def update_players_stats_info(
+        self,
+        league_name: str,
+        players_stats_info: List[PlayerStatsInfo],
+        add_sports_info: bool = True
+    ) -> None:
+        if add_sports_info:
+            sports_players = self._fs_sports_players_dao.get_sports_players(league_name)
+            players_stats_info = self._naming_dao.add_sports_info_to_players_stats_info(
+                league_name, players_stats_info, sports_players
+            )
+
+        db_session: SQLSession = Session()
+
+        # remove all previous stats
+        db_session.query(FSPlayersStats).filter(
+            FSPlayersStats.league_name == league_name
+        ).delete()
+
+        # add new stats
+        for player_stats_info in players_stats_info:
+            db_session.add(FSPlayersStats(league_name=league_name, **asdict(player_stats_info)))
+
+        db_session.commit()
+        db_session.close()
+
     def get_players_stats(self, league_name: str) -> PlayersLeagueStats:
         """
         Retrieves the player statistics for a given league.
@@ -326,9 +349,8 @@ class FSPlayersStatsDAO:
         return result
 
     def update_players_stats(
-        self, 
-        league_name: str, 
-        players_stats: PlayersLeagueStats, 
+        self,
+        league_name: str,
         add_sports_info: bool = True
     ) -> None:
         """
@@ -348,28 +370,6 @@ class FSPlayersStatsDAO:
             )
 
         db_session: SQLSession = Session()
-
-        # remove all previous stats
-        db_session.query(FSPlayersStats).filter(
-            FSPlayersStats.league_name == league_name
-        ).delete()
-
-        # add new stats
-        for index, abs_player_stats in players_stats.abs_stats.replace(
-            np.nan, None
-        ).iterrows():
-            db_session.add(
-                FSPlayersStats(type="abs", league_name=league_name, **abs_player_stats)
-            )
-
-        for index, norm_player_stats in players_stats.norm_stats.replace(
-            np.nan, None
-        ).iterrows():
-            db_session.add(
-                FSPlayersStats(
-                    type="norm", league_name=league_name, **norm_player_stats
-                )
-            )
 
         # remove all previous stats
         db_session.query(FSPlayersFreeKicks).filter(

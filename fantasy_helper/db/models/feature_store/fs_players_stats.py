@@ -10,14 +10,15 @@ class FSPlayersStats(Base):
     __tablename__ = "fs_players_stats"
 
     id = Column(BigInteger, primary_key=True)
-    type = Column(String, nullable=False)
     league_name = Column(String, nullable=False)
+    type = Column(String, nullable=True)
     # common
     name = Column(String, primary_key=False)
     team = Column(String, nullable=False)
-    position = Column(String, nullable=False)
+    position = Column(String, nullable=True)
     # playing time
     games = Column(Integer, nullable=True)
+    games_all = Column(Integer, nullable=True)
     minutes = Column(Float, nullable=True)
     # shooting
     goals = Column(Float, nullable=True)
@@ -52,38 +53,39 @@ class FSPlayersStats(Base):
 
     def __init__(
         self,
-        type: str,
         league_name: str,
         # common
         name: str,
         team: str,
         position: str,
         # playing time
-        games: Optional[float],
-        minutes: Optional[float],
+        type: Optional[str] = None,
+        games: Optional[float] = None,
+        games_all: Optional[float] = None,
+        minutes: Optional[float] = None,
         # shooting
-        goals: Optional[float],
-        shots: Optional[float],
-        shots_on_target: Optional[float],
-        average_shot_distance: Optional[float],
-        xg: Optional[float],
-        xg_np: Optional[float],
-        xg_xa: Optional[float],
-        xg_np_xa: Optional[float],
+        goals: Optional[float] = None,
+        shots: Optional[float] = None,
+        shots_on_target: Optional[float] = None,
+        average_shot_distance: Optional[float] = None,
+        xg: Optional[float] = None,
+        xg_np: Optional[float] = None,
+        xg_xa: Optional[float] = None,
+        xg_np_xa: Optional[float] = None,
         # passing
-        assists: Optional[float],
-        xa: Optional[float],
-        key_passes: Optional[float],
-        passes_into_penalty_area: Optional[float],
-        crosses_into_penalty_area: Optional[float],
+        assists: Optional[float] = None,
+        xa: Optional[float] = None,
+        key_passes: Optional[float] = None,
+        passes_into_penalty_area: Optional[float] = None,
+        crosses_into_penalty_area: Optional[float] = None,
         # pass types
-        touches_in_attacking_third: Optional[float],
-        touches_in_attacking_penalty_area: Optional[float],
-        carries_in_attacking_third: Optional[float],
-        carries_in_attacking_penalty_area: Optional[float],
+        touches_in_attacking_third: Optional[float] = None,
+        touches_in_attacking_penalty_area: Optional[float] = None,
+        carries_in_attacking_third: Optional[float] = None,
+        carries_in_attacking_penalty_area: Optional[float] = None,
         # shot creation
-        sca: Optional[float],
-        gca: Optional[float],
+        sca: Optional[float] = None,
+        gca: Optional[float] = None,
         # sports info
         sports_team: Optional[str] = None,
         sports_name: Optional[str] = None,
@@ -100,6 +102,7 @@ class FSPlayersStats(Base):
         self.position = position
         # playing time
         self.games = games
+        self.games_all = games_all
         self.minutes = minutes
         # shooting
         self.goals = goals
