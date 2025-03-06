@@ -77,7 +77,7 @@ class FSPlayersStatsDAO:
 
         return result
 
-    def get_players_stats_info(self, league_name: str) -> List[PlayerStatsInfo]:
+    def compute_players_stats_info(self, league_name: str) -> List[PlayerStatsInfo]:
         db_session: SQLSession = Session()
 
         # get all teams matches
@@ -263,6 +263,59 @@ class FSPlayersStatsDAO:
         db_session.close()
 
         result = self._add_empty_matches(result)
+
+        return result
+
+    def get_players_stats_info(self, league_name: str) -> List[PlayerStatsInfo]:
+        db_session: SQLSession = Session()
+
+        league_players_stats = db_session.query(FSPlayersStats).filter(
+            FSPlayersStats.league_name == league_name
+        ).all()
+
+        result = []
+        for player_stat in league_players_stats:
+            result.append(PlayerStatsInfo(
+                name=player_stat.name,
+                team=player_stat.team,
+                position=player_stat.position,
+                # playing time
+                games=player_stat.games,
+                games_all=player_stat.games_all,
+                minutes=player_stat.minutes,
+                # shooting
+                goals=player_stat.goals,
+                shots=player_stat.shots,
+                shots_on_target=player_stat.shots_on_target,
+                average_shot_distance=player_stat.average_shot_distance,
+                xg=player_stat.xg,
+                xg_np=player_stat.xg_np,
+                xg_xa=player_stat.xg_xa,
+                xg_np_xa=player_stat.xg_np_xa,
+                # passing
+                assists=player_stat.assists,
+                xa=player_stat.xa,
+                key_passes=player_stat.key_passes,
+                passes_into_penalty_area=player_stat.passes_into_penalty_area,
+                crosses_into_penalty_area=player_stat.crosses_into_penalty_area,
+                # pass types
+                touches_in_attacking_third=player_stat.touches_in_attacking_third,
+                touches_in_attacking_penalty_area=player_stat.touches_in_attacking_penalty_area,
+                carries_in_attacking_third=player_stat.carries_in_attacking_third,
+                carries_in_attacking_penalty_area=player_stat.carries_in_attacking_penalty_area,
+                # shot creation
+                sca=player_stat.sca,
+                gca=player_stat.gca,
+                # sports info
+                sports_team=player_stat.sports_team,
+                sports_name=player_stat.sports_name,
+                role=player_stat.role,
+                price=player_stat.price,
+                percent_ownership=player_stat.percent_ownership,
+                percent_ownership_diff=player_stat.percent_ownership_diff  
+            ))
+
+        db_session.close()
 
         return result
 
