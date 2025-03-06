@@ -131,7 +131,7 @@ class LeagueScheduleInfo:
     league_name: str
     home_team: str
     away_team: str
-    gameweek: int
+    gameweek: Optional[int] = None
     date: Optional[datetime.date] = None
     home_goals: Optional[int] = None
     away_goals: Optional[int] = None
@@ -451,6 +451,7 @@ class PlayerStatsInfo:
     position: Optional[str] = None
     # playing time
     games: Optional[int] = None
+    games_all: Optional[int] = None
     minutes: Optional[int] = None
     # shooting
     goals: Optional[int] = None

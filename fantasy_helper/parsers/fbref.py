@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import re
 from datetime import date, datetime
 from dataclasses import asdict
 from typing import Any, Callable, Dict, Literal, Optional, List, Tuple
@@ -20,7 +21,7 @@ def cast_to_float(text: str) -> Optional[float]:
     if not text:
         return None
     try:
-        return float(text)
+        return float(text.strip())
     except ValueError:
         logging.warning(f"To float: text={text} len={len(text)}")
         return None
@@ -30,8 +31,11 @@ def cast_to_int(text: str) -> Optional[int]:
     if not text:
         return None
     elif "," in text:
-        text = text.replace(",", "")
-
+        text = text.replace(",", "").strip()
+    elif "(" in text and ")" in text:
+        text = re.sub("\(.*?\)", "", text).strip()
+    else:
+        text = text.strip()
     try:
         return int(text)
     except ValueError:
@@ -928,7 +932,7 @@ class FbrefParser:
             return None
 
     def _parse_schedule_row(
-        self, table_row: Any, league_name: str
+        self, table_row: Any, league_name: str, cup: bool = False
     ) -> Optional[LeagueScheduleInfo]:
         _home_team = table_row.find("td", {"data-stat": "home_team"})
         if _home_team is not None and _home_team.text.strip() != "":
@@ -948,11 +952,18 @@ class FbrefParser:
                 _home_goals, _away_goals = None, None
                 _match_url = None
 
+            if cup:
+                home_team = " ".join(_home_team.text.strip().split(" ")[:-1])
+                away_team = " ".join(_away_team.text.strip().split(" ")[1:])
+            else:
+                home_team = _home_team.text.strip()
+                away_team = _away_team.text.strip()
+
             return LeagueScheduleInfo(
                 league_name=league_name,
                 gameweek=cast_to_int(_gameweek.text) if _gameweek is not None else None,
-                home_team=_home_team.text.strip(),
-                away_team=_away_team.text.strip(),
+                home_team=home_team,
+                away_team=away_team,
                 date=self._parse_fbref_date(_date.text.strip()) if _date is not None else None,
                 home_goals=_home_goals,
                 away_goals=_away_goals,
@@ -963,8 +974,7 @@ class FbrefParser:
         else:
             return None
 
-    def get_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
-
+    def get_league_schedule(self, league_name: str, cup: bool = False) -> List[LeagueScheduleInfo]:
         if league_name not in self._schedule_leagues:
             return []
         if league_name not in self._leagues_ids:
@@ -981,9 +991,14 @@ class FbrefParser:
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
             driver.get(self._schedule_leagues[league_name])
-            league_schedule = WebDriverWait(driver, 3).until(
-                EC.presence_of_element_located((By.ID, f"sched_2024-2025_{league_id}_1"))
-            )
+            if cup:
+                league_schedule = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.ID, f"div_sched_all"))
+                )
+            else:
+                league_schedule = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.ID, f"sched_2024-2025_{league_id}_1"))
+                )
             parsed_league_schedule = BeautifulSoup(
                 league_schedule.get_attribute("outerHTML"), "html.parser"
             )
@@ -997,7 +1012,7 @@ class FbrefParser:
         else:
             result = []
             for table_row in schedule_rows:
-                parsed_table_row = self._parse_schedule_row(table_row, league_name)
+                parsed_table_row = self._parse_schedule_row(table_row, league_name, cup)
                 if parsed_table_row is not None:
                     result.append(parsed_table_row)
             return result
@@ -1123,7 +1138,7 @@ class FbrefParser:
 
             return PlayerMatchStats(
                 # common
-                name=_player.text,
+                name=_player.text.strip(),
                 player_id=_player["data-append-csv"],
                 shirt_number=cast_to_int(_shirt_number.text) if _shirt_number is not None else None,
                 nationality=_nationality.text.split(" ")[-1] if _nationality is not None else None,
@@ -1197,8 +1212,6 @@ class FbrefParser:
             _player = player.find("th", {"data-stat": "player"})
             if _player is None or _player.get("data-append-csv") is None:
                 return None
-            # else:
-            #     print("process player passing", _player.text)
             _shirt_number = player.find("td", {"data-stat": "shirtnumber"})
             _nationality = player.find("td", {"data-stat": "nationality"})
             _position = player.find("td", {"data-stat": "position"})
@@ -1875,7 +1888,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_summary"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         summary_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_summary"})
 
         if summary_table is not None:
@@ -1898,7 +1913,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_passing"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         passing_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_passing"})
 
         if passing_table is not None:
@@ -1921,7 +1938,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_passing_types"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         pass_types_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_passing_types"})
     
         if pass_types_table is not None:
@@ -1944,7 +1963,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_defense"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         defensive_actions_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_defense"})
     
         if defensive_actions_table is not None:
@@ -1967,7 +1988,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_possession"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         possessions_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_possession"})
     
         if possessions_table is not None:
@@ -1990,7 +2013,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_stats_{team_id}_misc"})
-        team_name = section_anchor.text.replace(" Player Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Player Stats")[0].strip()
         miscellaneous_table = parsed_table.find("div", {"id": f"div_stats_{team_id}_misc"})
     
         if miscellaneous_table is not None:
@@ -2013,7 +2038,9 @@ class FbrefParser:
         result = []
 
         section_anchor = parsed_table.find("div", {"class": f"assoc_keeper_stats_{team_id}"})
-        team_name = section_anchor.text.replace(" Goalkeeper Stats", "").strip()
+        if section_anchor is None:
+            return result
+        team_name = section_anchor.text.split("Goalkeeper Stats")[0].strip()
         goalkeeper_table = parsed_table.find("div", {"id": f"div_keeper_stats_{team_id}"})
     
         if goalkeeper_table is not None:

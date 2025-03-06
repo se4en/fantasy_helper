@@ -15,6 +15,12 @@ NOT_VISIBLE_COLUMNS = {"id", "type", "league_name", "name", "team", "position"}
 COMMON_COLUMNS = {"sports_name", "sports_team", "role", "price", "games", "minutes"}
 FREE_KICKS_COLUMNS = {"sports_name", "sports_team", "role", "price", "games", "penalty_shots", "corner_kicks", "free_kicks_shots"}
 DEFAULT_COLUMNS = {"goals", "assists", "shots", "xg", "xg_xa"}
+STATS_COLUMNS = (
+    "goals", "shots", "shots_on_target", "xg", "xg_np", "xg_xa", "xg_np_xa", "assists", "xa",
+    "passes_into_penalty_area", "crosses_into_penalty_area", "touches_in_attacking_third",
+    "touches_in_attacking_penalty_area", "carries_in_attacking_third", "carries_in_attacking_penalty_area",
+    "sca", "gca",
+)
 
 COLUMNS_NAMES = (
     ("sports_name", "Имя"),
@@ -31,7 +37,7 @@ COLUMNS_NAMES = (
     ("goals", "Голы"),
     ("shots", "Удары"),
     ("shots_on_target", "УдСтвор"),
-    ("average_shot_distance", "УдДист"),
+    # ("average_shot_distance", "УдДист"),
     ("xg", "xG"),
     ("xg_np", "xGnp"),
     ("xg_xa", "xG + xA"),
@@ -39,7 +45,7 @@ COLUMNS_NAMES = (
     # passing
     ("assists", "ГолевыеПер"),
     ("xa", "xA"),
-    ("key_passes", "КлючПасы"),
+    # ("key_passes", "КлючПасы"),
     ("passes_into_penalty_area", "ПасыПенЗон"),
     ("crosses_into_penalty_area", "ПасыШтрЗон"),
     # possesion
@@ -62,43 +68,34 @@ COLUMNS_REVERSE_MAPPING = {v: k for k, v in COLUMNS_NAMES}
 
 @st.cache_data(ttl=3600, max_entries=100, show_spinner="Loading players stats...")
 def prepare_players_stats_df(
-    players_stats: PlayersLeagueStats,
+    players_stats_info: List[PlayerStatsInfo],
     games_count: int,
-    is_abs_stats: bool = True,
+    normalize_minutes: bool = False,
+    normalize_matches: bool = False,
     min_minutes: Optional[int] = None
 ) -> pd.DataFrame:
-    if is_abs_stats:
-        df = players_stats.abs_stats
-    else:
-        df = players_stats.norm_stats
-
+    df = pd.DataFrame([asdict(player_stats) for player_stats in players_stats_info])
     if df is None or len(df) == 0:
         return
 
-    df = df.loc[df["games"] <= games_count]
+    max_games_count = df["games_all"].max()
+    if max_games_count < games_count:
+        games_count_filter = max_games_count
+    else:
+        games_count_filter = games_count
+    
+    df = df.loc[df["games_all"] == games_count_filter]
     if min_minutes is not None:
         df = df.loc[df["minutes"] >= min_minutes]
 
+    if normalize_minutes:
+        df.loc[df["minutes"] > 0, STATS_COLUMNS].div(df.loc[df["minutes"] > 0, "minutes"], axis=0)
+    elif normalize_matches:
+        df.loc[df["games"] > 0, STATS_COLUMNS].div(df.loc[df["games"] > 0, "games"], axis=0)
+
     df.dropna(axis=1, how="all", inplace=True)
 
-    def _get_max_game_count_row(group: pd.DataFrame) -> pd.DataFrame:
-        """
-        Get the row with the maximum game count from a given group.
-
-        Args:
-            group (pd.DataFrame): The group of data to search for the row with the maximum game count.
-
-        Returns:
-            pd.DataFrame: The row with the maximum game count, as a DataFrame. If no such row exists, an empty DataFrame is returned.
-        """
-        result = group.loc[group["games"] == group["games"].max()]
-        if len(result) > 0:
-            return pd.DataFrame(result.iloc[0].to_dict(), index=[0])
-        else:
-            return pd.DataFrame()
-
     if not df.empty and "sports_name" in df.columns and "role" in df.columns:
-        df = df.groupby(by=["name"]).apply(_get_max_game_count_row)
         df.drop(columns=NOT_VISIBLE_COLUMNS, inplace=True, errors="ignore")        
         df = df.loc[~df["sports_name"].isna()]
         df.reset_index(drop=True, inplace=True)

@@ -16,7 +16,7 @@ from fantasy_helper.ui.utils.lineups import lineup_to_formation, plot_lineup
 from fantasy_helper.ui.utils.players_stats import get_available_stats_columns, get_default_stats_columns, get_player_stats, plot_free_kicks_stats, plot_main_players_stats, plot_players_stats_diff, prepare_players_stats_df
 from fantasy_helper.ui.utils.sports_players import get_available_positions, plot_sports_players
 from fantasy_helper.utils.common import load_config
-from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
@@ -84,6 +84,13 @@ def get_players_league_stats(league_name: str) -> PlayersLeagueStats:
     league_stats.from_json(r.json())
 
     return league_stats
+
+
+@st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players stats...")
+def get_players_stats_info(league_name: str) -> List[PlayerStatsInfo]:
+    r = requests.get(api_url + f"/players_stats_info/?league_name={league_name}")
+    players_stats = [PlayerStatsInfo(**player_stats) for player_stats in r.json()]
+    return players_stats
 
 
 @st.cache_data(ttl=3600, max_entries=10, show_spinner="Loading players stats...")
@@ -173,7 +180,8 @@ if authentication_status:
     leagues = get_leagues()
     st.session_state["league"] = list(leagues.values())[0]
     # players stats
-    st.session_state["normalize"] = False
+    st.session_state["normalize_minutes"] = False
+    st.session_state["normalize_matches"] = False
     st.session_state["games_count"] = 3
     st.session_state["min_minutes"] = 5
 
@@ -188,6 +196,7 @@ if authentication_status:
 
     coeffs_df = coeffs_to_df(st.session_state["league"])
     players_stats = get_players_league_stats(st.session_state["league"])
+    players_stats_info = get_players_stats_info(st.session_state["league"])
     players_stats_team_names = get_players_stats_teams_names(st.session_state["league"])
     players_stats_positions = get_available_positions()
     players_stats_prices = get_players_stats_prices(st.session_state["league"])
@@ -234,7 +243,7 @@ if authentication_status:
     # plot stats
     centrize_header("Статистика игроков")
 
-    columns = st.columns([2, 1, 1, 1, 2, 2, 2])
+    columns = st.columns([2, 1, 1, 1, 2, 2, 2, 2])
     with columns[0]:
         st.selectbox(
             "Команда",
@@ -267,32 +276,31 @@ if authentication_status:
         )
     with columns[4]:
         st.session_state["games_count"] = st.number_input(
-            "Матчи", value=3, min_value=1, max_value=30, step=1
+            "Последние матчи", value=3, min_value=1, max_value=30, step=1
         )
     with columns[5]:
         st.session_state["min_minutes"] = st.number_input(
-            "Минуты", value=None, min_value=1, max_value=1000, step=1
+            "Минимум минут", value=None, min_value=1, max_value=1000, step=1
         )
     with columns[6]:
         st.write("")
         st.write("")
-        st.session_state["normalize"] = st.toggle("Нормировать на 90 мин")
+        st.session_state["normalize_minutes"] = st.toggle("Нормировать на 90 мин")
+    with columns[7]:
+        st.write("")
+        st.write("")
+        st.session_state["normalize_matches"] = st.toggle("Нормировать на матчи")
 
     players_stats_df = prepare_players_stats_df(
-        players_stats,
+        players_stats_info,
         games_count=st.session_state["games_count"],
-        is_abs_stats=not st.session_state["normalize"],
-        min_minutes=st.session_state["min_minutes"]
-    )
-    abs_players_stats_df = prepare_players_stats_df(
-        players_stats,
-        games_count=st.session_state["games_count"],
-        is_abs_stats=True,
+        normalize_minutes=st.session_state["normalize_minutes"],
+        normalize_matches=st.session_state["normalize_matches"],
         min_minutes=st.session_state["min_minutes"]
     )
 
-    available_stats_columns = get_available_stats_columns(abs_players_stats_df)
-    default_stats_columns = get_default_stats_columns(abs_players_stats_df)
+    available_stats_columns = get_available_stats_columns(players_stats_df)
+    default_stats_columns = get_default_stats_columns(players_stats_df)
     st.multiselect(
         "Выбранные опции",
         options=available_stats_columns,
@@ -353,12 +361,12 @@ if authentication_status:
         )
     
     left_player = get_player_stats(
-        abs_players_stats_df,
+        players_stats_df,
         team_name=st.session_state["player_stats_team_name_left"],
         name=st.session_state["player_stats_player_name_left"]
     )
     right_player = get_player_stats(
-        abs_players_stats_df,
+        players_stats_df,
         team_name=st.session_state["player_stats_team_name_right"],
         name=st.session_state["player_stats_player_name_right"]
     )

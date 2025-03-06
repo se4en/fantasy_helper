@@ -15,7 +15,7 @@ class FbrefSchedule(Base):
     timestamp = Column(DateTime, nullable=False)
     home_team = Column(String, nullable=False)
     away_team = Column(String, nullable=False)
-    gameweek = Column(Integer, nullable=False)
+    gameweek = Column(Integer, nullable=True)
     date = Column(Date, nullable=True)
     home_goals = Column(Integer, nullable=True)
     away_goals = Column(Integer, nullable=True)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session as SQLSession
 import pandas as pd
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo, PlayerName, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo, PlayerName, PlayerStatsInfo, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.ml.player_name import PlayerName as DBPlayerName
 from fantasy_helper.db.models.ml.team_name import TeamName as DBTeamName
@@ -270,6 +270,50 @@ class NamingDAO:
         result.abs_stats = result.abs_stats.merge(players_info, how="left", on=["name", "sports_team"])
         result.norm_stats = result.norm_stats.merge(players_info, how="left", on=["name", "sports_team"])
         result.free_kicks = result.free_kicks.merge(players_info, how="left", on=["name", "sports_team"])
+
+        return result
+    
+    def add_sports_info_to_players_stats_info(
+            self, 
+            league_name: str, 
+            players_stats_info: List[PlayerStatsInfo], 
+            sports_players: List[SportsPlayerDiff]
+        ) -> List[PlayerStatsInfo]:
+        # get teams info
+        teams_names = self.get_teams(league_name)
+        teams_sports_2_fbref = {
+            team.sports_name: team.fbref_name for team in teams_names
+        }
+
+        # get players info
+        players_names = self.get_players(league_name)
+        players_sports_2_fbref = {
+            player.sports_name: player.fbref_name for player in players_names
+        }
+
+        # sports info
+        fbref_2_sports_players = {}
+        for player in sports_players:
+            fbref_name = players_sports_2_fbref.get(player.name)
+            fbref_team = teams_sports_2_fbref.get(player.team_name)
+            if fbref_name and fbref_team:
+                fbref_2_sports_players[(fbref_name, fbref_team)] = player
+
+        # add sports info
+        result = []
+        for player_stats_info in players_stats_info:
+            cur_player_stats_info = deepcopy(player_stats_info)
+            sports_player = fbref_2_sports_players.get(
+                (player_stats_info.name, player_stats_info.team)
+            )
+            if sports_player is not None:
+                cur_player_stats_info.sports_name = sports_player.name
+                cur_player_stats_info.sports_team = sports_player.team_name
+                cur_player_stats_info.role = sports_player.role
+                cur_player_stats_info.price = sports_player.price
+                cur_player_stats_info.percent_ownership = sports_player.percent_ownership
+                cur_player_stats_info.percent_ownership_diff = sports_player.percent_ownership_diff
+            result.append(cur_player_stats_info)
 
         return result
 

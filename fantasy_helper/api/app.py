@@ -16,7 +16,7 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -58,6 +58,12 @@ async def get_players_stats(league_name: str) -> Dict:
     """
     players_stats = FS_Player_dao.get_players_stats(league_name)
     return players_stats.to_json()
+
+
+@app.get("/players_stats_info/")
+async def get_players_stats_info(league_name: str) -> List[PlayerStatsInfo]:
+    players_stats_info = FS_Player_dao.get_players_stats_info(league_name)
+    return players_stats_info
 
 
 @app.get("/players_stats_teams_names/")

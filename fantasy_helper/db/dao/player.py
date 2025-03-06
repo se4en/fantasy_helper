@@ -49,7 +49,7 @@ class PlayerDAO:
                     return None
         else:
             return None
-        
+
     def _compute_avg_diff_value(
         self, max_value: Any, min_value: Any, min_games: Any, max_games: Any
     ) -> Any:
@@ -523,3 +523,5 @@ class PlayerDAO:
         for league in self.__leagues:
             players_stats = self.get_players_stats(league.name)
             feature_store.update_players_stats(league.name, players_stats)
+            players_stats_info = feature_store.compute_players_stats_info(league.name)
+            feature_store.update_players_stats_info(league.name, players_stats_info)
