@@ -522,6 +522,6 @@ class PlayerDAO:
 
         for league in self.__leagues:
             players_stats = self.get_players_stats(league.name)
-            feature_store.update_players_stats(league.name, players_stats)
+            feature_store.update_players_stats(league.name, players_stats, add_sports_info=False)
             players_stats_info = feature_store.compute_players_stats_info(league.name)
             feature_store.update_players_stats_info(league.name, players_stats_info)
