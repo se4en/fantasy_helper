@@ -246,6 +246,28 @@ class PlayerStats:
     passes_offsides: Optional[int] = None
     passes_blocked: Optional[int] = None
     # possesion
+    touches: Optional[int] = None
+    touches_def_pen_area: Optional[int] = None
+    touches_def_3rd: Optional[int] = None
+    touches_mid_3rd: Optional[int] = None
+    touches_att_3rd: Optional[int] = None
+    touches_att_pen_area: Optional[int] = None
+    touches_live_ball: Optional[int] = None
+    take_ons: Optional[int] = None
+    take_ons_won: Optional[int] = None
+    take_ons_won_pct: Optional[float] = None
+    take_ons_tackled: Optional[int] = None
+    take_ons_tackled_pct: Optional[float] = None
+    carries: Optional[int] = None
+    carries_distance: Optional[int] = None
+    carries_progressive_distance: Optional[int] = None
+    progressive_carries: Optional[int] = None
+    carries_into_final_third: Optional[int] = None
+    carries_into_penalty_area: Optional[int] = None
+    miscontrols: Optional[int] = None
+    dispossessed: Optional[int] = None
+    passes_received: Optional[int] = None
+    progressive_passes_received: Optional[int] = None
     # shot creation
     sca: Optional[int] = None
     sca_per90: Optional[float] = None
