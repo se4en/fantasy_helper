@@ -404,6 +404,7 @@ class FSPlayersStatsDAO:
     def update_players_stats(
         self,
         league_name: str,
+        players_stats: PlayersLeagueStats,
         add_sports_info: bool = True
     ) -> None:
         """
