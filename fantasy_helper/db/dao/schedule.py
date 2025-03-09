@@ -44,15 +44,26 @@ class ScheduleDao:
             .subquery()
         )
 
+        latest_timestamp = db_session.query(
+            func.max(all_league_schedules.c.timestamp)
+        ).scalar()
+
+        if latest_timestamp is None:
+            latest_league_schedules = all_league_schedules
+        else:
+            latest_league_schedules = db_session.query(all_league_schedules).filter(
+                func.DATE(all_league_schedules.c.timestamp) == latest_timestamp.date()
+            ).subquery()
+
         grouped_by_games = db_session.query(
-            all_league_schedules,
+            latest_league_schedules,
             func.row_number()
             .over(
-                order_by=(all_league_schedules.c.timestamp.desc()),
+                order_by=(latest_league_schedules.c.timestamp.desc()),
                 partition_by=(
-                    all_league_schedules.c.home_team,
-                    all_league_schedules.c.away_team,
-                    all_league_schedules.c.gameweek,
+                    latest_league_schedules.c.home_team,
+                    latest_league_schedules.c.away_team,
+                    latest_league_schedules.c.gameweek,
                 ),
             )
             .label("row_number"),
