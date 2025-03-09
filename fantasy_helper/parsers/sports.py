@@ -6,6 +6,7 @@ import pytz
 from datetime import datetime
 
 import requests
+from fantasy_helper.parsers.fbref import cast_to_int
 import iso8601
 
 from fantasy_helper.utils.dataclasses import LeagueInfo, SportsMatchInfo, SportsPlayerStats, SportsTourInfo
@@ -18,6 +19,7 @@ class SportsParser:
         url: str = "https://www.sports.ru/gql/graphql/",
         queries_path: Optional[str] = None,
     ):
+        self._playoff_tour_number = 50
         self._url = url
         if queries_path is not None:
             self._queries_path = queries_path
@@ -82,26 +84,37 @@ class SportsParser:
         
         tour_matches = []
         for match in tour_info.get("matches", []):
-            tour_matches.append(
-                SportsMatchInfo(
-                    id=match["id"],
-                    match_status=match["matchStatus"],
-                    scheduled_at_stamp=match["scheduledAtStamp"],
-                    date_only=match["dateOnly"],
-                    home_team=match.get("home", {}).get("team", {}).get("name", {}),
-                    away_team=match.get("away", {}).get("team", {}).get("name", {}),
-                    scheduled_at_datetime=datetime.fromtimestamp(match["scheduledAtStamp"])
+            if match is not None:
+                home_team, away_team = None, None
+                if match.get("home") is not None and match.get("home").get("team") is not None:
+                    home_team = match.get("home").get("team").get("name")
+                if match.get("away") is not None and match.get("away").get("team") is not None:
+                    away_team = match.get("away").get("team").get("name")
+                
+                if home_team is None or away_team is None:
+                    continue
+
+                tour_matches.append(
+                    SportsMatchInfo(
+                        id=match["id"],
+                        match_status=match["matchStatus"],
+                        scheduled_at_stamp=match["scheduledAtStamp"],
+                        date_only=match["dateOnly"],
+                        home_team=home_team,
+                        away_team=away_team,
+                        scheduled_at_datetime=datetime.fromtimestamp(match["scheduledAtStamp"])
+                    )
                 )
-            )
 
         return SportsTourInfo(
             league_name=league_name,
-            number=int(tour_info["name"].split(" ")[0]),
             matches=tour_matches,
             deadline=iso8601.parse_date(tour_info["startedAt"]).replace(
                 tzinfo=pytz.UTC
             ),
             status=tour_info["status"],
+            number=cast_to_int(tour_info["name"].split(" ")[0]),
+            name=tour_info["name"]
         )
 
     def get_schedule(self, league_name: str) -> Optional[List[SportsTourInfo]]:
@@ -115,11 +128,16 @@ class SportsParser:
 
         result = []
         query_id = list(data["data"].keys())[0]
+        prev_tour_number = self._playoff_tour_number
         for tour_info in data["data"][query_id]["squads"][0]["season"]["tours"]:
-            result.append(self._parse_tour_info(league_name, tour_info))
+            parsed_tour_info = self._parse_tour_info(league_name, tour_info)
+            if parsed_tour_info.number is None:
+                parsed_tour_info.number = prev_tour_number + 1
+            prev_tour_number = parsed_tour_info.number
+            result.append(parsed_tour_info)
 
         return result
-    
+
     def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[SportsMatchInfo]]:
         schedule = self.get_schedule(league_name)
         if schedule is None:
@@ -134,6 +152,7 @@ class SportsParser:
         while tour_index < len(schedule) and added_tours < tour_count:
             for match in schedule[tour_index].matches:
                 match.tour_number = schedule[tour_index].number
+                match.tour_name = schedule[tour_index].name
                 result.append(match)
             tour_index += 1
             added_tours += 1

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session as SQLSession
 import pandas as pd
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
-from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo, PlayerName, PlayerStatsInfo, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
+from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, MatchInfo, PlayerName, PlayerStatsInfo, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.ml.player_name import PlayerName as DBPlayerName
 from fantasy_helper.db.models.ml.team_name import TeamName as DBTeamName
@@ -321,7 +321,7 @@ class NamingDAO:
             self,
             league_name: str,
             coeffs: List[MatchInfo],
-            sports_matches: List[SportsMatchInfo]
+            sports_matches: List[LeagueScheduleInfo]
         ) -> List[MatchInfo]:
         teams_names = self.get_teams(league_name)
         xbet_team_2_sports = {
@@ -343,7 +343,7 @@ class NamingDAO:
             if coeff_match is not None:
                 coeff_match.home_team = match.home_team
                 coeff_match.away_team = match.away_team
-                coeff_match.tour_number = match.tour_number
+                coeff_match.tour_number = match.gameweek
                 result.append(coeff_match)
 
         return result

@@ -3,6 +3,7 @@ from typing import List, Literal, Optional, Tuple
 import os.path as path
 from datetime import timezone
 
+from fantasy_helper.db.dao.schedule import ScheduleDao
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
@@ -30,10 +31,7 @@ class CoeffDAO:
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
 
         self._xbet_parser = XbetParser(leagues=self._leagues)
-        self._sports_parser = SportsParser(
-            leagues=self._leagues,
-            queries_path=path.join(path.dirname(__file__), "../../parsers/queries"),
-        )
+        self._schedule_dao = ScheduleDao()
         self._naming_dao = NamingDAO()
 
     def get_actual_coeffs(self, league_name: str) -> List[MatchInfo]:
@@ -86,13 +84,6 @@ class CoeffDAO:
 
         return result
 
-    def get_tour_number(self, league_name: str) -> Optional[int]:
-        cur_tour = self._sports_parser.get_current_tour(league_name)
-        if cur_tour is None:
-            return None
-        else:
-            return cur_tour.number
-
     def update_coeffs(self, league_name: str) -> None:
         matches = self._xbet_parser.get_league_matches(league_name)
 
@@ -118,7 +109,7 @@ class CoeffDAO:
 
         for league in self._leagues:
             actual_coeffs = self.get_actual_coeffs(league.name)
-            sports_matches = self._sports_parser.get_next_matches(
+            sports_matches = self._schedule_dao.get_next_matches(
                 league.name, 2
             )
             sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
