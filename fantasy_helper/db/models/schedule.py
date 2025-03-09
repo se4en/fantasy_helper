@@ -16,6 +16,7 @@ class Schedule(Base):
     home_team = Column(String, nullable=False)
     away_team = Column(String, nullable=False)
     gameweek = Column(Integer, nullable=False)
+    tour_name = Column(String, nullable=True)
     date = Column(Date, nullable=True)
     home_goals = Column(Integer, nullable=True)
     away_goals = Column(Integer, nullable=True)
@@ -27,6 +28,7 @@ class Schedule(Base):
         home_team: str,
         away_team: str,
         gameweek: int,
+        tour_name: Optional[str] = None,
         date: Optional[datetime.date] = None,
         home_goals: Optional[int] = None,
         away_goals: Optional[int] = None,
@@ -36,6 +38,7 @@ class Schedule(Base):
         self.home_team = home_team
         self.away_team = away_team
         self.gameweek = gameweek
+        self.tour_name = tour_name
         self.date = date
         self.home_goals = home_goals
         self.away_goals = away_goals

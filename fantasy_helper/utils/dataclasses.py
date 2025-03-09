@@ -13,6 +13,7 @@ class MatchInfo:
     away_team: str
     start_datetime: Optional[datetime.datetime] = None
     tour_number: Optional[int] = None
+    tour_name: Optional[str] = None
 
     result_1: Optional[float] = None
     result_x: Optional[float] = None
@@ -132,6 +133,7 @@ class LeagueScheduleInfo:
     home_team: str
     away_team: str
     gameweek: Optional[int] = None
+    tour_name: Optional[str] = None
     date: Optional[datetime.date] = None
     home_goals: Optional[int] = None
     away_goals: Optional[int] = None
@@ -581,15 +583,17 @@ class SportsMatchInfo:
     away_team: Optional[str] = None
     scheduled_at_datetime: Optional[datetime.datetime] = None
     tour_number: Optional[int] = None
+    tour_name: Optional[str] = None
 
 
 @dataclass
 class SportsTourInfo:
     league_name: str
-    number: int
     matches: List[SportsMatchInfo]
     deadline: datetime.datetime
     status: str
+    number: Optional[int] = None
+    name: Optional[str] = None
 
 
 @dataclass

@@ -1,6 +1,6 @@
 from dataclasses import asdict
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 import os.path as path
 
 from sqlalchemy.orm import Session as SQLSession
@@ -82,12 +82,47 @@ class ScheduleDao:
                 home_team=schedule_row.home_team,
                 away_team=schedule_row.away_team,
                 gameweek=schedule_row.gameweek,
+                tour_name=schedule_row.tour_name,
                 date=schedule_row.date,
                 home_goals=schedule_row.home_goals,
                 away_goals=schedule_row.away_goals,
             ) 
             for schedule_row in latest_schedule_rows
         ]
+        return result
+
+    def get_current_tour_number(self, league_name: str) -> Optional[int]:
+        schedule = self.get_schedule(league_name)
+        if not schedule:
+            return None
+
+        ordered_schedule = sorted(schedule, key=lambda x: x.date)
+        min_gameweek = ordered_schedule[0].gameweek
+
+        return min_gameweek
+
+    def get_next_tour_number(self, league_name: str) -> Optional[int]:
+        schedule = self.get_schedule(league_name)
+        if not schedule:
+            return None
+
+        ordered_schedule = sorted(schedule, key=lambda x: x.date)
+        min_gameweek = ordered_schedule[0].gameweek
+
+        return min_gameweek + 1
+
+    def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[LeagueScheduleInfo]]:
+        schedule = self.get_schedule(league_name)
+        if not schedule:
+            return None
+
+        ordered_schedule = sorted(schedule, key=lambda x: x.date)
+        min_gameweek = ordered_schedule[0].gameweek
+        result = []
+        for match in ordered_schedule:
+            if match.gameweek >= min_gameweek and match.gameweek <= min_gameweek + tour_count:
+                result.append(match)
+
         return result
 
     def update_schedules_all_leagues(self) -> None:
@@ -105,6 +140,7 @@ class ScheduleDao:
                         home_team=match.home_team,
                         away_team=match.away_team,
                         gameweek=match.tour_number,
+                        tour_name=match.tour_name,
                         date=match.scheduled_at_datetime.date() if match.scheduled_at_datetime else None,
                         timestamp=datetime.now().replace(tzinfo=utc)
                     )
