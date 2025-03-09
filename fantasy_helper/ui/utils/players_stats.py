@@ -106,7 +106,7 @@ def prepare_players_stats_df(
 
 
 def plot_main_players_stats(
-    players_stats_df: pd.DataFrame, 
+    players_stats_df: Optional[pd.DataFrame],
     columns_names: List[str],
     team_name: str = "All",
     position: str = "All",
@@ -124,6 +124,9 @@ def plot_main_players_stats(
     Returns:
         None
     """
+    if players_stats_df is None or len(players_stats_df) == 0:
+        return
+
     df_columns = players_stats_df.columns
     if team_name != "All" and "sports_team" in df_columns:
         players_stats_df = players_stats_df.loc[players_stats_df["sports_team"] == team_name]
@@ -145,23 +148,33 @@ def plot_main_players_stats(
     st.dataframe(players_stats_df, hide_index=True)
 
 
-def get_available_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
+def get_available_stats_columns(players_stats_df: Optional[pd.DataFrame]) -> List[str]:
     result = []
+
+    if players_stats_df is None:
+        return result
+
     for column in list(players_stats_df.columns):
         if column not in COMMON_COLUMNS:
             column_name = COLUMNS_MAPPING.get(column)
             if column_name is not None:
                 result.append(column_name)
+
     return result
 
 
-def get_default_stats_columns(players_stats_df: pd.DataFrame) -> List[str]:
+def get_default_stats_columns(players_stats_df: Optional[pd.DataFrame]) -> List[str]:
     result = []
+
+    if players_stats_df is None:
+        return result
+
     for column in list(players_stats_df.columns):
         if column not in COMMON_COLUMNS and column in DEFAULT_COLUMNS:
             column_name = COLUMNS_MAPPING.get(column)
             if column_name is not None:
                 result.append(column_name)
+
     return result
 
 

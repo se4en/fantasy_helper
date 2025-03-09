@@ -205,13 +205,22 @@ class NameMatcher:
             sports_2_fbref_teams = self.match_teams_names(free_sports_teams_names, free_fbref_teams_names)
             sports_2_xbet_teams = self.match_teams_names(free_sports_teams_names, free_xbet_teams_names)
 
-            for k, v in sports_2_fbref_teams.items():
-                teams_to_add.append(TeamName(
-                    league_name=league_name,
-                    sports_name=k,
-                    fbref_name=v,
-                    xbet_name=sports_2_xbet_teams.get(k)
-                ))
+            if len(sports_2_fbref_teams) > len(sports_2_xbet_teams):
+                for k, v in sports_2_fbref_teams.items():
+                    teams_to_add.append(TeamName(
+                        league_name=league_name,
+                        sports_name=k,
+                        fbref_name=v,
+                        xbet_name=sports_2_xbet_teams.get(k)
+                    ))
+            else:
+                for k, v in sports_2_xbet_teams.items():
+                    teams_to_add.append(TeamName(
+                        league_name=league_name,
+                        sports_name=k,
+                        fbref_name=sports_2_fbref_teams.get(k),
+                        xbet_name=v
+                    ))
 
         return teams_to_add, teams_to_delete
 
