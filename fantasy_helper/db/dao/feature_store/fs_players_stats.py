@@ -96,7 +96,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.league_name == league_name,
                 FbrefSchedule.match_parsed == True
             ))
-        )
+        ).distinct()
         away_teams_matches = (
             db_session.query(
                 FbrefSchedule.home_team.label("home_team"),
@@ -112,7 +112,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.league_name == league_name,
                 FbrefSchedule.match_parsed == True
             ))
-        )
+        ).distinct()
         all_teams_matches = union(home_teams_matches, away_teams_matches).alias()
         ordered_teams_matches = db_session.query(
             all_teams_matches,
@@ -126,11 +126,43 @@ class FSPlayersStatsDAO:
 
         # get all players matches
         cur_league_players = (
-            db_session.query(PlayersMatch)
+            db_session.query(
+                # common
+                PlayersMatch.name.label("name"),
+                PlayersMatch.name.label("player_id"),
+                PlayersMatch.position.label("position"),
+                PlayersMatch.league_name.label("league_name"),
+                PlayersMatch.team_name.label("team_name"),
+                PlayersMatch.minutes.label("minutes"),
+                PlayersMatch.shirt_number.label("shirt_number"),
+                PlayersMatch.nationality.label("nationality"),
+                # match info
+                PlayersMatch.home_team.label("home_team"),
+                PlayersMatch.away_team.label("away_team"),
+                PlayersMatch.gameweek.label("gameweek"),
+                PlayersMatch.date.label("date"),
+                # other
+                PlayersMatch.goals.label("goals"),
+                PlayersMatch.shots.label("shots"),
+                PlayersMatch.shots_on_target.label("shots_on_target"),
+                PlayersMatch.xg.label("xg"),
+                PlayersMatch.xg_np.label("xg_np"),
+                PlayersMatch.assists.label("assists"),
+                PlayersMatch.xg_assist.label("xg_assist"),
+                PlayersMatch.passes_into_penalty_area.label("passes_into_penalty_area"),
+                PlayersMatch.crosses_into_penalty_area.label("crosses_into_penalty_area"),
+                PlayersMatch.touches_att_3rd.label("touches_att_3rd"),
+                PlayersMatch.touches_att_pen_area.label("touches_att_pen_area"),
+                PlayersMatch.carries_into_final_third.label("carries_into_final_third"),
+                PlayersMatch.carries_into_penalty_area.label("carries_into_penalty_area"),
+                PlayersMatch.sca.label("sca"),
+                PlayersMatch.gca.label("gca"),
+            )
             .filter(and_(
                 PlayersMatch.league_name == league_name,
                 PlayersMatch.date != None
             ))
+            .distinct()
             .subquery()
         )
 
