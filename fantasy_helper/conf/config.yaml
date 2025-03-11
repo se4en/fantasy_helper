@@ -199,13 +199,13 @@ leagues:
     fbref_league_id: 8
     fbref_table_url: https://fbref.com/en/comps/8/Champions-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures
-    fbref_playing_time_url: https://fbref.com/en/comps/8/playingtime/Champions-League-Stats
-    fbref_standart_url: https://fbref.com/en/comps/8/stats/Champions-League-Stats
-    fbref_shooting_url: https://fbref.com/en/comps/8/shooting/Champions-League-Stats
-    fbref_passing_url: https://fbref.com/en/comps/8/passing/Champions-League-Stats
-    fbref_pass_types_url: https://fbref.com/en/comps/8/passing_types/Champions-League-Stats
-    fbref_possesion_url: https://fbref.com/en/comps/8/possession/Champions-League-Stats
-    fbref_shot_creation_url: https://fbref.com/en/comps/8/gca/Champions-League-Stats
+    fbref_playing_time_url: null
+    fbref_standart_url: null
+    fbref_shooting_url: null
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
     sportsmole_name: "Champions League"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: EuropaLeague
@@ -217,11 +217,11 @@ leagues:
     fbref_league_id: 19
     fbref_table_url: https://fbref.com/en/comps/19/Europa-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures
-    fbref_playing_time_url: https://fbref.com/en/comps/19/playingtime/Europa-League-Stats
-    fbref_standart_url: https://fbref.com/en/comps/19/stats/Europa-League-Stats
-    fbref_shooting_url: https://fbref.com/en/comps/19/shooting/Europa-League-Stats
-    fbref_passing_url: https://fbref.com/en/comps/19/passing/Europa-League-Stats
-    fbref_pass_types_url: https://fbref.com/en/comps/19/passing_types/Europa-League-Stats
-    fbref_possesion_url: https://fbref.com/en/comps/19/possession/Europa-League-Stats
-    fbref_shot_creation_url: https://fbref.com/en/comps/19/gca/Europa-League-Stats
+    fbref_playing_time_url: null
+    fbref_standart_url: null
+    fbref_shooting_url: null
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
     sportsmole_name: "Europa League"
