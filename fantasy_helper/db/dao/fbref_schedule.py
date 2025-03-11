@@ -93,7 +93,7 @@ class FbrefScheduleDao:
                 league_name=league_name, cup=cup
             )
 
-            parsed_matches = set(self.get_parsed_matches(league_name=league_name))
+            parsed_matches = set(map(hash, self.get_parsed_matches(league_name=league_name)))
 
             matches_2_parse, matches_2_add = [], []
             for schedule_row in schedule_rows:
