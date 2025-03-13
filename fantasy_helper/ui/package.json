@@ -1,0 +1,21 @@
+{
+  "name": "fantasy-helper",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "vue": "3.4.0",
+    "vue-router": "4.2.5",
+    "pinia": "2.1.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.0.4",
+    "vite": "5.1.0",
+    "prettier": "3.2.5"
+  }
+}

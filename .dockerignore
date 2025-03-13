@@ -16,3 +16,6 @@ postgres_data/
 
 *.png
 *.sql
+
+# vue js
+node_modules

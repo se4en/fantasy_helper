@@ -1,16 +1,15 @@
-FROM python:3.9-slim
-
-RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essential
+FROM node:18-alpine
 
 WORKDIR /fantasy_helper
-COPY ./requirements /fantasy_helper/requirements
-RUN pip install --no-cache-dir --upgrade -r requirements/ui.txt
-COPY ./fantasy_helper/ui /fantasy_helper/fantasy_helper/ui
-COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
-COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
-ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
-EXPOSE 8501
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+COPY ./fantasy_helper/ui/package.json /fantasy_helper
 
-ENTRYPOINT ["streamlit", "run", "fantasy_helper/ui/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+RUN npm install
+COPY ./fantasy_helper/ui /fantasy_helper
+RUN npm run build
+
+# EXPOSE 8501
+EXPOSE 4173
+HEALTHCHECK CMD curl --fail http://localhost:4173/_stcore/health
+
+CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0"]
