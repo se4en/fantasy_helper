@@ -10,6 +10,6 @@ RUN npm run build
 
 # EXPOSE 8501
 EXPOSE 4173
-HEALTHCHECK CMD curl --fail http://localhost:4173/_stcore/health
+HEALTHCHECK CMD curl --fail http://localhost:4173/
 
 CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0"]
