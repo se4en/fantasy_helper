@@ -3,6 +3,7 @@ from dataclasses import asdict
 from typing import Dict, List, Literal, Optional
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from hydra.utils import instantiate
 import pandas as pd
 
@@ -16,13 +17,21 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
 leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues) if league.is_active}
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4173"],  # Add your UI's URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 create_db()
 Coeff_dao = CoeffDAO()
@@ -32,6 +41,20 @@ FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
 FS_Sports_Players_dao = FSSportsPlayersDAO()
 FS_Calendars_dao = FSCalendarsDAO()
+
+
+@app.get("/leagues_info/")
+async def get_leagues_info() -> List[LeagueInfo]:
+    """
+    Get the names of all the leagues.
+
+    Returns:
+        A dictionary with league names as keys and league descriptions as values.
+    """
+    result = []
+    for league_config in cfg.leagues:
+        result.append(instantiate(league_config))
+    return result
 
 
 @app.get("/leagues_names/")
