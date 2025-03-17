@@ -5,11 +5,12 @@ services:
     build:
       dockerfile: docker/Dockerfile.ui
       context: .
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     container_name: "ui"
     restart: always
-    # links:
-    #   - api
-    env_file: .env
+    links:
+      - api
     ports:
       - 4173:4173
     networks:

@@ -2,6 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /fantasy_helper
 
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 COPY ./fantasy_helper/ui/package.json /fantasy_helper
 
 RUN npm install
@@ -12,4 +15,4 @@ RUN npm run build
 EXPOSE 4173
 HEALTHCHECK CMD curl --fail http://localhost:4173/
 
-CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0"]
+CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0", "--logLevel", "debug"]
