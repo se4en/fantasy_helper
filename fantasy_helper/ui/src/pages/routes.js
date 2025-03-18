@@ -7,6 +7,14 @@ const routes = [
     path: '/',
     component: Homepage
   },
+  {
+    path: '/league/:leagueSlug',
+    // path: '/',
+    name: 'LeaguePage',
+    // component: () => import('@/views/LeaguePage.vue'),
+    component: Homepage,
+    // props: true
+  },
 ]
 
 const router = createRouter({

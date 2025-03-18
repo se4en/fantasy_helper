@@ -17,18 +17,14 @@ export const useLeaguesInfoStore = defineStore('leaguesInfo', {
           ENDPOINTS.LEAGUES_INFO
         )
         this.leagues_info = response.data
-        console.log("STORE: leagues_info response", response)
+        console.log("this.leagues_info", this.leagues_info)
       } catch (error) {
         this.error = error.message
-        console.log("STORE: error", this.error)
-        throw error // Propagate error to components
+        console.log("fetchLeaguesInfo error", this.error)
+        throw error 
       } finally {
         this.isLoading = false
       }
     }
-  },
-
-  // getters: {
-  //   sortedPosts: (state) => [...state.posts].sort((a, b) => b.id - a.id)
-  // }
+  }
 })
