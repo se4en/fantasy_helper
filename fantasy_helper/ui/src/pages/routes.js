@@ -1,6 +1,7 @@
 // routes.js
 import { createRouter, createWebHistory } from 'vue-router'
 import Homepage from './home/Home.vue'
+import LeaguePage from './league/LeaguePage.vue'
 
 const routes = [
   {
@@ -9,11 +10,9 @@ const routes = [
   },
   {
     path: '/league/:leagueSlug',
-    // path: '/',
     name: 'LeaguePage',
-    // component: () => import('@/views/LeaguePage.vue'),
-    component: Homepage,
-    // props: true
+    component: LeaguePage,
+    props: true
   },
 ]
 

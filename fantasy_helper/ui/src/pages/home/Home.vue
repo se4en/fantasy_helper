@@ -9,16 +9,25 @@ import Loader from '@/components/Loader.vue'
 const leaguesInfoStore = useLeaguesInfoStore()
 const router = useRouter()
 
-const { isLoading } = storeToRefs(leaguesInfoStore)
+const { leagues_info, isLoading } = storeToRefs(leaguesInfoStore)
 const { showLoader } = useLoaderDelay(isLoading, 500)
 
 const leagueRoute = (league) => {
   return {
     name: 'LeaguePage',
     params: {
-      leagueSlug: league.name
+      leagueSlug: slugify(league.name)
     }
   }
+}
+
+const slugify = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-')     // Replace spaces with -
+    .replace(/--+/g, '-')     // Replace multiple - with single
+    .trim()
 }
 
 onMounted(async () => {
