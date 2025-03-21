@@ -17,7 +17,7 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -119,16 +119,7 @@ async def get_players_stats_players_names(league_name: str, team_name: str) -> L
 
 
 @app.get("/coeffs/")
-async def get_coeffs(league_name: str) -> List[MatchInfo]:
-    """
-    Retrieve the coefficients for a given league and tour.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        List[MatchInfo]: The list of coefficients for the given league and tour.
-    """
+async def get_coeffs(league_name: str) -> List[CoeffTableRow]:
     return FS_Coeff_dao.get_coeffs(league_name)
 
 
