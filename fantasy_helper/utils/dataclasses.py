@@ -85,6 +85,20 @@ class MatchInfo:
 
 
 @dataclass
+class CoeffTableRow:
+    team_name: str
+    league_name: str
+    tour_names: Optional[List[str]] = None
+    tour_numbers: Optional[List[int]] = None
+    tour_rivals: Optional[List[str]] = None
+    tour_match_types: Optional[List[str]] = None
+    tour_attack_coeffs: Optional[List[float]] = None
+    tour_deffence_coeffs: Optional[List[float]] = None
+    tour_attack_colors: Optional[List[str]] = None
+    tour_deffence_colors: Optional[List[str]] = None
+
+
+@dataclass
 class LeagueInfo:
     name: str
     ru_name: str
