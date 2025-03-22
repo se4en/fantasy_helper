@@ -11,8 +11,10 @@ export const useLeaguesInfoStore = defineStore('leaguesInfo', {
   }),
   actions: {
     async fetchLeaguesInfo() {
-      this.isLoading = true
       try {
+        if (this.isLoading) return
+        this.isLoading = true
+
         const response = await httpClient.get(
           ENDPOINTS.LEAGUES_INFO
         )

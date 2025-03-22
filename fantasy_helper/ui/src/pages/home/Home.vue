@@ -16,7 +16,7 @@ const leagueRoute = (league) => {
   return {
     name: 'LeaguePage',
     params: {
-      leagueSlug: slugify(league.name)
+      leagueSlug: league.name
     }
   }
 }
