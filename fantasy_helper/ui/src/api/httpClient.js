@@ -11,14 +11,10 @@ httpClient.interceptors.request.use(config => {
   return config
 })
 
-// Response interceptor
 httpClient.interceptors.response.use(
   response => response,
   error => {
     const { response } = error
-    // if (response?.status === 401) {
-    //   window.location.href = '/login' // Redirect to login
-    // }
     console.error("response error", error)
     return Promise.reject(error)
   }
@@ -26,7 +22,8 @@ httpClient.interceptors.response.use(
 
 
 export const ENDPOINTS = {
-  LEAGUES_INFO: '/leagues_info/'
+  LEAGUES_INFO: '/leagues_info/',
+  COEFFS: '/coeffs/'
 }
 
 export default httpClient
