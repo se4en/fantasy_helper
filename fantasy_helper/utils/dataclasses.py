@@ -93,9 +93,9 @@ class CoeffTableRow:
     tour_rivals: Optional[List[str]] = None
     tour_match_types: Optional[List[str]] = None
     tour_attack_coeffs: Optional[List[float]] = None
-    tour_deffence_coeffs: Optional[List[float]] = None
+    tour_defence_coeffs: Optional[List[float]] = None
     tour_attack_colors: Optional[List[str]] = None
-    tour_deffence_colors: Optional[List[str]] = None
+    tour_defence_colors: Optional[List[str]] = None
 
 
 @dataclass

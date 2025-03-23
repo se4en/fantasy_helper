@@ -18,9 +18,9 @@ class FSCoeffs(Base):
     tour_rivals = Column(JSON, nullable=True)
     tour_match_types = Column(JSON, nullable=True)
     tour_attack_coeffs = Column(JSON, nullable=True)
-    tour_deffence_coeffs = Column(JSON, nullable=True)
+    tour_defence_coeffs = Column(JSON, nullable=True)
     tour_attack_colors = Column(JSON, nullable=True)
-    tour_deffence_colors = Column(JSON, nullable=True)
+    tour_defence_colors = Column(JSON, nullable=True)
     timestamp = Column(DateTime, nullable=True)
 
     def __init__(
@@ -32,9 +32,9 @@ class FSCoeffs(Base):
         tour_rivals: Optional[List[str]] = None,
         tour_match_types: Optional[List[str]] = None,
         tour_attack_coeffs: Optional[List[float]] = None,
-        tour_deffence_coeffs: Optional[List[float]] = None,
+        tour_defence_coeffs: Optional[List[float]] = None,
         tour_attack_colors: Optional[List[str]] = None,
-        tour_deffence_colors: Optional[List[str]] = None,
+        tour_defence_colors: Optional[List[str]] = None,
         timestamp: Optional[datetime] = None
     ):
         self.team_name = team_name
@@ -44,9 +44,9 @@ class FSCoeffs(Base):
         self.tour_rivals = tour_rivals
         self.tour_match_types = tour_match_types
         self.tour_attack_coeffs = tour_attack_coeffs
-        self.tour_deffence_coeffs = tour_deffence_coeffs
+        self.tour_defence_coeffs = tour_defence_coeffs
         self.tour_attack_colors = tour_attack_colors
-        self.tour_deffence_colors = tour_deffence_colors
+        self.tour_defence_colors = tour_defence_colors
         self.timestamp = timestamp
 
     def __repr__(self):
