@@ -120,14 +120,16 @@ class FSCoeffsDAO:
                     match_type = "[д]"
                     attack_coeff = tour_match.total_1_over_1_5
                     defence_coeff = tour_match.total_2_under_0_5
+                    rival_name = tour_match.away_team
                 else:
                     match_type = "[г]"
                     attack_coeff = tour_match.total_2_over_1_5
                     defence_coeff = tour_match.total_1_under_0_5
+                    rival_name = tour_match.home_team
 
                 tour_names.append(tour_name)
                 tour_numbers.append(tour_match.tour_number)
-                tour_rivals.append(tour_match.away_team)
+                tour_rivals.append(rival_name)
                 tour_match_types.append(match_type)
                 tour_attack_coeffs.append(attack_coeff)
                 tour_defence_coeffs.append(defence_coeff)

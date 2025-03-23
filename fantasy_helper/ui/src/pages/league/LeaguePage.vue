@@ -211,7 +211,7 @@ function setSort(type, tourIndex) {
                 {{ row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '' }}
               </td>
               <td class="rival-cell">
-                {{ row.tour_rivals?.[tourIndex] || '' }}
+                {{ row.tour_rivals?.[tourIndex] + " " + row.tour_match_types?.[tourIndex] || '' }}
               </td>
             </template>
           </tr>
