@@ -20,11 +20,10 @@ httpClient.interceptors.response.use(
   }
 )
 
-
 export const ENDPOINTS = {
   LEAGUES_INFO: '/leagues_info/',
-  COEFFS: '/coeffs/'
+  COEFFS: '/coeffs/',
+  CALENDAR: '/calendar/'
 }
 
 export default httpClient
-
