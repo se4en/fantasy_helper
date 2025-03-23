@@ -32,9 +32,9 @@ class FSCoeffsDAO:
                 tour_rivals=match.tour_rivals,
                 tour_match_types=match.tour_match_types,
                 tour_attack_coeffs=match.tour_attack_coeffs,
-                tour_deffence_coeffs=match.tour_deffence_coeffs,
+                tour_defence_coeffs=match.tour_defence_coeffs,
                 tour_attack_colors=match.tour_attack_colors,
-                tour_deffence_colors=match.tour_deffence_colors
+                tour_defence_colors=match.tour_defence_colors
             )
             for match in cur_tour_matches
         ]
@@ -111,9 +111,9 @@ class FSCoeffsDAO:
             tour_rivals = []
             tour_match_types = []
             tour_attack_coeffs = []
-            tour_deffence_coeffs = []
+            tour_defence_coeffs = []
             tour_attack_colors = []
-            tour_deffence_colors = []
+            tour_defence_colors = []
 
             for tour_name, tour_match in team_matches.items():
                 if team_name == tour_match.home_team:
@@ -130,9 +130,9 @@ class FSCoeffsDAO:
                 tour_rivals.append(tour_match.away_team)
                 tour_match_types.append(match_type)
                 tour_attack_coeffs.append(attack_coeff)
-                tour_deffence_coeffs.append(defence_coeff)
+                tour_defence_coeffs.append(defence_coeff)
                 tour_attack_colors.append(self._color_coeff(attack_coeff))
-                tour_deffence_colors.append(self._color_coeff(defence_coeff))
+                tour_defence_colors.append(self._color_coeff(defence_coeff))
 
             result.append(
                 CoeffTableRow(
@@ -143,9 +143,9 @@ class FSCoeffsDAO:
                     tour_rivals=tour_rivals,
                     tour_match_types=tour_match_types,
                     tour_attack_coeffs=tour_attack_coeffs,
-                    tour_deffence_coeffs=tour_deffence_coeffs,
+                    tour_defence_coeffs=tour_defence_coeffs,
                     tour_attack_colors=tour_attack_colors,
-                    tour_deffence_colors=tour_deffence_colors,
+                    tour_defence_colors=tour_defence_colors,
                 )
             )
 

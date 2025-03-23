@@ -29,6 +29,7 @@ export default defineConfig({
       compress: {
         drop_console: false // Keep console logs
       }
-    }
+    },
+    sourcemap: true,
   }
 })
