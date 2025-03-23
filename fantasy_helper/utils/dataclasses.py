@@ -166,12 +166,26 @@ class CalendarInfo:
     home_team: str
     away_team: str
     tour: int
-    home_points_color: Optional[str]
-    away_points_color: Optional[str]
-    home_goals_color: Optional[str]
-    away_goals_color: Optional[str]
-    home_xg_color: Optional[str]
-    away_xg_color: Optional[str]
+    tour_name: Optional[str] = None
+    home_points_color: Optional[str] = None
+    away_points_color: Optional[str] = None
+    home_goals_color: Optional[str] = None
+    away_goals_color: Optional[str] = None
+    home_xg_color: Optional[str] = None
+    away_xg_color: Optional[str] = None
+
+
+@dataclass
+class CalendarTableRow:
+    team_name: str
+    league_name: str
+    tour_names: Optional[List[str]] = None
+    tour_numbers: Optional[List[int]] = None
+    tour_rivals: Optional[List[str]] = None
+    tour_match_types: Optional[List[str]] = None
+    tour_points_colors: Optional[List[str]] = None
+    tour_goals_colors: Optional[List[str]] = None
+    tour_xg_colors: Optional[List[str]] = None
 
 
 @dataclass

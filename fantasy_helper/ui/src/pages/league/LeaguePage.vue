@@ -5,6 +5,8 @@ import { useLoaderDelay } from '@/composables/useLoaderDelay'
 import { onMounted, computed, watch, ref } from 'vue'
 import { useLeaguesInfoStore } from '@/stores/leaguesInfo.store'
 import { useCoeffStore } from '@/stores/coeffs.store'
+import { useCalendarStore } from '@/stores/calendar.store'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -23,6 +25,13 @@ const {
 } = storeToRefs(coeffStore)
 const { showCoeffsLoader } = useLoaderDelay(isCoeffsLoading, 500)
 
+const calendarStore = useCalendarStore()
+const { 
+  calendar,
+  isLoading: isCalendarLoading 
+} = storeToRefs(calendarStore)
+const { showCalendarLoader } = useLoaderDelay(isCalendarLoading, 500)
+
 
 const currentLeague = computed(() => {
   return leagues_info.value?.find(league => 
@@ -37,6 +46,9 @@ onMounted(async () => {
     }
     if (!coeffs.value?.length && route.params.leagueSlug) {
       await coeffStore.fetchCoeffs(route.params.leagueSlug)
+    }
+    if (!calendar.value?.length && route.params.leagueSlug) {
+      await calendarStore.fetchCalendar(route.params.leagueSlug)
     }
   } catch (error) {
     console.error('Failed to load data:', error)
@@ -129,6 +141,52 @@ function setSort(type, tourIndex) {
     sortCoeffsDirection.value = 'asc'
   }
 }
+
+const caledarType = ref('points')
+
+// Get tour names for headers
+const tourCalendarHeaders = computed(() => {
+  // Add comprehensive validation
+  try {
+    if (!calendar.value || !Array.isArray(calendar.value) || calendar.value.length === 0) {
+      return []
+    }
+    // Safely access tour_names with optional chaining and array check
+    const firstRowTours = calendar.value[0]?.tour_names
+    return Array.isArray(firstRowTours) ? firstRowTours : []
+  } catch (error) {
+    console.error('Failed to get tour headers:', error)
+    return []
+  }
+})
+
+// Get maximum number of tours
+const maxCalendarTours = computed(() => {
+  try {
+    if (!calendar.value || !Array.isArray(calendar.value) || calendar.value.length === 0) {
+      return 0
+    }
+    if (!calendar.value[0]?.tour_names || !Array.isArray(calendar.value[0]?.tour_names)) {
+      return 0
+    }
+    return calendar.value[0]?.tour_names.length
+  } catch (error) {
+    console.error('Failed to get tour headers:', error)
+    return 0
+  }
+})
+
+const getCalendarCellStyle = (row, tourIndex) => {
+  const color = {
+    points: row.tour_points_colors?.[tourIndex],
+    goals: row.tour_goals_colors?.[tourIndex],
+    xg: row.tour_xg_colors?.[tourIndex]
+  }[caledarType.value]
+
+  return {
+    backgroundColor: color || '#ffffff'
+  }
+}
 </script>
 
 <template>
@@ -139,6 +197,7 @@ function setSort(type, tourIndex) {
   </div>
 
   <Loader v-if="showCoeffsLoader" />
+  <h2>Coeffs</h2>
 
   <div class="coefficients-table">
     <!-- Loading & Error States -->
@@ -213,6 +272,66 @@ function setSort(type, tourIndex) {
               <td class="rival-cell">
                 {{ row.tour_rivals?.[tourIndex] + " " + row.tour_match_types?.[tourIndex] || '' }}
               </td>
+            </template>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <Loader v-if="showCalendarLoader" />
+  <h2>Calendar</h2>
+
+  <div class="calendar-table">
+    <!-- Loading & Error States -->
+    <div v-if="isCalendarLoading" class="status-message">Loading calendar...</div>
+    <div v-else-if="error" class="status-message error">Error: {{ error.message }}</div>
+
+    <!-- Data Table -->
+    <div v-else class="table-container">
+      <!-- Selection Controls -->
+      <div class="view-selector">
+        <div class="label-group">
+          <label for="viewSelect">Display Mode</label>
+          <span class="help-text">Calendar type</span>
+        </div>
+        <select v-model="caledarType">
+          <option value="points">Points</option>
+          <option value="goals">Goals</option>
+          <option value="xg">Expected Goals (xG)</option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <!-- Fixed Columns -->
+            <th class="team-column" rowspan="2">Team</th>
+
+            <!-- Dynamic Tour Columns -->
+            <template v-if="maxCalendarTours > 0">
+              <th 
+                v-for="(tourName, index) in tourCalendarHeaders" 
+                :key="index" 
+              >
+                {{ tourName || `Tour ${index + 1}` }}
+              </th>
+            </template>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="(row, rowIndex) in calendar" :key="rowIndex">
+            <!-- Fixed Columns -->
+            <td class="team-cell">{{ row.team_name }}</td>
+
+            <!-- Dynamic Tour Data -->
+            <template v-for="(tour, tourIndex) in maxCalendarTours" :key="tourIndex">
+              <!-- <td v-for="(_, tourIndex) in maxCalendarTours" :key="tourIndex"> -->
+              <td class="calendar-cell" :style="getCalendarCellStyle(row, tourIndex)">
+                {{ row.tour_rivals?.[tourIndex] || '' }}
+              </td>
+              <!-- </td> -->
             </template>
           </tr>
         </tbody>

@@ -17,7 +17,7 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -157,16 +157,7 @@ async def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
 
 
 @app.get("/calendar/")
-async def get_calendar(league_name: str) -> List[CalendarInfo]:
-    """
-    Retrieves the calendars for a specific league.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        List[CalendarInfo]: A list of CalendarInfo objects representing the calendars for the league.
-    """
+async def get_calendar(league_name: str) -> List[CalendarTableRow]:
     return FS_Calendars_dao.get_calendar(league_name)
 
 
