@@ -4,15 +4,25 @@ WORKDIR /fantasy_helper
 
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_TELEGRAM_BOT_USERNAME
+ENV VITE_TELEGRAM_BOT_USERNAME=$VITE_TELEGRAM_BOT_USERNAME
 
 COPY ./fantasy_helper/ui/package.json /fantasy_helper
 
 RUN npm install
 COPY ./fantasy_helper/ui /fantasy_helper
-RUN npm run build
+COPY ./certs /fantasy_helper/certs
+RUN npm run build && \
+    apk add --no-cache ca-certificates && \
+    update-ca-certificates
+
 
 # EXPOSE 8501
 EXPOSE 4173
-HEALTHCHECK CMD curl --fail http://localhost:4173/
+# HEALTHCHECK CMD curl --fail http://localhost:4173/ --insecure
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl --fail https://localhost:4173/ --insecure || exit 1
 
-CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0", "--logLevel", "debug"]
+# CMD ["npm", "run", "preview", "--", "--port", "4173", "--host", "0.0.0.0", "--logLevel", "debug"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "4173"]
+# CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "4173", "--https", "--key", "./certs/dev.fantasy-helper.ru-key.pem", "--cert", "./certs/dev.fantasy-helper.ru.pem"]

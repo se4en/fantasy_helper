@@ -1,5 +1,5 @@
 from datetime import datetime
-import typing as t
+from typing import Optional
 
 from sqlalchemy import Column
 from sqlalchemy import Integer, String, Boolean, DateTime
@@ -10,25 +10,34 @@ from fantasy_helper.db.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    tg_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    registration_date = Column(DateTime, nullable=False)
-    valid = Column(Boolean, nullable=False)
-    profile_url = Column(String, nullable=True)
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    username = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    login_timestamp = Column(DateTime, nullable=True)
+    last_timestamp = Column(DateTime, nullable=True)
 
     def __init__(
         self,
-        tg_id: int,
-        name: str,
-        registration_date: datetime,
-        valid: bool = False,
-        profile_url: t.Optional[str] = None,
+        id: int,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
+        username: Optional[str] = None,
+        phone: Optional[str] = None,
+        status: Optional[str] = None,
+        login_timestamp: Optional[datetime] = None,
+        last_timestamp: Optional[datetime] = None,
     ):
-        self.tg_id = tg_id
-        self.name = name
-        self.registration_date = registration_date
-        self.valid = valid
-        self.profile_url = profile_url
+        self.id = id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.username = username
+        self.phone = phone
+        self.status = status
+        self.login_timestamp = login_timestamp
+        self.last_timestamp = last_timestamp
 
     def __repr__(self):
-        return f"Name={self.name} reg_date={self.registration_date} valid={self.valid}"
+        return f"first_name={self.first_name} last_name={self.last_name}"

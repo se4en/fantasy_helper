@@ -625,6 +625,17 @@ class SportsTourInfo:
 
 
 @dataclass
+class TelegramAuthData:
+    id: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    username: Optional[str] = None
+    photo_url: Optional[str] = None
+    auth_date: Optional[int] = None
+    hash: Optional[str] = None
+
+
+@dataclass
 class TeamName:
     league_name: Optional[str] = None
     sports_name: Optional[str] = None

@@ -5,7 +5,7 @@ import { CalendarTableRowSchema } from '@/types/calendar'
 
 export const useCalendarStore = defineStore('calendar', {
   state: () => ({
-    calendar: [],
+    calendar: null,
     isLoading: false,
     error: null
   }),
@@ -36,7 +36,6 @@ export const useCalendarStore = defineStore('calendar', {
         }
         
         this.calendar = result.data
-        console.log("this.calendar", this.calendar)
       } catch (error) {
         this.error = error.message
         console.log("fetchCalendar error", this.error)

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import asdict
+import os
 from typing import Dict, List, Literal, Optional
 
 from fastapi import FastAPI
@@ -12,12 +13,38 @@ from fantasy_helper.utils.common import load_config
 from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.player import PlayerDAO
+# from fantasy_helper.db.dao.user import UserDAO
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup, TelegramAuthData
+
+
+# def verify_telegram_data(data: TelegramAuthData):
+#     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+#     data_check = "\n".join([
+#         f"auth_date={data.auth_date}",
+#         f"first_name={data.first_name}",
+#         f"id={data.id}",
+#         f"last_name={data.last_name or ''}",
+#         f"photo_url={data.photo_url or ''}",
+#         f"username={data.username or ''}"
+#     ])
+    
+#     secret_key = hashlib.sha256(bot_token.encode()).digest()
+#     computed_hash = hmac.new(
+#         secret_key,
+#         msg=data_check.encode(),
+#         digestmod=hashlib.sha256
+#     ).hexdigest()
+    
+#     if computed_hash != data.hash:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Invalid authentication data"
+#         )
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -27,13 +54,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4173"],  # Add your UI's URL
+    allow_origins=[
+        "https://dev.fantasy-helper.ru",
+        "https://api-dev.fantasy-helper.ru",
+    ],  # Add your UI's URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 create_db()
+# User_dao = UserDAO()
 Coeff_dao = CoeffDAO()
 Player_dao = PlayerDAO()
 FS_Coeff_dao = FSCoeffsDAO()
@@ -41,6 +73,14 @@ FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
 FS_Sports_Players_dao = FSSportsPlayersDAO()
 FS_Calendars_dao = FSCalendarsDAO()
+
+
+@app.post("/auth/telegram/")
+async def auth_telegram(auth_data: TelegramAuthData) -> List[LeagueInfo]:
+    print("auth_data", auth_data)
+    return []
+    # verify_telegram_data(auth_data)
+    # return result
 
 
 @app.get("/leagues_info/")
