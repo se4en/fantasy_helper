@@ -12,36 +12,27 @@ const route = useRoute()
 const router = useRouter()
 
 const leaguesInfoStore = useLeaguesInfoStore()
-const { 
-  leagues_info,
-  isLoading: isLeaguesInfoLoading 
-} = storeToRefs(leaguesInfoStore)
+const { leaguesInfo, isLoading: isLeaguesInfoLoading } = storeToRefs(leaguesInfoStore)
 const { showLeaguesInfoLoader } = useLoaderDelay(isLeaguesInfoLoading, 500)
 
 const coeffStore = useCoeffStore()
-const { 
-  coeffs,
-  isLoading: isCoeffsLoading 
-} = storeToRefs(coeffStore)
+const { coeffs, isLoading: isCoeffsLoading } = storeToRefs(coeffStore)
 const { showCoeffsLoader } = useLoaderDelay(isCoeffsLoading, 500)
 
 const calendarStore = useCalendarStore()
-const { 
-  calendar,
-  isLoading: isCalendarLoading 
-} = storeToRefs(calendarStore)
+const { calendar, isLoading: isCalendarLoading } = storeToRefs(calendarStore)
 const { showCalendarLoader } = useLoaderDelay(isCalendarLoading, 500)
 
 
 const currentLeague = computed(() => {
-  return leagues_info.value?.find(league => 
+  return leaguesInfo.value?.find(league => 
     league.name === route.params.leagueSlug
   ) || null
 })
 
 onMounted(async () => {
   try {
-    if (!leagues_info.value?.length) {
+    if (!leaguesInfo.value?.length) {
       await leaguesInfoStore.fetchLeaguesInfo()
     }
     if (!coeffs.value?.length && route.params.leagueSlug) {

@@ -10,6 +10,7 @@ from fantasy_helper.db.utils.create_db import create_db
 
 if __name__ == "__main__":
     create_db()
+    print("start")
     schedule_dao = ScheduleDao()
     table_dao = TableDao()
     calendar_dao = FSCalendarsDAO()
@@ -17,3 +18,4 @@ if __name__ == "__main__":
     schedule_dao.update_schedules_all_leagues()
     table_dao.update_tables_all_leagues()
     calendar_dao.update_calendar_all_leagues()
+    print('end')

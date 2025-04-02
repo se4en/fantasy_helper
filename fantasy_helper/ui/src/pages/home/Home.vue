@@ -9,7 +9,7 @@ import Loader from '@/components/Loader.vue'
 const leaguesInfoStore = useLeaguesInfoStore()
 const router = useRouter()
 
-const { leagues_info, isLoading } = storeToRefs(leaguesInfoStore)
+const { leaguesInfo, isLoading } = storeToRefs(leaguesInfoStore)
 const { showLoader } = useLoaderDelay(isLoading, 500)
 
 const leagueRoute = (league) => {
@@ -19,15 +19,6 @@ const leagueRoute = (league) => {
       leagueSlug: league.name
     }
   }
-}
-
-const slugify = (str) => {
-  return str
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove special chars
-    .replace(/\s+/g, '-')     // Replace spaces with -
-    .replace(/--+/g, '-')     // Replace multiple - with single
-    .trim()
 }
 
 onMounted(async () => {
@@ -44,25 +35,22 @@ onMounted(async () => {
     <h2 class="leagues-header">Available Leagues:</h2>
 
     <Loader v-if="showLoader" />
-    
-    <div v-if="!leaguesInfoStore.isLoading">
-      <div v-if="leaguesInfoStore.leagues_info.length === 0" class="empty-state">
-        No leagues available
-      </div>
-      <div v-else class="leagues-container">
+
+    <div v-if="leaguesInfo">
+      <div v-if="leaguesInfo.length" class="leagues-container">
         <div 
-          v-for="(league, index) in leaguesInfoStore.leagues_info" 
-          :key="index" 
+          v-for="league in leaguesInfo" 
+          :key="league.name" 
           class="league-item"
         >
-          <router-link 
-            :to="leagueRoute(league)"
-            class="emoji-link"
-          >
+          <router-link :to="leagueRoute(league)" class="emoji-link">
             <div class="emoji">{{ league.emoji }}</div>
           </router-link>
-          <div class="name">{{ league.ru_name }}</div>
+          <div class="league-name">{{ league.ru_name }}</div>
         </div>
+      </div>
+      <div v-else class="empty-state">
+        No leagues available
       </div>
     </div>
   </div>

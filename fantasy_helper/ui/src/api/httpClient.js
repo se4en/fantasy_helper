@@ -2,14 +2,28 @@ import axios from 'axios'
 
 const httpClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10000
+  withCredentials: true,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+  }
 })
 
 httpClient.interceptors.request.use(config => {
-  console.error("VITE_API_URL", import.meta.env.VITE_API_URL)
-  console.error("request full url", config.baseURL, config.url)
+  console.warn("VITE_API_URL", import.meta.env.VITE_API_URL)
+  console.warn("config.baseUR", config.baseURL)
+  console.warn("config.url", config.url)
   return config
 })
+
+// Add request interceptor
+// httpClient.interceptors.request.use(config => {
+//   if (!config.url.startsWith('http')) {
+//     config.url = window.location.origin + config.url;
+//   }
+//   return config;
+// });
 
 httpClient.interceptors.response.use(
   response => response,
@@ -23,7 +37,8 @@ httpClient.interceptors.response.use(
 export const ENDPOINTS = {
   LEAGUES_INFO: '/leagues_info/',
   COEFFS: '/coeffs/',
-  CALENDAR: '/calendar/'
+  CALENDAR: '/calendar/',
+  TELEGRAM_AUTH : '/auth/telegram/'
 }
 
 export default httpClient

@@ -5,7 +5,7 @@ import { CoeffTableRowSchema } from '@/types/coeff'
 
 export const useCoeffStore = defineStore('coeffs', {
   state: () => ({
-    coeffs: [],
+    coeffs: null,
     isLoading: false,
     error: null
   }),
@@ -13,7 +13,6 @@ export const useCoeffStore = defineStore('coeffs', {
   actions: {
     async fetchCoeffs(leagueName) {
       try {
-        console.log("start fetchCoeffs")
         if (this.isLoading) return
         this.isLoading = true
         this.error = null
@@ -37,7 +36,6 @@ export const useCoeffStore = defineStore('coeffs', {
         }
         
         this.coeffs = result.data
-        console.log("this.coeffs", this.coeffs)
       } catch (error) {
         this.error = error.message
         console.log("fetchCoeffs error", this.error)

@@ -2,9 +2,9 @@
   "name": "fantasy-helper",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host dev.fantasy-helper.ru --port 4173",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0 --port 4173 --https",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs",
     "format": "prettier --write ."
   },
