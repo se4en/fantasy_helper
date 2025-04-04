@@ -190,6 +190,7 @@ class XbetParser:
         if league_name not in self._leagues:
             return None
 
+        result = []
         driver = None
         try:
             opts = FirefoxOptions()
@@ -205,7 +206,6 @@ class XbetParser:
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "c-events__teams"))
             )
 
-            result = []
             for match in all_matches:
                 team_names = match.get_attribute("title").split("—")
                 match_url = match.find_element(By.XPATH, "..").get_attribute("href")
