@@ -1,29 +1,51 @@
 // routes.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Homepage from './home/Home.vue'
+import HomePage from './home/HomePage.vue'
+import LeaguesPage from './leagues/LeaguesPage.vue'
 import LeaguePage from './league/LeaguePage.vue'
 import LoginPage from './login/LoginPage.vue'
 
 const routes = [
   {
-    path: '/login/',
-    name: 'Login',
-    component: LoginPage,
-    meta: { requiresAuth: false }
-  },
-  {
     path: '/',
     name: 'Home',
-    component: Homepage,
-    meta: { requiresAuth: false }
-
+    component: HomePage,
+    meta: {
+      requiresAuth: false,
+      showInNavigation: false,
+      navTitle: 'Home'
+    }
+  },
+  {
+    path: '/leagues/',
+    name: 'Leagues',
+    component: LeaguesPage,
+    meta: {
+      requiresAuth: false,
+      showInNavigation: true,
+      navTitle: 'Leafues'
+    }
   },
   {
     path: '/league/:leagueSlug',
-    name: 'LeaguePage',
+    name: 'League',
     component: LeaguePage,
     props: true,
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: false,
+      showInNavigation: false,
+      navTitle: 'League'
+    }
+  },
+  {
+    path: '/login/',
+    name: 'Login',
+    component: LoginPage,
+    meta: { 
+      requiresAuth: false,
+      showInNavigation: false,
+      navTitle: 'Login'
+    }
   },
 ]
 
