@@ -55,11 +55,7 @@ export default {
       script.dataset.radius = '14';
       script.dataset.requestAccess = 'write';
       script.dataset.authUrl = window.location.href;
-      // script.dataset.authUrl = `${window.location.origin}/auth/callback`; // Important for reloads
-      
-      // Use proper Telegram callback name
-      // window.onTelegramAuth = (user) => this.handleTelegramAuth(user);
-      
+
       script.onload = () => {
         window.onTelegramAuth = (user) => {
           this.handleTelegramAuth(user);
@@ -67,9 +63,6 @@ export default {
           this.$forceUpdate();
         };
       };
-      
-      // script.onload = () => console.log('Telegram widget loaded with user', user);
-      // script.onerror = (e) => console.error('Widget load error:', e);
       
       this.$refs.telegramWidget.appendChild(script);
     },
@@ -82,15 +75,10 @@ export default {
           user
         );
         
-        // Store authentication data
-        // localStorage.setItem('access_token', response.data.access_token);
-        // localStorage.setItem('user', JSON.stringify(response.data.user));
-        
         // Redirect to protected route
         this.$router.push({ name: 'Home' });
       } catch (error) {
         console.error('Authentication failed:', error);
-        // alert('Login failed. Please try again.');
         this.isProcessingCallback = false;
         this.loadTelegramWidget(); // Reinitialize widget
       }
@@ -105,22 +93,7 @@ export default {
       <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
         Welcome to MyApp
       </h1>
-      
-      <!-- <div class="telegram-login-wrapper flex justify-center mb-6">
-        <script
-          async
-          :src="`https://telegram.org/js/telegram-widget.js?${widgetVersion}`"
-          :data-telegram-login="botUsername"
-          data-size="large"
-          data-radius="14"
-          data-request-access="write"
-          @telegram-auth="handleTelegramAuth"
-        ></script>
-      </div> -->
 
-      <!-- <div class="login-page">
-        <div ref="telegramWidget"></div>
-      </div> -->
       <div class="login-container">
         <div v-if="!isProcessingCallback" ref="telegramWidget"></div>
         <div v-else class="loading-message">

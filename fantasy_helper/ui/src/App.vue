@@ -1,19 +1,45 @@
-<script setup>
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
+<script>
+import AppHeader from './components/AppHeader.vue'
 
+export default {
+  name: 'App', 
+  components: { 
+    AppHeader
+  },
+  computed: {
+    availableRoutes() {
+      return this.$router.options.routes.filter(route => 
+        route.meta?.showInNavigation && 
+        !route.meta?.requiresAuth && 
+        route.name &&
+        route.name !== 'Home' &&
+        route.name !== 'Login'
+      )
+    }
+  }
+}
 </script>
 
 <template>
-  <router-view></router-view>
+  <div class="min-h-screen bg-gray-50">
+    <AppHeader />
+    <main class="py-8">
+      <router-view />
+    </main>
+  </div>
 </template>
 
 <style>
 html, body {
   background-color: #90e3ba!important;
 }
+
+/* Add proper layout */
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply min-h-screen flex flex-col;
+}
+
+main {
+  @apply flex-1;
 }
 </style>
