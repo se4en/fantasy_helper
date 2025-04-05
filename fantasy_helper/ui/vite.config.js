@@ -49,5 +49,4 @@ export default defineConfig({
     },
     sourcemap: true,
   }
-  // base: './',
 })

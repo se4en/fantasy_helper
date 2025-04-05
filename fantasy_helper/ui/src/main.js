@@ -7,4 +7,4 @@ import router from './pages/routes.js'  // Updated import
 createApp(App)
   .use(router)
   .use(createPinia())
-  .mount('#app')
+  .mount('#app');
