@@ -21,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="wrapper">
     <AppHeader />
     <main class="py-8">
       <router-view />
@@ -32,14 +32,25 @@ export default {
 <style>
 html, body {
   background-color: #90e3ba!important;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* Add proper layout */
-#app {
-  @apply min-h-screen flex flex-col;
+body nav,
+body .navbar,
+body .wrapper,
+body .container,
+body .nav-links,
+body .nav-links li,
+body .nav-link {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-main {
-  @apply flex-1;
-}
 </style>
