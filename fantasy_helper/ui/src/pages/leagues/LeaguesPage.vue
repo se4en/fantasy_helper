@@ -14,7 +14,7 @@ const { showLoader } = useLoaderDelay(isLoading, 500)
 
 const leagueRoute = (league) => {
   return {
-    name: 'LeaguePage',
+    name: 'LeagueCoeffs',
     params: {
       leagueSlug: league.name
     }
@@ -36,17 +36,13 @@ onMounted(async () => {
 
     <Loader v-if="showLoader" />
 
-    <div v-if="leaguesInfo">
-      <div v-if="leaguesInfo.length" class="leagues-container">
-        <div 
-          v-for="league in leaguesInfo" 
-          :key="league.name" 
-          class="league-item"
-        >
+    <div v-else class="leagues-container">
+      <div v-if="leaguesInfo && leaguesInfo.length" class="leagues-grid">
+        <div v-for="league in leaguesInfo" :key="league.name" class="league-item">
           <router-link :to="leagueRoute(league)" class="emoji-link">
             <div class="emoji">{{ league.emoji }}</div>
           </router-link>
-          <div class="league-name">{{ league.ru_name }}</div>
+          <div>{{ league.ru_name }}</div>
         </div>
       </div>
       <div v-else class="empty-state">
