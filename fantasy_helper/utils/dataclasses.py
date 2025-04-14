@@ -92,6 +92,7 @@ class LeagueInfo:
     is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
+    betcity_url: Optional[str] = None
     fbref_league_id: Optional[int] = None
     fbref_table_url: Optional[str] = None
     fbref_schedule_url: Optional[str] = None
