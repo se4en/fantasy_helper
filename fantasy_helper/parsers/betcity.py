@@ -450,7 +450,7 @@ class BetcityParser:
         result = []
         league_matches = self._parse_league_matches(league_name)
         if league_matches is not None:
-            for match in league_matches[:1]:
+            for match in league_matches:
                 parsed_match = self._parse_match(match)
                 if (
                     parsed_match.total_1_over_1_5 is not None
