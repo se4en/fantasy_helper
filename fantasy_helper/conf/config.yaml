@@ -16,6 +16,7 @@ leagues:
     squad_id: 316902
     is_active: true
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
+    betcity_url: https://betcity.ru/ru/line/soccer/74979
     fbref_league_id: 30
     fbref_table_url: https://fbref.com/en/comps/30/Russian-Premier-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/30/schedule/Russian-Premier-League-Scores-and-Fixtures
@@ -34,6 +35,7 @@ leagues:
     squad_id: 344967
     is_active: true
     xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
+    betcity_url: https://betcity.ru/ru/line/soccer/445
     fbref_league_id: 9
     fbref_table_url: https://fbref.com/en/comps/9/Premier-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures
@@ -52,6 +54,7 @@ leagues:
     squad_id: 347718
     is_active: true
     xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
+    betcity_url: https://betcity.ru/ru/line/soccer/75175
     fbref_league_id: 12
     fbref_table_url: https://fbref.com/en/comps/12/La-Liga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures
@@ -70,6 +73,7 @@ leagues:
     squad_id: 347725
     is_active: true
     xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
+    betcity_url: https://betcity.ru/ru/line/soccer/433
     fbref_league_id: 13
     fbref_table_url: https://fbref.com/en/comps/13/Ligue-1-Stats
     fbref_schedule_url: https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures
@@ -88,6 +92,7 @@ leagues:
     squad_id: 335045
     is_active: true
     xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
+    betcity_url: https://betcity.ru/ru/line/soccer/1324
     fbref_league_id: 32
     fbref_table_url: https://fbref.com/en/comps/32/Primeira-Liga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/32/schedule/Primeira-Liga-Scores-and-Fixtures
@@ -106,6 +111,7 @@ leagues:
     squad_id: 335035
     is_active: true
     xber_url: https://1xstavka.ru/line/football/2018750-netherlands-eredivisie
+    betcity_url: https://betcity.ru/ru/line/soccer/337
     fbref_league_id: 23
     fbref_table_url: https://fbref.com/en/comps/23/Eredivisie-Stats
     fbref_schedule_url: https://fbref.com/en/comps/23/schedule/Eredivisie-Scores-and-Fixtures
@@ -124,6 +130,7 @@ leagues:
     squad_id: 335059
     is_active: true
     xber_url: https://1xstavka.ru/line/football/11113-turkey-superliga
+    betcity_url: https://betcity.ru/ru/line/soccer/10353
     fbref_league_id: 26
     fbref_table_url: https://fbref.com/en/comps/26/Super-Lig-Stats
     fbref_schedule_url: https://fbref.com/en/comps/26/schedule/Super-Lig-Scores-and-Fixtures
@@ -142,6 +149,7 @@ leagues:
     squad_id: 335052
     is_active: true
     xber_url: https://1xstavka.ru/line/football/105759-england-championship
+    betcity_url: https://betcity.ru/ru/line/soccer/24
     fbref_league_id: 10
     fbref_table_url: https://fbref.com/en/comps/10/Championship-Stats
     fbref_schedule_url: https://fbref.com/en/comps/10/schedule/Championship-Scores-and-Fixtures
@@ -160,6 +168,7 @@ leagues:
     squad_id: 347720
     is_active: true
     xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
+    betcity_url: https://betcity.ru/ru/line/soccer/75173
     fbref_league_id: 11
     fbref_table_url: https://fbref.com/en/comps/11/Serie-A-Stats
     fbref_schedule_url: https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures
@@ -178,6 +187,7 @@ leagues:
     squad_id: 369055
     is_active: true
     xber_url: https://1xstavka.ru/line/football/96463-germany-bundesliga
+    betcity_url: https://betcity.ru/ru/line/soccer/441
     fbref_league_id: 20
     fbref_table_url: https://fbref.com/en/comps/20/Bundesliga-Stats
     fbref_schedule_url: https://fbref.com/en/comps/20/schedule/Bundesliga-Scores-and-Fixtures
@@ -196,6 +206,7 @@ leagues:
     squad_id: 406400
     is_active: true
     xber_url: https://1xstavka.ru/en/line/football/118587-uefa-champions-league
+    betcity_url: https://betcity.ru/ru/line/soccer/1295
     fbref_league_id: 8
     fbref_table_url: https://fbref.com/en/comps/8/Champions-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures
@@ -214,6 +225,7 @@ leagues:
     squad_id: 408847
     is_active: true
     xber_url: https://1xstavka.ru/en/line/football/118593-uefa-europa-league
+    betcity_url: https://betcity.ru/ru/line/soccer/15444
     fbref_league_id: 19
     fbref_table_url: https://fbref.com/en/comps/19/Europa-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures

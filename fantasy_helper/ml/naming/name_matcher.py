@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Tuple
 import os.path as path
 import json
+from datetime import datetime
 
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_
@@ -101,9 +102,27 @@ class NameMatcher:
         db_session: SQLSession = Session()
 
         query = (
-            db_session.query(Coeff.home_team).filter(
-                Coeff.league_name == league_name
-            )
+            db_session.query(Coeff.home_team).filter(and_(
+                Coeff.league_name == league_name,
+                Coeff.timestamp <= datetime(2025, 4, 15)
+            ))
+            .distinct()
+            .order_by(Coeff.home_team)
+        )
+        team_names = query.all()
+
+        db_session.close()
+
+        return [elem[0] for elem in team_names]
+    
+    def get_betcity_teams_names(self, league_name: str) -> Optional[List[str]]:
+        db_session: SQLSession = Session()
+
+        query = (
+            db_session.query(Coeff.home_team).filter(and_(
+                Coeff.league_name == league_name,
+                Coeff.timestamp > datetime(2025, 4, 15)
+            ))
             .distinct()
             .order_by(Coeff.home_team)
         )
@@ -176,13 +195,15 @@ class NameMatcher:
         cur_sports_teams_names = self.get_sports_teams_names(league_name)
         cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
         cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
+        cur_betcity_teams_names = self.get_betcity_teams_names(league_name)
 
-        free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names = [], [], []
+        free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names, free_betcity_teams_names = [], [], [], []
         teams_to_add, teams_to_delete = [], []
 
         cur_sports_name_2_team = {team_name.sports_name: team_name for team_name in teams_names}
         cur_fbref_name_2_team = {team_name.fbref_name: team_name for team_name in teams_names}
         cur_xbet_name_2_team = {team_name.xbet_name: team_name for team_name in teams_names}
+        cur_betcity_name_2_team = {team_name.betcity_name: team_name for team_name in teams_names}
 
         free_sports_teams_names, sports_teams_to_delete = self._compute_free_and_delete_elements(
             cur_sports_teams_names, cur_sports_name_2_team
@@ -193,25 +214,39 @@ class NameMatcher:
         free_xbet_teams_names, xbet_teams_to_delete = self._compute_free_and_delete_elements(
             cur_xbet_teams_names, cur_xbet_name_2_team
         )
+        free_betcity_teams_names, betcity_teams_to_delete = self._compute_free_and_delete_elements(
+            cur_betcity_teams_names, cur_betcity_name_2_team
+        )
 
         # remove dublicated teams
-        if sports_teams_to_delete or fbref_teams_to_delete or xbet_teams_to_delete:
+        if sports_teams_to_delete or fbref_teams_to_delete or xbet_teams_to_delete or betcity_teams_to_delete:
             teams_to_delete = list(dict.fromkeys(
-                sports_teams_to_delete + fbref_teams_to_delete + xbet_teams_to_delete
+                sports_teams_to_delete + fbref_teams_to_delete + xbet_teams_to_delete + betcity_teams_to_delete
             ))
 
         # compute new teams names
-        if free_sports_teams_names or free_fbref_teams_names or free_xbet_teams_names:
+        if free_sports_teams_names or free_fbref_teams_names or free_xbet_teams_names or free_betcity_teams_names:
             sports_2_fbref_teams = self.match_teams_names(free_sports_teams_names, free_fbref_teams_names)
             sports_2_xbet_teams = self.match_teams_names(free_sports_teams_names, free_xbet_teams_names)
+            sports_2_betcity_teams = self.match_teams_names(free_sports_teams_names, free_betcity_teams_names)
 
-            if len(sports_2_fbref_teams) > len(sports_2_xbet_teams):
+            if len(sports_2_betcity_teams) > len(sports_2_fbref_teams):
+                for k, v in sports_2_betcity_teams.items():
+                    teams_to_add.append(TeamName(
+                        league_name=league_name,
+                        sports_name=k,
+                        fbref_name=sports_2_fbref_teams.get(k),
+                        xbet_name=sports_2_xbet_teams.get(k),
+                        betcity_name=v
+                    ))
+            elif len(sports_2_fbref_teams) > len(sports_2_xbet_teams):
                 for k, v in sports_2_fbref_teams.items():
                     teams_to_add.append(TeamName(
                         league_name=league_name,
                         sports_name=k,
                         fbref_name=v,
-                        xbet_name=sports_2_xbet_teams.get(k)
+                        xbet_name=sports_2_xbet_teams.get(k),
+                        betcity_name=sports_2_betcity_teams.get(k)
                     ))
             else:
                 for k, v in sports_2_xbet_teams.items():
@@ -219,7 +254,8 @@ class NameMatcher:
                         league_name=league_name,
                         sports_name=k,
                         fbref_name=sports_2_fbref_teams.get(k),
-                        xbet_name=v
+                        xbet_name=v,
+                        betcity_name=sports_2_betcity_teams.get(k)
                     ))
 
         return teams_to_add, teams_to_delete

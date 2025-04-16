@@ -13,7 +13,7 @@ from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 from fantasy_helper.db.dao.ml.naming import NamingDAO
-from fantasy_helper.parsers.xbet import XbetParser
+from fantasy_helper.parsers.betcity import BetcityParser
 from fantasy_helper.parsers.sports import SportsParser
 from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
@@ -30,7 +30,7 @@ class CoeffDAO:
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
 
-        self._xbet_parser = XbetParser(leagues=self._leagues)
+        self._betcity_parser = BetcityParser(leagues=self._leagues)
         self._schedule_dao = ScheduleDao()
         self._naming_dao = NamingDAO()
 
@@ -85,7 +85,7 @@ class CoeffDAO:
         return result
 
     def update_coeffs(self, league_name: str) -> None:
-        matches = self._xbet_parser.get_league_matches(league_name)
+        matches = self._betcity_parser.get_league_matches(league_name)
 
         db_session: SQLSession = Session()
 

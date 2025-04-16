@@ -92,6 +92,7 @@ class LeagueInfo:
     is_active: bool = False
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
+    betcity_url: Optional[str] = None
     fbref_league_id: Optional[int] = None
     fbref_table_url: Optional[str] = None
     fbref_schedule_url: Optional[str] = None
@@ -602,19 +603,22 @@ class TeamName:
     sports_name: Optional[str] = None
     fbref_name: Optional[str] = None
     xbet_name: Optional[str] = None
+    betcity_name: Optional[str] = None
     name: Optional[str] = None
 
     def __post_init__(self):
         if self.name is None:
             if self.sports_name is not None:
                 self.name = self.sports_name
+            elif self.betcity_name is not None:
+                self.name = self.betcity_name
             elif self.xbet_name is not None:
                 self.name = self.xbet_name
             else:
                 self.name = self.fbref_name
 
     def __hash__(self):
-        return hash((self.league_name, self.sports_name, self.fbref_name, self.xbet_name, self.name))
+        return hash((self.league_name, self.sports_name, self.fbref_name, self.xbet_name, self.betcity_name, self.name))
 
 
 @dataclass
