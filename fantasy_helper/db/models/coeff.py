@@ -16,7 +16,7 @@ class Coeff(Base):
     league_name = Column(String, nullable=False)
     tour_number = Column(Integer, nullable=True)
     tour_name = Column(String, nullable=True)
-    start_datetime = Column(DateTime, nullable=False)
+    start_datetime = Column(DateTime, nullable=True)
     url = Column(String, nullable=True)
     timestamp = Column(DateTime, nullable=False)
 
