@@ -3,6 +3,7 @@ import logging
 import sys
 import os
 import json
+import time
 import pytz
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -47,7 +48,10 @@ class BetcityParser:
             )
             driver.set_page_load_timeout(90) # 1 minute
             driver.set_script_timeout(30)
-            driver.get(self._leagues[league_name])  
+            driver.get("about:blank")
+            url = self._leagues[league_name]
+            driver.execute_script(f"window.location.href = '{url}';")
+            time.sleep(3)
 
             champ_line = WebDriverWait(driver, 3).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
@@ -436,7 +440,10 @@ class BetcityParser:
             )
             driver.set_page_load_timeout(90) # 1 minute
             driver.set_script_timeout(30)
-            driver.get(match_info.url)
+            driver.get("about:blank")
+            url = match_info.url
+            driver.execute_script(f"window.location.href = '{url}';")
+            time.sleep(3)
 
             match_info = self._parse_header_bets(driver, match_info)
             match_info = self._parse_main_bets(driver, match_info)
