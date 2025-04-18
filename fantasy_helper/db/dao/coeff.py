@@ -112,7 +112,10 @@ class CoeffDAO:
             sports_matches = self._schedule_dao.get_next_matches(
                 league.name, 2
             )
-            sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
-                league.name, actual_coeffs, sports_matches
-            )
+            if actual_coeffs and sports_matches:
+                sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
+                    league.name, actual_coeffs, sports_matches
+                )
+            else:
+                sports_coeffs = actual_coeffs
             feature_store.update_coeffs(league.name, sports_coeffs)
