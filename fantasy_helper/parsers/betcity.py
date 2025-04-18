@@ -45,6 +45,8 @@ class BetcityParser:
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
+            driver.set_page_load_timeout(60) # 1 minute
+            driver.set_script_timeout(30)
             driver.get(self._leagues[league_name])  
 
             champ_line = WebDriverWait(driver, 3).until(
