@@ -434,6 +434,8 @@ class BetcityParser:
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
+            driver.set_page_load_timeout(60) # 1 minute
+            driver.set_script_timeout(30)
             driver.get(match_info.url)
 
             match_info = self._parse_header_bets(driver, match_info)
