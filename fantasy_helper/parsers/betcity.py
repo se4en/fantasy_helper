@@ -45,7 +45,7 @@ class BetcityParser:
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
-            driver.set_page_load_timeout(60) # 1 minute
+            driver.set_page_load_timeout(90) # 1 minute
             driver.set_script_timeout(30)
             driver.get(self._leagues[league_name])  
 
@@ -434,7 +434,7 @@ class BetcityParser:
             driver = webdriver.Firefox(
                 executable_path=os.environ["GECKODRIVER_PATH"], options=opts
             )
-            driver.set_page_load_timeout(60) # 1 minute
+            driver.set_page_load_timeout(90) # 1 minute
             driver.set_script_timeout(30)
             driver.get(match_info.url)
 
@@ -452,6 +452,7 @@ class BetcityParser:
 
     def get_league_matches(self, league_name: str) -> List[MatchInfo]:
         result = []
+        print("parse league", league_name)
         league_matches = self._parse_league_matches(league_name)
         if league_matches is not None:
             for match in league_matches:
