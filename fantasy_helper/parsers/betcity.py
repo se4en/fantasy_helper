@@ -11,8 +11,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver import FirefoxOptions
 
+from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 
@@ -43,15 +45,18 @@ class BetcityParser:
             opts.add_argument("--headless")
             opts.add_argument("--disable-blink-features=AutomationControlled")
 
+            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            proxy = Proxy({
+                'proxyType': ProxyType.MANUAL,
+                'httpProxy': proxy_url,
+                'ftpProxy': proxy_url,
+                'sslProxy': proxy_url,
+                'noProxy': ''
+            })
             driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts, proxy=proxy
             )
-            driver.set_page_load_timeout(90) # 1 minute
-            driver.set_script_timeout(30)
-            driver.get("about:blank")
-            url = self._leagues[league_name]
-            driver.execute_script(f"window.location.href = '{url}';")
-            time.sleep(3)
+            driver.get(self._leagues[league_name])
 
             champ_line = WebDriverWait(driver, 3).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
@@ -72,8 +77,8 @@ class BetcityParser:
                     MatchInfo(
                         url=match_url,
                         league_name=league_name,
-                        home_team=match_teams_names[0].text.strip(),
-                        away_team=match_teams_names[1].text.strip(),
+                        home_team=home_team_name,
+                        away_team=away_team_name,
                     )
                 )
         except Exception as ex:
@@ -435,15 +440,18 @@ class BetcityParser:
             opts.add_argument("--headless")
             opts.add_argument("--disable-blink-features=AutomationControlled")
 
+            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            proxy = Proxy({
+                'proxyType': ProxyType.MANUAL,
+                'httpProxy': proxy_url,
+                'ftpProxy': proxy_url,
+                'sslProxy': proxy_url,
+                'noProxy': ''
+            })
             driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts, proxy=proxy
             )
-            driver.set_page_load_timeout(90) # 1 minute
-            driver.set_script_timeout(30)
-            driver.get("about:blank")
-            url = match_info.url
-            driver.execute_script(f"window.location.href = '{url}';")
-            time.sleep(3)
+            driver.get(match_info.url)
 
             match_info = self._parse_header_bets(driver, match_info)
             match_info = self._parse_main_bets(driver, match_info)
