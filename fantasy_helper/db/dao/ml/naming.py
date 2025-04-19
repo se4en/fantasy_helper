@@ -62,6 +62,7 @@ class NamingDAO:
                 sports_name=team.sports_name,
                 fbref_name=team.fbref_name,
                 xbet_name=team.xbet_name,
+                betcity_name=team.betcity_name,
                 name=team.name
             ) 
             for team in teams_names
@@ -93,7 +94,8 @@ class NamingDAO:
                 DBTeamName.name == team_name.name,
                 DBTeamName.sports_name == team_name.sports_name,
                 DBTeamName.fbref_name == team_name.fbref_name,
-                DBTeamName.xbet_name == team_name.xbet_name
+                DBTeamName.xbet_name == team_name.xbet_name,
+                DBTeamName.xbet_name == team_name.betcity_name
             )).delete()
 
         db_session.commit()

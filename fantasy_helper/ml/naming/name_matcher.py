@@ -118,7 +118,7 @@ class NameMatcher:
     def get_betcity_teams_names(self, league_name: str) -> Optional[List[str]]:
         db_session: SQLSession = Session()
 
-        query = (
+        home_query = (
             db_session.query(Coeff.home_team).filter(and_(
                 Coeff.league_name == league_name,
                 Coeff.timestamp > datetime(2025, 4, 15)
@@ -126,11 +126,22 @@ class NameMatcher:
             .distinct()
             .order_by(Coeff.home_team)
         )
-        team_names = query.all()
+        home_team_names = home_query.all()
+
+        away_query = (
+            db_session.query(Coeff.away_team).filter(and_(
+                Coeff.league_name == league_name,
+                Coeff.timestamp > datetime(2025, 4, 15)
+            ))
+            .distinct()
+            .order_by(Coeff.away_team)
+        )
+        away_team_names = away_query.all()
 
         db_session.close()
 
-        return [elem[0] for elem in team_names]
+        all_team_names = [elem[0] for elem in home_team_names] + [elem[0] for elem in away_team_names]
+        return sorted(set(all_team_names))
 
     def _get_match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
         if len(teams_names_1) == 0 or len(teams_names_2) == 0:
@@ -196,14 +207,30 @@ class NameMatcher:
         cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
         cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
         cur_betcity_teams_names = self.get_betcity_teams_names(league_name)
+        print()
+        print(league_name)
+        print(cur_betcity_teams_names)
+        return [], []
 
         free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names, free_betcity_teams_names = [], [], [], []
         teams_to_add, teams_to_delete = [], []
 
-        cur_sports_name_2_team = {team_name.sports_name: team_name for team_name in teams_names}
-        cur_fbref_name_2_team = {team_name.fbref_name: team_name for team_name in teams_names}
-        cur_xbet_name_2_team = {team_name.xbet_name: team_name for team_name in teams_names}
-        cur_betcity_name_2_team = {team_name.betcity_name: team_name for team_name in teams_names}
+        cur_sports_name_2_team = {
+            team_name.sports_name: team_name 
+            for team_name in teams_names if team_name.sports_name
+        }
+        cur_fbref_name_2_team = {
+            team_name.fbref_name: team_name 
+            for team_name in teams_names if team_name.fbref_name
+        }
+        cur_xbet_name_2_team = {
+            team_name.xbet_name: team_name 
+            for team_name in teams_names if team_name.xbet_name
+        }
+        cur_betcity_name_2_team = {
+            team_name.betcity_name: team_name 
+            for team_name in teams_names if team_name.betcity_name
+        }
 
         free_sports_teams_names, sports_teams_to_delete = self._compute_free_and_delete_elements(
             cur_sports_teams_names, cur_sports_name_2_team
