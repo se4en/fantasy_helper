@@ -70,7 +70,7 @@
           <h1 class="league-title">{{ currentLeague.ru_name || currentLeague.name }}</h1>
         </div>
         <div class="nav-center" v-else>
-          <!-- Optional: Default title when not on a league page -->
+          <!-- Default title when not on a league page -->
           <h1 class="site-title">Fantasy Helper</h1>
         </div>
 
@@ -172,12 +172,13 @@
 
 /* Center title styling */
 .nav-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex: 1;
   text-align: center;
-  padding: 0 10px;
+  height: 100%;
 }
 
 .league-title {
