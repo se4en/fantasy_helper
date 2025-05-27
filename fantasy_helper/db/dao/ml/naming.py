@@ -175,6 +175,7 @@ class NamingDAO:
                 sports_name=team.sports_name,
                 fbref_name=team.fbref_name,
                 xbet_name=team.xbet_name,
+                betcity_name=team.betcity_name,
                 name=team.name
             ) 
             for team in teams
@@ -326,15 +327,16 @@ class NamingDAO:
             sports_matches: List[LeagueScheduleInfo]
         ) -> List[MatchInfo]:
         teams_names = self.get_teams(league_name)
-        xbet_team_2_sports = {
-            team.xbet_name: team.sports_name
+        
+        betcity_team_2_sports = {
+            team.betcity_name: team.sports_name
             for team in teams_names
         }
 
         teams_2_coeffs = {
             (
-                xbet_team_2_sports.get(coeff.home_team), 
-                xbet_team_2_sports.get(coeff.away_team)
+                betcity_team_2_sports.get(coeff.home_team), 
+                betcity_team_2_sports.get(coeff.away_team)
             ): coeff
             for coeff in coeffs
         }

@@ -45,17 +45,43 @@ class BetcityParser:
             opts.add_argument("--headless")
             opts.add_argument("--disable-blink-features=AutomationControlled")
 
-            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-            proxy = Proxy({
-                'proxyType': ProxyType.MANUAL,
-                'httpProxy': proxy_url,
-                'ftpProxy': proxy_url,
-                'sslProxy': proxy_url,
-                'noProxy': ''
-            })
+            # proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            # proxy = Proxy({
+            #     'proxyType': ProxyType.MANUAL,
+            #     'httpProxy': proxy_url,
+            #     'ftpProxy': proxy_url,
+            #     'sslProxy': proxy_url,
+            #     'noProxy': ''
+            # })
+            # opts.set_preference("network.proxy.type", 1)
+            # opts.set_preference("network.proxy.http", PROXY_HOST)
+            # opts.set_preference("network.proxy.http_port", int(PROXY_PORT))
+            # opts.set_preference("network.proxy.ssl", PROXY_HOST)
+            # opts.set_preference("network.proxy.ssl_port", int(PROXY_PORT))
+            # opts.set_preference("network.proxy.ftp", PROXY_HOST)
+            # opts.set_preference("network.proxy.ftp_port", int(PROXY_PORT))
+            # opts.set_preference("network.proxy.socks", PROXY_HOST)
+            # opts.set_preference("network.proxy.socks_port", int(PROXY_PORT))
+            # opts.set_preference("network.proxy.no_proxies_on", "localhost,127.0.0.1")
+
+            # Add authentication
+            # opts.set_preference("network.proxy.http.auth.user", PROXY_USER)
+            # opts.set_preference("network.proxy.http.auth.password", PROXY_PASSWORD)
+            # opts.set_preference("network.proxy.ssl.auth.user", PROXY_USER)
+            # opts.set_preference("network.proxy.ssl.auth.password", PROXY_PASSWORD)
+            # opts.set_preference("network.proxy.ftp.auth.user", PROXY_USER)
+            # opts.set_preference("network.proxy.ftp.auth.password", PROXY_PASSWORD)
+            # opts.set_preference("network.proxy.socks.auth.user", PROXY_USER)
+            # opts.set_preference("network.proxy.socks.auth.password", PROXY_PASSWORD)
+
+            # os.environ['HTTP_PROXY'] = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            # os.environ['HTTPS_PROXY'] = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+
             driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts, proxy=proxy
+                executable_path=os.environ["GECKODRIVER_PATH"], options=opts #, proxy=proxy
             )
+            # driver.get("https://httpbin.org/ip")
+            # print(driver.page_source)
             driver.get(self._leagues[league_name])
 
             champ_line = WebDriverWait(driver, 3).until(

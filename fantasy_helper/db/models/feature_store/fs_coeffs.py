@@ -16,7 +16,7 @@ class FSCoeffs(Base):
     league_name = Column(String, nullable=False)
     tour_number = Column(Integer, nullable=False)
     tour_name = Column(String, nullable=True)
-    start_datetime = Column(DateTime, nullable=False)
+    start_datetime = Column(DateTime, nullable=True)
     url = Column(String, nullable=True)
     total_1_over_1_5 = Column(Float, nullable=True)
     total_1_under_0_5 = Column(Float, nullable=True)
