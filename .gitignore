@@ -151,3 +151,8 @@ postgres_data
 certs
 # vue js
 node_modules
+
+# aider
+.aider*
+
+certs
