@@ -145,14 +145,9 @@ cython_debug/
 postgres_data
 /*.sql
 
-# aider
-.aider*
-
 certs
 # vue js
 node_modules
 
 # aider
 .aider*
-
-certs
