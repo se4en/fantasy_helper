@@ -92,10 +92,17 @@ onMounted(async () => {
   padding: 1rem;
 }
 
+.leagues-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
 .league-item {
-  flex: 1 0 23%; /* 4 items per row (100% / 4 - gap) */
-  min-width: 200px;
-  max-width: calc(25% - 1rem);
+  flex: 0 0 calc(20% - 1rem); /* 5 items per row (100% / 5 - gap) */
+  min-width: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -103,24 +110,27 @@ onMounted(async () => {
   box-sizing: border-box;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .league-item {
-    flex: 1 0 31%; /* 3 items per row */
-    max-width: calc(33.33% - 1rem);
+    flex-basis: calc(25% - 1rem); /* 4 items per row */
+  }
+}
+
+@media (max-width: 1024px) {
+  .league-item {
+    flex-basis: calc(33.33% - 1rem); /* 3 items per row */
   }
 }
 
 @media (max-width: 768px) {
   .league-item {
-    flex: 1 0 48%; /* 2 items per row */
-    max-width: calc(50% - 1rem);
+    flex-basis: calc(50% - 1rem); /* 2 items per row */
   }
 }
 
 @media (max-width: 480px) {
   .league-item {
-    flex: 1 0 100%; /* 1 item per row */
-    max-width: 100%;
+    flex-basis: 100%; /* 1 item per row */
   }
 }
 </style>
