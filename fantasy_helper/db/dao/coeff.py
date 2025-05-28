@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Literal, Optional, Tuple
 import os.path as path
 from datetime import timezone
@@ -39,11 +39,12 @@ class CoeffDAO:
 
         db_session: SQLSession = Session()
 
+        week_ago = current_datetime - timedelta(days=7)
         actual_coeffs_rows = (
             db_session.query(Coeff)
             .filter(and_(
-                Coeff.league_name == league_name, 
-                Coeff.start_datetime >= current_datetime
+                Coeff.league_name == league_name,
+                Coeff.timestamp >= week_ago
             ))
             .subquery()
         )
@@ -105,14 +106,18 @@ class CoeffDAO:
             self.update_coeffs(league.name)
 
     def update_feature_store(self) -> None:
+        print("update_feature_store")
         feature_store = FSCoeffsDAO()
 
         for league in self._leagues:
             actual_coeffs = self.get_actual_coeffs(league.name)
+            print("actual_coeffs", len(actual_coeffs))
             sports_matches = self._schedule_dao.get_next_matches(
                 league.name, 2
             )
+            print("sports_matches", len(sports_matches))
             if actual_coeffs and sports_matches:
+                print("add_sports_info_to_coeffs")
                 sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
                     league.name, actual_coeffs, sports_matches
                 )

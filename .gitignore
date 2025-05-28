@@ -144,3 +144,8 @@ cython_debug/
 # data
 postgres_data
 /*.sql
+
+# aider
+.aider*
+
+certs
