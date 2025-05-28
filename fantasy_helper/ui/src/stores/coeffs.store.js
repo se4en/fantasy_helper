@@ -32,7 +32,15 @@ export const useCoeffStore = defineStore('coeffs', {
 
         const result = CoeffTableRowSchema.array().safeParse(response.data)
         if (!result.success) {
-          throw new Error('Invalid data format from API')
+          // throw new Error('Invalid data format from API')
+          const errorDetails = {                                                                                                                                              
+            message: 'Invalid data format from API',                                                                                                                          
+            validationErrors: result.error.issues,  // Zod validation errors                                                                                                  
+            receivedData: response.data,           // The actual data that failed                                                                                             
+            endpoint: ENDPOINTS.COEFFS,                                                                                                                                       
+            params: { league_name: leagueName }                                                                                                                               
+          };                                                                                                                                                                  
+          throw new Error(JSON.stringify(errorDetails));
         }
         
         this.coeffs = result.data
