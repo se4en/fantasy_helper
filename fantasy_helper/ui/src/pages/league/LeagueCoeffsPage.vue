@@ -129,7 +129,7 @@ onMounted(async () => {
                 class="sub-header"
                 :class="{ active: sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex }"
               >
-                Attack
+                <span class="attack-header">Attack</span>
                 <span v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
                   {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
                 </span>
@@ -139,7 +139,7 @@ onMounted(async () => {
                 class="sub-header"
                 :class="{ active: sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex }"
               >
-                Defence
+                <span class="defence-header">Defence</span>
                 <span v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
                   {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
                 </span>
@@ -214,6 +214,14 @@ th {
 
 .tour-header {
   background-color: #f0f0f0;
+}
+
+.attack-header {
+  width: 100px; /* Set a fixed width for the attack column */
+}
+
+.defence-header {
+  width: 100px; /* Set a fixed width for the defence column */
 }
 
 .sub-header {
