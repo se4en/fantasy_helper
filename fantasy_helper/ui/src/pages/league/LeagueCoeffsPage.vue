@@ -85,6 +85,18 @@ function setSort(type, tourIndex) {
   }
 }
 
+// Helper function to get background color for attack coefficient
+function getAttackCellStyle(row, tourIndex) {
+  const color = row.tour_attack_colors?.[tourIndex]
+  return color ? { backgroundColor: color } : {}
+}
+
+// Helper function to get background color for defence coefficient
+function getDefenceCellStyle(row, tourIndex) {
+  const color = row.tour_defence_colors?.[tourIndex]
+  return color ? { backgroundColor: color } : {}
+}
+
 onMounted(async () => {
   try {
     if (!coeffs.value?.length && route.params.leagueSlug) {
@@ -158,10 +170,10 @@ onMounted(async () => {
             <td class="team-cell">{{ row.team_name }}</td>
 
             <template v-for="(tour, tourIndex) in maxTours" :key="`coeff-${rowIndex}-${tourIndex}`">
-              <td>
+              <td class="attack-cell" :style="getAttackCellStyle(row, tourIndex)">
                 {{ row.tour_attack_coeffs?.[tourIndex]?.toFixed(2) || '' }}
               </td>
-              <td>
+              <td class="defence-cell" :style="getDefenceCellStyle(row, tourIndex)">
                 {{ row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '' }}
               </td>
               <td class="rival-cell">
@@ -270,6 +282,14 @@ th {
   position: sticky;
   left: 0;
   z-index: 1;
+}
+
+.attack-cell {
+  /* Background color will be set dynamically via :style */
+}
+
+.defence-cell {
+  /* Background color will be set dynamically via :style */
 }
 
 .rival-cell {
