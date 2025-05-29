@@ -126,22 +126,26 @@ onMounted(async () => {
             <template v-for="(_, tourIndex) in maxTours" :key="'subheader-'+tourIndex">
               <th 
                 @click="setSort('attack', tourIndex)" 
-                class="sub-header"
+                class="sub-header attack-header"
                 :class="{ active: sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex }"
               >
-                <span class="attack-header">Attack</span>
-                <span v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
-                  {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                <span class="header-content">
+                  <span class="header-text">Attack</span>
+                  <span class="sort-arrow" v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
+                    {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
                 </span>
               </th>
               <th 
                 @click="setSort('defence', tourIndex)" 
-                class="sub-header"
+                class="sub-header defence-header"
                 :class="{ active: sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex }"
               >
-                <span class="defence-header">Defence</span>
-                <span v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
-                  {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                <span class="header-content">
+                  <span class="header-text">Defence</span>
+                  <span class="sort-arrow" v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
+                    {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
                 </span>
               </th>
               <th class="rival-header">Rival</th>
@@ -217,11 +221,15 @@ th {
 }
 
 .attack-header {
-  width: 100px; /* Set a fixed width for the attack column */
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
 }
 
 .defence-header {
-  width: 100px; /* Set a fixed width for the defence column */
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
 }
 
 .sub-header {
@@ -237,10 +245,23 @@ th {
   background-color: #dee2e6;
 }
 
-.sub-header span {
-  margin-left: 0.5rem;
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.header-text {
+  flex-shrink: 0;
+}
+
+.sort-arrow {
   font-weight: bold;
   color: #2c3e50;
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .team-cell {
