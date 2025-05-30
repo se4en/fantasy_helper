@@ -201,6 +201,7 @@ onMounted(async () => {
 .coefficients-table {
   overflow-x: auto;
   margin: 1rem 0;
+  --row-height: 20px; /* Define fixed row height */
 }
 
 table {
@@ -209,15 +210,24 @@ table {
   min-width: 600px;
 }
 
-th, td {
+th {
   padding: 0.75rem;
   border: 1px solid #e0e0e0;
   text-align: center;
-}
-
-th {
   background-color: #f8f9fa;
   font-weight: 600;
+}
+
+td {
+  padding: 0.75rem;
+  height: var(--row-height); /* Enforce fixed row height */
+  min-height: var(--row-height); /* Ensure minimum height */
+  max-height: var(--row-height); /* Constrain maximum height */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Truncate long text */
+  white-space: nowrap; /* Prevent wrapping */
+  border: 1px solid #e0e0e0;
+  text-align: center;
 }
 
 .team-column {
@@ -226,6 +236,11 @@ th {
   left: 0;
   background: white;
   z-index: 2;
+  /* Center team column content both horizontally and vertically */
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  /* Removed fixed height for header */
 }
 
 .tour-header {
@@ -282,6 +297,12 @@ th {
   position: sticky;
   left: 0;
   z-index: 1;
+  /* Team cell needs explicit vertical alignment */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Keep fixed height for data row team cells */
+  height: var(--row-height);
 }
 
 .attack-cell {
