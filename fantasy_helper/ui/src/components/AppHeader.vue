@@ -88,7 +88,8 @@
 
         <div class="nav-center">
           <h1 class="site-title">
-            Fantasy Helper<template v-if="showLeagueTitle"> | {{ currentLeague.ru_name || currentLeague.name }} <span class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</span></template>
+            <template v-if="showLeagueTitle">{{ currentLeague.ru_name || currentLeague.name }} <span class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</span></template>
+            <template v-else>Fantasy Helper</template>
           </h1>
         </div>
 

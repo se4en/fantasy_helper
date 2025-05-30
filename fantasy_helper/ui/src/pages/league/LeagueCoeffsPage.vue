@@ -110,7 +110,7 @@ onMounted(async () => {
 
 <template>
   <div class="coeffs-page">
-    <h2 class="section-title">Team Coefficients</h2>
+    <!-- <h2 class="section-title">Team Coefficients</h2> -->
 
     <Loader v-if="showLoader" />
     

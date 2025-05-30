@@ -68,7 +68,7 @@ onMounted(async () => {
 
 <template>
   <div class="calendar-page">
-    <h2 class="section-title">League Calendar</h2>
+    <!-- <h2 class="section-title">League Calendar</h2> -->
 
     <Loader v-if="showLoader" />
     
