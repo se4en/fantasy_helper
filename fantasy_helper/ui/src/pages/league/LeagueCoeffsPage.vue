@@ -87,14 +87,14 @@ function setSort(type, tourIndex) {
 
 // Helper function to get background color for attack coefficient
 function getAttackCellStyle(row, tourIndex) {
-  const color = row.tour_attack_colors?.[tourIndex]
-  return color ? { backgroundColor: color } : {}
+  const color = row.tour_attack_colors?.[tourIndex] || '#f0f0f0'
+  return { backgroundColor: color }
 }
 
 // Helper function to get background color for defence coefficient
 function getDefenceCellStyle(row, tourIndex) {
-  const color = row.tour_defence_colors?.[tourIndex]
-  return color ? { backgroundColor: color } : {}
+  const color = row.tour_defence_colors?.[tourIndex] || '#f0f0f0'
+  return { backgroundColor: color }
 }
 
 onMounted(async () => {
