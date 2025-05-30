@@ -1,5 +1,26 @@
 <script>
+  import { useLeaguesInfoStore } from '@/stores/leaguesInfo.store'
+  import { storeToRefs } from 'pinia'
+
   export default {
+    setup() {
+      const leaguesInfoStore = useLeaguesInfoStore()
+      const { leaguesInfo } = storeToRefs(leaguesInfoStore)
+      return { 
+        leaguesInfoStore,
+        leaguesInfo
+      }
+    },
+    async mounted() {
+      // Ensure leagues info is loaded when the header mounts
+      if (!this.leaguesInfo?.length) {
+        try {
+          await this.leaguesInfoStore.fetchLeaguesInfo()
+        } catch (error) {
+          console.error('Failed to load leagues info in header:', error)
+        }
+      }
+    },
     computed: {
       availableRoutes() {
         return this.$router.options.routes.filter(route => 
@@ -9,33 +30,34 @@
           route.name !== 'Home' &&
           route.name !== 'Login'
         )
+      },
+      // Get current league if we're on a league page
+      currentLeague() {
+        const leagueSlug = this.$route.params.leagueSlug;
+        if (!leagueSlug) {
+          return null;
+        }
+
+        if (!this.leaguesInfo) {
+          return null;
+        }
+
+        // Fix: Access leaguesInfo directly, not .value since it's already a ref
+        const leagues = this.leaguesInfo || [];
+        return leagues.find(league => league.name === leagueSlug) || null;
+      },
+      // Determine if we should show league title
+      showLeagueTitle() {
+        return this.$route.path.includes('/league/') && this.currentLeague
       }
     },
-    // Get current league if we're on a league page
-    currentLeague() {
-      // Check if we're on a league page
-      console.error('currentRoute.params.leagueSlug', this.currentRoute.params.leagueSlug)
-      console.error('cthis.$store', this.$store)
-
-      if (this.currentRoute.params.leagueSlug && this.$store) {
-        try {
-          // console.error('cthis.$store', this.$store)
-          // Try to get league info from store if available
-          const leaguesStore = this.$store.state.leaguesInfo
-          if (leaguesStore && leaguesStore.leaguesInfo) {
-            return leaguesStore.leaguesInfo.find(
-              league => league.name === this.currentRoute.params.leagueSlug
-            )
-          }
-        } catch (error) {
-          console.error('Error getting league info:', error)
+    watch: {
+      // Watch for route changes to ensure league info is available
+      '$route'(to, from) {
+        if (to.path.includes('/league/') && !this.leaguesInfo?.length) {
+          this.leaguesInfoStore.fetchLeaguesInfo()
         }
       }
-      return null
-    },
-    // Determine if we should show league title
-    showLeagueTitle() {
-      return this.currentRoute.path.includes('/league/') && this.currentLeague.value
     }
   }
 </script>
@@ -64,14 +86,10 @@
           </li>
         </ul>
 
-        <!-- Center title - League name -->
-        <div class="nav-center" v-if="showLeagueTitle">
-          <span class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</span>
-          <h1 class="league-title">{{ currentLeague.ru_name || currentLeague.name }}</h1>
-        </div>
-        <div class="nav-center" v-else>
-          <!-- Default title when not on a league page -->
-          <h1 class="site-title">Fantasy Helper</h1>
+        <div class="nav-center">
+          <h1 class="site-title">
+            Fantasy Helper<template v-if="showLeagueTitle"> | {{ currentLeague.ru_name || currentLeague.name }} <span class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</span></template>
+          </h1>
         </div>
 
         <ul class="nav-links-right">
@@ -194,7 +212,7 @@
 
 .league-emoji {
   font-size: 1.4rem;
-  margin-right: 8px;
+  margin-left: 8px;
 }
 
 .site-title {
@@ -203,6 +221,9 @@
   font-size: 1.3rem;
   font-weight: 700;
   color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* @media (max-width: 768px) {

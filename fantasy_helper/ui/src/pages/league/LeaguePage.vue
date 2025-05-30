@@ -66,11 +66,6 @@ const subnavItems = computed(() => {
     <Loader v-if="showLeaguesInfoLoader" />
     
     <template v-else-if="currentLeague">
-      <header class="league-header">
-        <h1>{{ currentLeague.ru_name || currentLeague.name }}</h1>
-        <div class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</div>
-      </header>
-
       <!-- Router view for child routes -->
       <router-view />
     </template>
@@ -87,18 +82,6 @@ const subnavItems = computed(() => {
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.league-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-}
-
-.league-emoji {
-  font-size: 2rem;
 }
 
 .empty-state {
