@@ -1,87 +1,27 @@
 <script>
-import { useRouter } from 'vue-router'
-import httpClient from '@/api/httpClient'
-import { ENDPOINTS } from '@/api/httpClient'
-
-const router = useRouter();
-
-
 export default {
-  mounted() {
-    this.checkTelegramCallback();
-    this.loadTelegramWidget();
-  },
   data() {
     return {
-      botUsername: import.meta.env.VITE_TELEGRAM_BOT_USERNAME,
-      isProcessingCallback: false
+      keycloakButtonText: 'Login with Keycloak'
     };
   },
   methods: {
-    checkTelegramCallback() {
-      // Check for Telegram auth parameters in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      console.warn("telegram ury params", urlParams);
-
-      if (urlParams.has('id') && urlParams.has('hash')) {
-        this.isProcessingCallback = true;
-        
-        const userData = {
-          id: urlParams.get('id'),
-          first_name: urlParams.get('first_name'),
-          last_name: urlParams.get('last_name'),
-          username: urlParams.get('username'),
-          photo_url: urlParams.get('photo_url'),
-          auth_date: urlParams.get('auth_date'),
-          hash: urlParams.get('hash')
-          // initData: window.Telegram.WebApp.initData
-        };
-
-        this.handleTelegramAuth(userData);
-        
-        // Clean URL after processing
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    generateRandomString(length) {
+      const array = new Uint8Array(length);
+      window.crypto.getRandomValues(array);
+      return Array.from(array, b => b.toString(16).padStart(2, '0')).join('').substr(0, length);
     },
-    async loadTelegramWidget() {
-      if (this.isProcessingCallback) return;
-
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = `https://telegram.org/js/telegram-widget.js?22`;
-      script.dataset.telegramLogin = this.botUsername;
-      script.dataset.size = 'large';
-      script.dataset.radius = '14';
-      script.dataset.requestAccess = 'write';
-      script.dataset.authUrl = window.location.href;
-
-      script.onload = () => {
-        window.onTelegramAuth = (user) => {
-          this.handleTelegramAuth(user);
-          // Force update to clear loading state
-          this.$forceUpdate();
-        };
-      };
+    keycloakLogin() {
+      const state = this.generateRandomString(16);
+      sessionStorage.setItem('keycloak_state', state);
       
-      this.$refs.telegramWidget.appendChild(script);
-    },
-    async handleTelegramAuth(user) {
-      try {
-        console.warn('handleTelegramAuth user:', user);
+      const keycloakUrl = `${import.meta.env.VITE_KEYCLOAK_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/auth`;
+      const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
+      const redirectUri = encodeURIComponent(window.location.origin);
+      const scope = 'openid';
 
-        const response = await httpClient.post(
-          ENDPOINTS.TELEGRAM_AUTH, 
-          user
-        );
-        
-        // Redirect to protected route
-        this.$router.push({ name: 'Home' });
-      } catch (error) {
-        console.error('Authentication failed:', error);
-        this.isProcessingCallback = false;
-        this.loadTelegramWidget(); // Reinitialize widget
-      }
+      const loginUrl = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;
+      window.location.href = loginUrl;
     }
   }
 };
@@ -95,32 +35,17 @@ export default {
       </h1>
 
       <div class="login-container">
-        <div v-if="!isProcessingCallback" ref="telegramWidget"></div>
-        <div v-else class="loading-message">
-          Processing Telegram login...
-        </div>
+        <button @click="keycloakLogin" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">
+          {{ keycloakButtonText }}
+        </button>
       </div>
 
-      <p class="text-sm text-gray-600 text-center">
-        Secure authentication powered by Telegram
+      <p class="text-sm text-gray-600 text-center mt-4">
+        Secure authentication options
       </p>
-      
     </div>
   </div>
 </template>
 
 <style scoped>
-.telegram-login-wrapper {
-  min-height: 48px;
-  margin: 1.5rem 0;
-}
-
-:deep(.telegram-login-button) {
-  background-color: #0088cc !important;
-  transition: transform 0.2s ease;
-}
-
-:deep(.telegram-login-button):hover {
-  transform: scale(1.05);
-}
 </style>
