@@ -1,3 +1,4 @@
+from typing import Optional
 import httpx
 from fastapi import HTTPException
 
@@ -5,7 +6,7 @@ from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, K
 
 
 class KeycloakClient:
-    def __init__(self, client: httpx.AsyncClient | None = None):
+    def __init__(self, client: Optional[httpx.AsyncClient] = None):
         self.client = client or httpx.AsyncClient()
 
         self._token_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"

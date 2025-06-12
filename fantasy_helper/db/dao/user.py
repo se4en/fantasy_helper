@@ -12,7 +12,7 @@ from fantasy_helper.utils.dataclasses import KeycloakUser
 utc = timezone.utc
 
 
-class UserDao:
+class UserDAO:
     def __init__(self):
         self._default_status = "basic"
 

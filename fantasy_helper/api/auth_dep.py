@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import Depends, HTTPException, Request
 
 from fantasy_helper.api.keycloak_client import KeycloakClient
@@ -9,7 +10,7 @@ def get_keycloak_client(request: Request) -> KeycloakClient:
 
 
 # ✅ Получаем токен из cookie (None, если нет)
-async def get_token_from_cookie(request: Request) -> str | None:
+async def get_token_from_cookie(request: Request) -> Optional[str]:
     return request.cookies.get("access_token")
 
 

@@ -23,7 +23,7 @@ from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayer
 from fantasy_helper.api.keycloak_client import KeycloakClient
 from fantasy_helper.api.auth_dep import get_keycloak_client
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup, TelegramAuthData
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
 
 
@@ -34,11 +34,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=[
-    #     "https://dev.fantasy-helper.ru",
-    #     "https://api-dev.fantasy-helper.ru",
-    # ],  # Add your UI's URL
-    allow_origins=["*"],
+    allow_origins=[
+        "https://dev.fantasy-helper.ru",
+        "https://api-dev.fantasy-helper.ru",
+        "https://keycloak-dev.fantasy-helper.ru",
+    ],  # Add your UI's URL
+    # allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,9 +59,9 @@ FS_Calendars_dao = FSCalendarsDAO()
 
 @app.get("/login/callback/")
 async def login_callback(
-    code: str | None = None,
-    error: str | None = None,
-    error_description: str | None = None,
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
     keycloak: KeycloakClient = Depends(get_keycloak_client)
 ) -> RedirectResponse:
     """
@@ -103,7 +104,7 @@ async def login_callback(
             await User_dao.add_user(user)
 
         # Установка cookie с токенами и редирект
-        response = RedirectResponse(url="/protected")
+        response = RedirectResponse(url="/")
         response.set_cookie(
             key="access_token",
             value=access_token,
