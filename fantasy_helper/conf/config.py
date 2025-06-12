@@ -30,6 +30,13 @@ PROXY_PASSWORD = str(os.getenv("PROXY_PASSWORD"))
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
 
+# keycloak
+KEYCLOAK_BASE_URL=str(os.getenv("KEYCLOAK_BASE_URL"))
+KEYCLOAK_SERVER_URL=str(os.getenv("PROXY_HOST"))                                                                                                                                                                                                                                                                                                                                     
+KEYCLOAK_REALM=str(os.getenv("KEYCLOAK_REALM"))                                                                                                                                                                                                                                                                                                                                               
+KEYCLOAK_CLIENT_ID=str(os.getenv("KEYCLOAK_CLIENT_ID"))                                                                                                                                                                                                                                                                                                                                     
+KEYCLOAK_CLIENT_SECRET=str(os.getenv("KEYCLOAK_CLIENT_SECRET"))
+
 # load leagues info
 if not GlobalHydra().is_initialized():
     initialize(config_path=".", version_base=None)

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session as SQLSession
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.user import User
+from fantasy_helper.utils.dataclasses import KeycloakUser
 
 
 utc = timezone.utc
@@ -15,38 +16,30 @@ class UserDao:
     def __init__(self):
         self._default_status = "basic"
 
-    def login(
-        self,
-        id: int,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        username: Optional[str] = None,
-        phone: Optional[str] = None,
-        status: Optional[str] = None,
-        login_timestamp: Optional[datetime] = None,
-        last_timestamp: Optional[datetime] = None
-    ) -> Optional[str]:
+    def get_user_by_id(self, id: int) -> Optional[KeycloakUser]:
+        db_session: SQLSession = Session()
+        user = db_session.query(User).filter(User.id == id).first()
+        db_session.close()
+        if user is None:
+            return None
+        else:
+            return KeycloakUser(**user.__dict__)
+
+    def add_user(self, user: KeycloakUser) -> None:
         db_session: SQLSession = Session()
 
-        user_status = self._default_status if status is None else status
-        cur_user = db_session.query(User).filter(User.id == id).first()
         current_timestamp = datetime.now().replace(tzinfo=utc)
-        if cur_user is None:
-            db_session.add(User(
-                id, 
-                first_name=first_name,
-                last_name=last_name,
-                username=username,
-                phone=phone,
-                status=user_status,
-                login_timestamp=current_timestamp,
-                last_timestamp=current_timestamp
-            ))
-        else:
-            user_status = cur_user.status
-            cur_user.last_timestamp = current_timestamp
+        db_session.add(User(
+            id=user.id, 
+            email=user.email,
+            email_verified=user.email_verified,
+            name=user.name,
+            preferred_username=user.preferred_username,
+            given_name=user.given_name,
+            family_name=user.family_name,
+            login_timestamp=current_timestamp
+        ))
+            
         db_session.commit()
         db_session.close()
-
-        return user_status
     

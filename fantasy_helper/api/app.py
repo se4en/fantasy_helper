@@ -2,8 +2,10 @@ from collections import defaultdict
 from dataclasses import asdict
 import os
 from typing import Dict, List, Literal, Optional
+from urllib.parse import urlencode
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from hydra.utils import instantiate
 import pandas as pd
@@ -13,38 +15,16 @@ from fantasy_helper.utils.common import load_config
 from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.player import PlayerDAO
-# from fantasy_helper.db.dao.user import UserDAO
+from fantasy_helper.db.dao.user import UserDAO
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
+from fantasy_helper.api.keycloak_client import KeycloakClient
+from fantasy_helper.api.auth_dep import get_keycloak_client
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup, TelegramAuthData
-
-
-# def verify_telegram_data(data: TelegramAuthData):
-#     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-#     data_check = "\n".join([
-#         f"auth_date={data.auth_date}",
-#         f"first_name={data.first_name}",
-#         f"id={data.id}",
-#         f"last_name={data.last_name or ''}",
-#         f"photo_url={data.photo_url or ''}",
-#         f"username={data.username or ''}"
-#     ])
-    
-#     secret_key = hashlib.sha256(bot_token.encode()).digest()
-#     computed_hash = hmac.new(
-#         secret_key,
-#         msg=data_check.encode(),
-#         digestmod=hashlib.sha256
-#     ).hexdigest()
-    
-#     if computed_hash != data.hash:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Invalid authentication data"
-#         )
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup, TelegramAuthData
+from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -54,10 +34,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://dev.fantasy-helper.ru",
-        "https://api-dev.fantasy-helper.ru",
-    ],  # Add your UI's URL
+    # allow_origins=[
+    #     "https://dev.fantasy-helper.ru",
+    #     "https://api-dev.fantasy-helper.ru",
+    # ],  # Add your UI's URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,7 +46,7 @@ app.add_middleware(
 )
 
 create_db()
-# User_dao = UserDAO()
+User_dao = UserDAO()
 Coeff_dao = CoeffDAO()
 Player_dao = PlayerDAO()
 FS_Coeff_dao = FSCoeffsDAO()
@@ -75,12 +56,124 @@ FS_Sports_Players_dao = FSSportsPlayersDAO()
 FS_Calendars_dao = FSCalendarsDAO()
 
 
-@app.post("/auth/telegram/")
-async def auth_telegram(auth_data: TelegramAuthData) -> List[LeagueInfo]:
-    print("auth_data", auth_data)
-    return []
-    # verify_telegram_data(auth_data)
-    # return result
+@app.get("/login/callback/")
+async def login_callback(
+    code: str | None = None,
+    error: str | None = None,
+    error_description: str | None = None,
+    keycloak: KeycloakClient = Depends(get_keycloak_client)
+) -> RedirectResponse:
+    """
+    Обрабатывает callback после авторизации в Keycloak.
+    Получает токен, информацию о пользователе, сохраняет пользователя в БД (если нужно)
+    и устанавливает cookie с токенами. Обрабатывает ошибки от Keycloak.
+    """
+    if error:
+        # logger.error(f"Keycloak error: {error}, description: {error_description}")
+        raise HTTPException(status_code=401, detail="Authorization code is required")
+
+    if not code:
+        raise HTTPException(status_code=401, detail="Authorization code is required")
+
+    try:
+        # Получение токенов от Keycloak
+        token_data = await keycloak.get_tokens(code)
+        access_token = token_data.get("access_token")
+        refresh_token = token_data.get("refresh_token")
+        id_token = token_data.get("id_token")
+
+        if not access_token:
+            raise HTTPException(status_code=401, detail="Токен доступа не найден")
+        if not refresh_token:
+            raise HTTPException(status_code=401, detail="Refresh token не найден")
+        if not id_token:
+            raise HTTPException(status_code=401, detail="ID token не найден")
+
+        # Получение информации о пользователе
+        user_info = await keycloak.get_user_info(access_token)
+        user_id = user_info.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="ID пользователя не найден")
+
+        # Проверка существования пользователя, создание нового при необходимости
+        user = await User_dao.find_one_or_none_by_id(user_id)
+        if not user and isinstance(user_info, dict):
+            user_info["id"] = user_info.pop("sub")
+            user = KeycloakUser(**user_info)
+            await User_dao.add_user(user)
+
+        # Установка cookie с токенами и редирект
+        response = RedirectResponse(url="/protected")
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("expires_in", 3600),
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("refresh_expires_in", 2592000),
+        )
+        response.set_cookie(
+            key="id_token",
+            value=id_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("expires_in", 3600),
+        )
+        # logger.info(f"User {user_id} logged in successfully")
+        return response
+
+    except Exception as e:
+        # logger.error(f"Ошибка обработки callback'а логина: {str(e)}")
+        raise HTTPException(status_code=401, detail="Ошибка авторизации")
+
+
+@app.get("/logout")
+async def logout(request: Request):
+    id_token = request.cookies.get("id_token")
+    params = {
+        "client_id": KEYCLOAK_CLIENT_ID,
+        "post_logout_redirect_uri": KEYCLOAK_BASE_URL,
+    }
+    if id_token:
+        params["id_token_hint"] = id_token
+
+    keycloak_logout_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/logout"
+    full_logout_url = f"{keycloak_logout_url}?{urlencode(params)}"
+    response = RedirectResponse(url=full_logout_url)
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    response.delete_cookie(
+        key="id_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    return response
 
 
 @app.get("/leagues_info/")

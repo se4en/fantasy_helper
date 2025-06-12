@@ -1,0 +1,122 @@
+{
+  "realm": "fantasy-helper",
+  "enabled": true,
+  "displayName": "Fantasy Helper",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": false,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 30,
+  "defaultRoles": ["default-roles-fantasy-helper", "offline_access", "uma_authorization"],
+  "requiredCredentials": ["password"],
+  "clients": [
+    {
+      "clientId": "fantasy-helper-ui",
+      "name": "Fantasy Helper UI",
+      "description": "Frontend application for Fantasy Helper",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "${FRONTEND_URL}/*",
+        "${FRONTEND_URL_HTTPS}/*"
+      ],
+      "webOrigins": [
+        "${FRONTEND_URL}",
+        "${FRONTEND_URL_HTTPS}"
+      ],
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "fantasy-helper-api",
+      "name": "Fantasy Helper API",
+      "description": "Backend API for Fantasy Helper",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
+  "users": [],
+  "roles": {                                                                                                                                                       
+    "realm": [                                                                                                                                                   
+      {                                                                                                                                                        
+        "name": "basic_user",
+        "description": "Basic user role"                                                                                                                     
+      },                                                                                                                                                       
+      {                                                                                                                                                        
+        "name": "admin_user",                                                                                                                                  
+        "description": "Administrator role"                                                                                                                  
+      },                                                                                                                                                       
+      {                                                                                                                                                        
+        "name": "premium_user",                                                                                                                                   
+        "description": "Premium user role"                                                                                                                   
+      }                                                                                                                                                        
+    ]                                                                                                
+  },
+  "groups": [],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email",
+    "roles",
+    "web-origins"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone",
+    "microprofile-jwt"
+  ]
+}

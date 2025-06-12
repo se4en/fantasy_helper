@@ -626,14 +626,15 @@ class SportsTourInfo:
 
 
 @dataclass
-class TelegramAuthData:
+class KeycloakUser:
     id: int
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    username: Optional[str] = None
-    photo_url: Optional[str] = None
-    auth_date: Optional[int] = None
-    hash: Optional[str] = None
+    email: Optional[str] = None
+    email_verified: Optional[bool] = None
+    name: Optional[str] = None
+    preferred_username: Optional[str] = None
+    given_name: Optional[str] = None
+    family_name: Optional[str] = None
+    login_timestamp: Optional[datetime.datetime] = None
 
 
 @dataclass
