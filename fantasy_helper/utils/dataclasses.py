@@ -627,7 +627,7 @@ class SportsTourInfo:
 
 @dataclass
 class KeycloakUser:
-    id: int
+    id: str
     email: Optional[str] = None
     email_verified: Optional[bool] = None
     name: Optional[str] = None

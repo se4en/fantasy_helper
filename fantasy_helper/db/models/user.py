@@ -3,6 +3,8 @@ from typing import Optional
 
 from sqlalchemy import Column
 from sqlalchemy import Integer, String, Boolean, DateTime
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 from fantasy_helper.db.database import Base
 
@@ -10,7 +12,8 @@ from fantasy_helper.db.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    # id = Column(String(36), primary_key=True)
     email = Column(String, nullable=True)
     email_verified = Column(Boolean, nullable=True)
     name = Column(String, nullable=True)

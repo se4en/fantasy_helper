@@ -6,6 +6,7 @@ import LeaguePage from './league/LeaguePage.vue'
 import LeagueCoeffsPage from './league/LeagueCoeffsPage.vue'
 import LeagueCalendarPage from './league/LeagueCalendarPage.vue'
 import LoginPage from './login/LoginPage.vue'
+import LoginCallback from './login/LoginCallback.vue'; 
 
 const routes = [
   {
@@ -82,6 +83,15 @@ const routes = [
       showInNavigation: false,
       navTitle: 'Login'
     }
+  },
+  {                                                                                                                                                          
+    path: '/login/callback',                                                                                                                                 
+    name: 'LoginCallback',                                                                                                                                   
+    component: LoginCallback,                                                                                                                                
+    meta: {                                                                                                                                                  
+      requiresAuth: false,                                                                                                                                   
+      showInNavigation: false                                                                                                                                
+    }                                                                                                                                                        
   },
 ]
 

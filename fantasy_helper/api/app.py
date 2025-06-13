@@ -1,14 +1,18 @@
 from collections import defaultdict
 from dataclasses import asdict
 import os
+import sys
 from typing import Dict, List, Literal, Optional
 from urllib.parse import urlencode
+from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from hydra.utils import instantiate
 import pandas as pd
+from loguru import logger
 
 from fantasy_helper.db.dao.feature_store.fs_calendar import FSCalendarsDAO
 from fantasy_helper.utils.common import load_config
@@ -24,13 +28,33 @@ from fantasy_helper.api.keycloak_client import KeycloakClient
 from fantasy_helper.api.auth_dep import get_keycloak_client
 
 from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
-from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS
 
 
 cfg = load_config(config_path="../conf", config_name="config")
 leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues) if league.is_active}
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    http_client = httpx.AsyncClient()
+    app.state.keycloak_client = KeycloakClient(http_client)
+    yield
+
+    await http_client.aclose()
+
+app = FastAPI(lifespan=lifespan)
+
+# @app.exception_handler(HTTPException)
+# async def auth_exception_handler(request: Request, exc: HTTPException):
+#     if exc.status_code == 401:
+#         return RedirectResponse(
+#             f"{settings.auth_url}"
+#             f"?client_id={settings.CLIENT_ID}"
+#             f"&response_type=code"
+#             f"&scope=openid"
+#             f"&redirect_uri={settings.redirect_uri}"
+#         )
+#     raise exc
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +62,7 @@ app.add_middleware(
         "https://dev.fantasy-helper.ru",
         "https://api-dev.fantasy-helper.ru",
         "https://keycloak-dev.fantasy-helper.ru",
-    ],  # Add your UI's URL
+    ],
     # allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -63,17 +87,13 @@ async def login_callback(
     error: Optional[str] = None,
     error_description: Optional[str] = None,
     keycloak: KeycloakClient = Depends(get_keycloak_client)
-) -> RedirectResponse:
-    """
-    Обрабатывает callback после авторизации в Keycloak.
-    Получает токен, информацию о пользователе, сохраняет пользователя в БД (если нужно)
-    и устанавливает cookie с токенами. Обрабатывает ошибки от Keycloak.
-    """
+) -> JSONResponse:
     if error:
-        # logger.error(f"Keycloak error: {error}, description: {error_description}")
+        logger.debug(f"Keycloak error: {error}, description: {error_description}")
         raise HTTPException(status_code=401, detail="Authorization code is required")
 
     if not code:
+        logger.debug(f"Authorization code is required")
         raise HTTPException(status_code=401, detail="Authorization code is required")
 
     try:
@@ -84,27 +104,39 @@ async def login_callback(
         id_token = token_data.get("id_token")
 
         if not access_token:
+            logger.error(f"Токен доступа не найден")
             raise HTTPException(status_code=401, detail="Токен доступа не найден")
         if not refresh_token:
+            logger.error(f"Refresh token не найден")
             raise HTTPException(status_code=401, detail="Refresh token не найден")
         if not id_token:
+            logger.error(f"ID token не найден")
             raise HTTPException(status_code=401, detail="ID token не найден")
 
         # Получение информации о пользователе
         user_info = await keycloak.get_user_info(access_token)
         user_id = user_info.get("sub")
         if not user_id:
+            logger.error(f"ID пользователя не найден")
             raise HTTPException(status_code=401, detail="ID пользователя не найден")
 
         # Проверка существования пользователя, создание нового при необходимости
-        user = await User_dao.find_one_or_none_by_id(user_id)
+        user = User_dao.get_user_by_id(user_id)
+        logger.info(f"user get_user_by_id: {user}")
         if not user and isinstance(user_info, dict):
             user_info["id"] = user_info.pop("sub")
-            user = KeycloakUser(**user_info)
-            await User_dao.add_user(user)
+            user = KeycloakUser(
+                id=user_info["id"],
+                email=user_info["email"],
+                email_verified=user_info["email_verified"],
+                name=user_info["name"],
+                preferred_username=user_info["preferred_username"],
+                given_name=user_info["given_name"],
+                family_name=user_info["family_name"],
+            )
+            User_dao.add_user(user)
 
-        # Установка cookie с токенами и редирект
-        response = RedirectResponse(url="/")
+        response = JSONResponse(content={"message": "Login successful"}) 
         response.set_cookie(
             key="access_token",
             value=access_token,
@@ -132,11 +164,13 @@ async def login_callback(
             path="/",
             max_age=token_data.get("expires_in", 3600),
         )
-        # logger.info(f"User {user_id} logged in successfully")
+        logger.debug(f"User {user_id} logged in successfully")
         return response
 
     except Exception as e:
-        # logger.error(f"Ошибка обработки callback'а логина: {str(e)}")
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error(f"Ошибка обработки callback'а логина: {exc_type}, {fname}, {exc_tb.tb_lineno}")
         raise HTTPException(status_code=401, detail="Ошибка авторизации")
 
 

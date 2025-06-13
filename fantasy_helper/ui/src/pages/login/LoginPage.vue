@@ -17,7 +17,7 @@ export default {
       
       const keycloakUrl = `${import.meta.env.VITE_KEYCLOAK_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/auth`;
       const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
-      const redirectUri = encodeURIComponent(window.location.origin);
+      const redirectUri = encodeURIComponent(`${window.location.origin}/login/callback`);
       const scope = 'openid';
 
       const loginUrl = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;

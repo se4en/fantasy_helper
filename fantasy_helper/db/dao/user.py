@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy.orm import Session as SQLSession
+from loguru import logger
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.user import User
@@ -19,11 +20,14 @@ class UserDAO:
     def get_user_by_id(self, id: int) -> Optional[KeycloakUser]:
         db_session: SQLSession = Session()
         user = db_session.query(User).filter(User.id == id).first()
+        keycloak_user = None
+        if user is not None:
+            logger.info(f"user from db, {user.__dict__}")
+            user_dict = user.__dict__
+            user_dict.pop("_sa_instance_state")
+            keycloak_user = KeycloakUser(**user_dict)
         db_session.close()
-        if user is None:
-            return None
-        else:
-            return KeycloakUser(**user.__dict__)
+        return keycloak_user
 
     def add_user(self, user: KeycloakUser) -> None:
         db_session: SQLSession = Session()

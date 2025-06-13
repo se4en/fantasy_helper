@@ -1,8 +1,10 @@
 from typing import Optional
+
 import httpx
 from fastapi import HTTPException
+from loguru import logger
 
-from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS
 
 
 class KeycloakClient:
@@ -11,7 +13,7 @@ class KeycloakClient:
 
         self._token_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
         self._userinfo_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
-        self._redirect_url = f"{KEYCLOAK_BASE_URL}/api/login/callback"
+        self._redirect_url = f"{FRONTEND_URL_HTTPS}/login/callback"
 
     async def get_tokens(self, code: str) -> dict:
         """Обмен authorization code на токены"""
@@ -20,15 +22,18 @@ class KeycloakClient:
             "code": code,
             "redirect_uri": self._redirect_url,
             "client_id": KEYCLOAK_CLIENT_ID,
-            "client_secret": KEYCLOAK_CLIENT_SECRET,
+            # "client_secret": KEYCLOAK_CLIENT_SECRET,
         }
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         try:
+            # logger.debug(f"_token_url: {self._token_url}")
+            # logger.debug(f"_redirect_url: {self._redirect_url}")
+            # logger.debug(f"Token exchange request data: {data}")
             response = await self.client.post(
                 self._token_url, 
                 data=data, 
                 headers=headers
-            )
+            )                                                    
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=401, detail=f"Token request failed: {response.text}"
