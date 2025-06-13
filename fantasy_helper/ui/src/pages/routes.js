@@ -1,5 +1,6 @@
 // routes.js
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import HomePage from './home/HomePage.vue'
 import LeaguesPage from './leagues/LeaguesPage.vue'
 import LeaguePage from './league/LeaguePage.vue'
@@ -100,17 +101,26 @@ const router = createRouter({
   routes
 })
 
-// Authentication guard
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('access_token');
+// Updated authentication guard using Pinia store
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  
+  // Wait for auth to initialize if it hasn't already
+  if (!authStore.isInitialized) {
+    await authStore.fetchUser()
+  }
+  
+  const isAuthenticated = authStore.isAuthenticated
   
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: 'Login' });
+    // Store intended route for redirect after login
+    sessionStorage.setItem('redirect_after_login', to.fullPath)
+    next({ name: 'Login' })
   } else if (to.name === 'Login' && isAuthenticated) {
-    next({ name: 'Home' });
+    next({ name: 'Home' })
   } else {
-    next();
+    next()
   }
-});
+})
 
 export default router;

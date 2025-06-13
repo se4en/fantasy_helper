@@ -25,7 +25,7 @@ from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 from fantasy_helper.api.keycloak_client import KeycloakClient
-from fantasy_helper.api.auth_dep import get_keycloak_client
+from fantasy_helper.api.auth_dep import get_keycloak_client, get_current_user
 
 from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
 from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS
@@ -79,6 +79,19 @@ FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
 FS_Sports_Players_dao = FSSportsPlayersDAO()
 FS_Calendars_dao = FSCalendarsDAO()
+
+
+@app.get("/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    return {
+        "id": current_user["sub"],
+        "email": current_user.get("email"),
+        "name": current_user.get("name"),
+        "preferred_username": current_user.get("preferred_username"),
+        "given_name": current_user.get("given_name"),
+        "family_name": current_user.get("family_name")
+    }
 
 
 @app.get("/login/callback/")
@@ -140,6 +153,7 @@ async def login_callback(
         response.set_cookie(
             key="access_token",
             value=access_token,
+            domain=".fantasy-helper.ru",
             httponly=True,
             secure=True,
             samesite="none",
@@ -149,6 +163,7 @@ async def login_callback(
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
+            domain=".fantasy-helper.ru",
             httponly=True,
             secure=True,
             samesite="none",
@@ -158,6 +173,7 @@ async def login_callback(
         response.set_cookie(
             key="id_token",
             value=id_token,
+            domain=".fantasy-helper.ru",
             httponly=True,
             secure=True,
             samesite="none",

@@ -15,9 +15,15 @@
   </div>                                                                                                                                                     
 </template>                                                                                                                                                  
                                                                                                                                                              
-<script>                                                                                                                                                     
+<script>
+import { useAuthStore } from '@/stores/auth'
+
 export default {                                                                                                                                             
-  name: 'LoginCallback',                                                                                                                                     
+  name: 'LoginCallback',
+  setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
   data() {                                                                                                                                                   
     return {                                                                                                                                                 
       loading: true,                                                                                                                                         
@@ -70,10 +76,25 @@ export default {
           // Clear the state from session storage
           console.warn('before keycloak_state');                                                                                                      
           sessionStorage.removeItem('keycloak_state');
-          console.warn('after keycloak_state');                                                                                                       
-                                                                                                                                                             
-          // Redirect to home page or dashboard                                                                                                              
-          this.$router.push('/');                                                                                                                            
+          console.warn('after keycloak_state');
+
+          // Wait a moment for cookies to be set
+          await new Promise(resolve => setTimeout(resolve, 500))
+
+          // Fetch user info to update the auth store
+          await this.authStore.fetchUser()
+
+          if (this.authStore.isAuthenticated) {
+            // Get redirect URL from session storage or default to home
+            const redirectTo = sessionStorage.getItem('redirect_after_login') || '/'
+            sessionStorage.removeItem('redirect_after_login')
+            
+            // Redirect to intended page
+            this.$router.push(redirectTo)
+          } else {
+            this.error = 'Failed to authenticate user'
+            this.loading = false
+          }                                                                                                                                                             
         } else {                                                                                                                                             
           this.error = 'Login failed on server';                                                                                                             
           this.loading = false;                                                                                                                              
