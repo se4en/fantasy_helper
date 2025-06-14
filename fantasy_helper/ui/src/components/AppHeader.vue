@@ -1,14 +1,22 @@
 <script>
   import { useLeaguesInfoStore } from '@/stores/leaguesInfo.store'
+  import { useAuthStore } from '@/stores/auth'
   import { storeToRefs } from 'pinia'
 
   export default {
     setup() {
       const leaguesInfoStore = useLeaguesInfoStore()
       const { leaguesInfo } = storeToRefs(leaguesInfoStore)
+      
+      const authStore = useAuthStore()
+      const { isAuthenticated, user } = storeToRefs(authStore)
+      
       return { 
         leaguesInfoStore,
-        leaguesInfo
+        leaguesInfo,
+        authStore,
+        isAuthenticated,
+        user
       }
     },
     async mounted() {
@@ -49,6 +57,13 @@
       // Determine if we should show league title
       showLeagueTitle() {
         return this.$route.path.includes('/league/') && this.currentLeague
+      },
+      // Get the text for the login/user button
+      loginButtonText() {
+        if (this.isAuthenticated && this.user?.given_name) {
+          return this.user.given_name
+        }
+        return 'Login'
       }
     },
     watch: {
@@ -96,7 +111,7 @@
         <ul class="nav-links-right">
           <li>
             <router-link :to="{ name: 'Login' }" class="nav-link">
-              Login
+              {{ loginButtonText }}
             </router-link>
           </li>
         </ul>
@@ -177,6 +192,12 @@
   position: relative; /* For positioning the underline indicator */
 }
 
+/* Button styling for nav-button */
+.nav-button {
+  background: none;
+  cursor: pointer;
+}
+
 /* Hover effect - you can adjust this color as needed */
 .nav-link:hover {
   color: #f0ad4e; /* Golden color on hover */
@@ -245,7 +266,7 @@
 } */
 
 /* Add overrides for any potential framework styles */
-nav, div, ul, li, a {
+nav, div, ul, li, a, button {
   border: 0 !important;
   border-width: 0 !important;
   border-style: none !important;
