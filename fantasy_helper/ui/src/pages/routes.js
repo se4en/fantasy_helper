@@ -116,8 +116,6 @@ router.beforeEach(async (to, from, next) => {
     // Store intended route for redirect after login
     sessionStorage.setItem('redirect_after_login', to.fullPath)
     next({ name: 'Login' })
-  } else if (to.name === 'Login' && isAuthenticated) {
-    next({ name: 'Home' })
   } else {
     next()
   }

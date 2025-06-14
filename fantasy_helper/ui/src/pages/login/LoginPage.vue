@@ -18,11 +18,6 @@ export default {
     if (urlParams.get('error') === 'auth_failed') {
       this.errorMessage = 'Authentication failed. Please try again.'
     }
-
-    // Redirect if already authenticated
-    if (this.authStore.isAuthenticated) {
-      this.$router.push('/')
-    }
   },
   methods: {
     generateRandomString(length) {
