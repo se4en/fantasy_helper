@@ -22,7 +22,6 @@ async def get_current_user(
     if not token:
         # Возвращаем стандартную ошибку — редиректим позже в роутере
         raise HTTPException(status_code=401, detail="Unauthorized: No access token")
-
     try:
         user_info = await keycloak.get_user_info(token)
         return user_info

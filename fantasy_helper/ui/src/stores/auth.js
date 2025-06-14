@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import httpClient from '@/api/httpClient'
+import { ENDPOINTS } from '@/api/httpClient'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -23,25 +25,17 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async fetchUser() {
       if (this.isLoading) return
-      
       this.isLoading = true
       try {
-        const response = await fetch('/api/me', { 
-          credentials: 'include',
-          headers: { 'Accept': 'application/json' }
-        })
-        
-        if (response.ok) {
-          this.user = await response.json()
-        } else if (response.status === 401) {
+        const response = await httpClient.get(ENDPOINTS.ME)
+        this.user = response.data
+      } catch (error) {
+        if (error.response?.status === 401) {
           this.user = null
         } else {
-          console.error('Failed to fetch user:', response.status, response.statusText)
+          console.error('Failed to fetch user:', error)
           this.user = null
         }
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-        this.user = null
       } finally {
         this.isLoading = false
         this.isInitialized = true
@@ -50,17 +44,9 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        const response = await fetch('/api/logout', { 
-          credentials: 'include',
-          method: 'GET'
-        })
-        
-        if (response.ok) {
-          this.user = null
-          window.location.href = '/login'
-        } else {
-          console.error('Logout failed:', response.status, response.statusText)
-        }
+        await httpClient.get(ENDPOINTS.LOGOUT)
+        this.user = null
+        window.location.href = '/login'
       } catch (error) {
         console.error('Logout failed:', error)
         // Clear user anyway and redirect

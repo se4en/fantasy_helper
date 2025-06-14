@@ -29,7 +29,7 @@ httpClient.interceptors.response.use(
   response => response,
   error => {
     const { response } = error
-    console.error("response error", error)
+    // console.error("response error", error)
     return Promise.reject(error)
   }
 )
@@ -38,7 +38,8 @@ export const ENDPOINTS = {
   LEAGUES_INFO: '/leagues_info/',
   COEFFS: '/coeffs/',
   CALENDAR: '/calendar/',
-  TELEGRAM_AUTH : '/auth/telegram/'
+  ME: '/me',
+  LOGOUT: '/logout'
 }
 
 export default httpClient
