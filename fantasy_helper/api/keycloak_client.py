@@ -1,6 +1,7 @@
 from typing import Optional
 
 import httpx
+import jwt
 from fastapi import HTTPException
 from loguru import logger
 
@@ -14,6 +15,7 @@ class KeycloakClient:
         self._token_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
         self._userinfo_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
         self._logout_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/logout"
+        self._certs_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/certs"
         self._redirect_url = f"{FRONTEND_URL_HTTPS}/login/callback"
 
     async def get_tokens(self, code: str) -> dict:
@@ -54,7 +56,27 @@ class KeycloakClient:
                 raise HTTPException(
                     status_code=401, detail=f"Invalid access token: {response.text}"
                 )
-            return response.json()
+            user_info = response.json()
+            
+            # Decode the JWT token to get role information
+            try:
+                # Decode without verification for now (you should verify in production)
+                decoded_token = jwt.decode(token, options={"verify_signature": False})
+                
+                # Add realm_access and roles from the token
+                if "realm_access" in decoded_token:
+                    user_info["realm_access"] = decoded_token["realm_access"]
+                
+                # Add any other claims you need from the token
+                for claim in ["resource_access", "scope", "client_id"]:
+                    if claim in decoded_token:
+                        user_info[claim] = decoded_token[claim]
+                        
+            except jwt.DecodeError as e:
+                logger.warning(f"Failed to decode JWT token: {e}")
+                # Continue without role information
+            
+            return user_info
         except httpx.RequestError as e:
             raise HTTPException(
                 status_code=500, detail=f"Keycloak request error: {str(e)}"

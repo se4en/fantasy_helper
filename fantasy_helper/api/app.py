@@ -84,13 +84,16 @@ FS_Calendars_dao = FSCalendarsDAO()
 @app.get("/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
     """Get current user information"""
+    print("User info:")
+    print(current_user)
     return {
         "id": current_user["sub"],
         "email": current_user.get("email"),
         "name": current_user.get("name"),
         "preferred_username": current_user.get("preferred_username"),
         "given_name": current_user.get("given_name"),
-        "family_name": current_user.get("family_name")
+        "family_name": current_user.get("family_name"),
+        "roles": current_user.get("roles")
     }
 
 
