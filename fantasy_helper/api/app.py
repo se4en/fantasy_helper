@@ -191,19 +191,14 @@ async def login_callback(
 
 
 @app.get("/logout")
-async def logout(request: Request):
+async def logout(
+    request: Request,
+    keycloak: KeycloakClient = Depends(get_keycloak_client)
+) -> RedirectResponse:
     id_token = request.cookies.get("id_token")
-    params = {
-        "client_id": KEYCLOAK_CLIENT_ID,
-        "post_logout_redirect_uri": KEYCLOAK_BASE_URL,
-    }
-    if id_token:
-        params["id_token_hint"] = id_token
+    keycloak_logout_url = keycloak.get_logout_url(id_token)
 
-    keycloak_logout_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/logout"
-    full_logout_url = f"{keycloak_logout_url}?{urlencode(params)}"
-    response = RedirectResponse(url=full_logout_url)
-    logger.debug("start delete cookies")
+    response = RedirectResponse(url=keycloak_logout_url)
     response.delete_cookie(
         key="access_token",
         httponly=True,
