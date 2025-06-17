@@ -13,6 +13,7 @@ class KeycloakClient:
 
         self._token_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
         self._userinfo_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
+        self._logout_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/logout"
         self._redirect_url = f"{FRONTEND_URL_HTTPS}/login/callback"
 
     async def get_tokens(self, code: str) -> dict:
@@ -58,3 +59,20 @@ class KeycloakClient:
             raise HTTPException(
                 status_code=500, detail=f"Keycloak request error: {str(e)}"
             )
+
+    def get_logout_url(self, id_token: Optional[str] = None, post_logout_redirect_uri: Optional[str] = None) -> str:
+        """Построить URL для выхода из Keycloak"""
+        params = {
+            "client_id": KEYCLOAK_CLIENT_ID,
+        }
+        
+        if post_logout_redirect_uri:
+            params["post_logout_redirect_uri"] = post_logout_redirect_uri
+        else:
+            params["post_logout_redirect_uri"] = FRONTEND_URL_HTTPS
+            
+        if id_token:
+            params["id_token_hint"] = id_token
+            
+        query_string = "&".join([f"{key}={value}" for key, value in params.items()])
+        return f"{self._logout_url}?{query_string}"

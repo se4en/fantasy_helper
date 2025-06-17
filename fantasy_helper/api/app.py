@@ -203,9 +203,11 @@ async def logout(request: Request):
     keycloak_logout_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/logout"
     full_logout_url = f"{keycloak_logout_url}?{urlencode(params)}"
     response = RedirectResponse(url=full_logout_url)
+    logger.debug("start delete cookies")
     response.delete_cookie(
         key="access_token",
         httponly=True,
+        domain=".fantasy-helper.ru",
         secure=True,
         samesite="none",
         path="/",
@@ -213,6 +215,7 @@ async def logout(request: Request):
     response.delete_cookie(
         key="id_token",
         httponly=True,
+        domain=".fantasy-helper.ru",
         secure=True,
         samesite="none",
         path="/",
@@ -220,6 +223,7 @@ async def logout(request: Request):
     response.delete_cookie(
         key="refresh_token",
         httponly=True,
+        domain=".fantasy-helper.ru",
         secure=True,
         samesite="none",
         path="/",

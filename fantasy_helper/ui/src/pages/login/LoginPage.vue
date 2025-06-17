@@ -40,6 +40,14 @@ export default {
 
       const loginUrl = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;
       window.location.href = loginUrl;
+    },
+    async keycloakLogout() {
+      try {
+        await this.authStore.logout();
+      } catch (error) {
+        console.error('Logout error:', error);
+        this.errorMessage = 'An unexpected error occurred during logout.';
+      }
     }
   }
 };
@@ -59,12 +67,21 @@ export default {
 
       <div class="login-container">
         <button 
+          v-if="!authStore.isAuthenticated"
           @click="keycloakLogin" 
           :disabled="authStore.isLoading"
           class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
           <span v-if="authStore.isLoading">Logging in...</span>
           <span v-else>{{ keycloakButtonText }}</span>
+        </button>
+
+        <button 
+          v-else
+          @click="keycloakLogout" 
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+        >
+          Logout
         </button>
       </div>
 

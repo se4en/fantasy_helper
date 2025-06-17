@@ -44,14 +44,26 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        await httpClient.get(ENDPOINTS.LOGOUT)
-        this.user = null
-        window.location.href = '/login'
+        // Get the logout URL from the backend
+        const response = await httpClient.get(ENDPOINTS.LOGOUT)
+        
+        if (response.status === 200 && response.data?.logout_url) {
+          // Clear user state immediately
+          this.clearUser()
+          
+          // Redirect to Keycloak logout URL
+          window.location.href = response.data.logout_url
+        } else {
+          console.error('Invalid logout response:', response)
+          // Fallback: just clear user state and redirect to home
+          this.clearUser()
+          window.location.href = '/'
+        }
       } catch (error) {
-        console.error('Logout failed:', error)
-        // Clear user anyway and redirect
-        this.user = null
-        window.location.href = '/login'
+        console.error('Logout error:', error)
+        // Fallback: clear user state and redirect to home
+        this.clearUser()
+        window.location.href = '/'
       }
     },
 
