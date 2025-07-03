@@ -8,6 +8,7 @@ from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
+from loguru import logger
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
@@ -86,7 +87,9 @@ class CoeffDAO:
         return result
 
     def update_coeffs(self, league_name: str) -> None:
+        logger.info(f"update coeffs for {league_name}")
         matches = self._betcity_parser.get_league_matches(league_name)
+        logger.info(f"got {len(matches)} matches for {league_name}")
 
         db_session: SQLSession = Session()
 

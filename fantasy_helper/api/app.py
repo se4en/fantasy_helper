@@ -239,7 +239,9 @@ async def get_leagues_info() -> List[LeagueInfo]:
     """
     result = []
     for league_config in cfg.leagues:
-        result.append(instantiate(league_config))
+        league_info = instantiate(league_config)
+        if league_info.is_active:
+            result.append(league_info)
     return result
 
 

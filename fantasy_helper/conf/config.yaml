@@ -14,7 +14,7 @@ leagues:
     ru_name: Россия
     emoji: 🇷🇺
     squad_id: 316902
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
     betcity_url: https://betcity.ru/ru/line/soccer/74979
     fbref_league_id: 30
@@ -33,7 +33,7 @@ leagues:
     ru_name: Англия
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
     squad_id: 344967
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
     betcity_url: https://betcity.ru/ru/line/soccer/445
     fbref_league_id: 9
@@ -52,7 +52,7 @@ leagues:
     ru_name: Испания
     emoji: 🇪🇸
     squad_id: 347718
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
     betcity_url: https://betcity.ru/ru/line/soccer/75175
     fbref_league_id: 12
@@ -71,7 +71,7 @@ leagues:
     ru_name: Франция
     emoji: 🇫🇷
     squad_id: 347725
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
     betcity_url: https://betcity.ru/ru/line/soccer/433
     fbref_league_id: 13
@@ -90,7 +90,7 @@ leagues:
     ru_name: Португалия
     emoji: 🇵🇹
     squad_id: 335045
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
     betcity_url: https://betcity.ru/ru/line/soccer/1324
     fbref_league_id: 32
@@ -109,7 +109,7 @@ leagues:
     ru_name: Нидерланды
     emoji: 🇳🇱
     squad_id: 335035
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/2018750-netherlands-eredivisie
     betcity_url: https://betcity.ru/ru/line/soccer/337
     fbref_league_id: 23
@@ -128,7 +128,7 @@ leagues:
     ru_name: Турция
     emoji: 🇹🇷
     squad_id: 335059
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/11113-turkey-superliga
     betcity_url: https://betcity.ru/ru/line/soccer/10353
     fbref_league_id: 26
@@ -147,7 +147,7 @@ leagues:
     ru_name: Чемпионшип
     emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
     squad_id: 335052
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/105759-england-championship
     betcity_url: https://betcity.ru/ru/line/soccer/24
     fbref_league_id: 10
@@ -166,7 +166,7 @@ leagues:
     ru_name: Италия
     emoji: 🇮🇹
     squad_id: 347720
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
     betcity_url: https://betcity.ru/ru/line/soccer/75173
     fbref_league_id: 11
@@ -185,7 +185,7 @@ leagues:
     ru_name: Германия
     emoji: 🇩🇪
     squad_id: 369055
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/line/football/96463-germany-bundesliga
     betcity_url: https://betcity.ru/ru/line/soccer/441
     fbref_league_id: 20
@@ -204,7 +204,7 @@ leagues:
     ru_name: Лига Чемпионов
     emoji: 🇪🇺
     squad_id: 406400
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/en/line/football/118587-uefa-champions-league
     betcity_url: https://betcity.ru/ru/line/soccer/1295
     fbref_league_id: 8
@@ -223,7 +223,7 @@ leagues:
     ru_name: Лига Европы
     emoji: 🇪🇺
     squad_id: 408847
-    is_active: true
+    is_active: false
     xber_url: https://1xstavka.ru/en/line/football/118593-uefa-europa-league
     betcity_url: https://betcity.ru/ru/line/soccer/15444
     fbref_league_id: 19
@@ -237,3 +237,22 @@ leagues:
     fbref_possesion_url: null
     fbref_shot_creation_url: null
     sportsmole_name: "Europa League"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: ClubWorldCup
+    ru_name: КЧМ
+    emoji: 🌍
+    squad_id: 414835
+    is_active: true
+    xber_url: null
+    betcity_url: https://betcity.ru/ru/line/soccer/602437
+    fbref_league_id: 719
+    fbref_table_url: https://fbref.com/en/comps/719/FIFA-Club-World-Cup-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/719/schedule/FIFA-Club-World-Cup-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/719/playingtime/FIFA-Club-World-Cup-Stats
+    fbref_standart_url: https://fbref.com/en/comps/719/stats/FIFA-Club-World-Cup-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/719/shooting/FIFA-Club-World-Cup-Stats
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
+    sportsmole_name: null
