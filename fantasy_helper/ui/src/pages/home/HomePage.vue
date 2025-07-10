@@ -39,66 +39,134 @@ export default {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen bg-white">
     <!-- Hero Section -->
-    <section class="text-center py-20 bg-gradient-to-b from-blue-50 to-white">
-      <div class="max-w-4xl mx-auto px-4">
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          Fantasy Helper
-          <span class="text-blue-600">Pro</span>
-        </h1>
-        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Your ultimate companion for fantasy sports success. Get real-time insights, 
-          expert predictions, and smart team management tools all in one place.
-        </p>
-        <div class="flex justify-center space-x-4">
-          <router-link 
-            to="/signup" 
-            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg"
-          >
-            Get Started
-          </router-link>
-          <router-link 
-            to="/features" 
-            class="bg-white text-blue-600 px-8 py-3 rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition-colors text-lg"
-          >
-            Learn More
-          </router-link>
+    <section class="relative overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 py-24 text-center">
+        <div class="space-y-8">
+          <h1 class="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight">
+            Fantasy Helper
+          </h1>
+          <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Advanced analytics and AI-powered insights for fantasy sports success. 
+            Make smarter decisions with real-time data and expert predictions.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
+            <router-link 
+              to="/leagues" 
+              class="bg-gray-900 text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all duration-200 text-lg font-medium shadow-sm"
+            >
+              Browse Leagues
+            </router-link>
+            <router-link 
+              to="/login" 
+              class="text-gray-700 px-8 py-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-lg font-medium"
+            >
+              Sign In
+            </router-link>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Key Features -->
-    <section class="py-16">
-      <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8">
-        <div 
-          v-for="(feature, index) in features"
-          :key="index"
-          class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-        >
-          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-2xl">{{ feature.icon }}</span>
+    <!-- Stats Section -->
+    <section class="border-t border-gray-100 py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div class="space-y-2">
+            <div class="text-3xl font-bold text-gray-900">15+</div>
+            <div class="text-sm text-gray-600 uppercase tracking-wide">Leagues</div>
           </div>
-          <h3 class="text-xl font-semibold mb-2">{{ feature.title }}</h3>
-          <p class="text-gray-600">{{ feature.description }}</p>
+          <div class="space-y-2">
+            <div class="text-3xl font-bold text-gray-900">1M+</div>
+            <div class="text-sm text-gray-600 uppercase tracking-wide">Players Tracked</div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-3xl font-bold text-gray-900">24/7</div>
+            <div class="text-sm text-gray-600 uppercase tracking-wide">Live Updates</div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-3xl font-bold text-gray-900">AI</div>
+            <div class="text-sm text-gray-600 uppercase tracking-wide">Powered</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Everything you need to win
+          </h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Comprehensive tools and insights to give you the competitive edge in fantasy sports
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <div 
+            v-for="(feature, index) in features"
+            :key="index"
+            class="group p-8 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
+          >
+            <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gray-100 transition-colors">
+              <span class="text-2xl">{{ feature.icon }}</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ feature.title }}</h3>
+            <p class="text-gray-600 leading-relaxed">{{ feature.description }}</p>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- How It Works -->
-    <section class="bg-gray-50 py-16">
-      <div class="max-w-4xl mx-auto px-4 text-center">
-        <h2 class="text-3xl font-bold mb-8">How It Works</h2>
+    <section class="bg-gray-50 py-20">
+      <div class="max-w-4xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Get started in minutes
+          </h2>
+          <p class="text-lg text-gray-600">
+            Simple setup process to get you winning faster
+          </p>
+        </div>
+        
         <div class="grid md:grid-cols-3 gap-8">
           <div 
             v-for="(step, index) in steps"
             :key="index"
-            class="bg-white p-6 rounded-lg"
+            class="relative bg-white p-8 rounded-2xl shadow-sm"
           >
-            <div class="text-blue-600 text-2xl font-bold mb-2">0{{ index + 1 }}</div>
-            <h3 class="text-lg font-semibold mb-2">{{ step.title }}</h3>
-            <p class="text-gray-600">{{ step.description }}</p>
+            <div class="absolute -top-4 left-8">
+              <div class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                {{ index + 1 }}
+              </div>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3 pt-4">{{ step.title }}</h3>
+            <p class="text-gray-600 leading-relaxed">{{ step.description }}</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <div class="bg-gray-900 rounded-3xl p-12 text-white">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            Ready to dominate your league?
+          </h2>
+          <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join thousands of fantasy managers who are already using Fantasy Helper to win their leagues.
+          </p>
+          <router-link 
+            to="/leagues" 
+            class="inline-block bg-white text-gray-900 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium"
+          >
+            Start Winning Today
+          </router-link>
         </div>
       </div>
     </section>
@@ -106,19 +174,20 @@ export default {
 </template>
   
 <style scoped>
-/* Custom animations */
-.hero-enter-active {
-  animation: slide-up 0.8s ease;
+/* Subtle animations and effects */
+.group:hover .group-hover\:bg-gray-100 {
+  transition: background-color 0.2s ease;
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Custom gradient overlay for hero */
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.05) 100%);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 </style>
