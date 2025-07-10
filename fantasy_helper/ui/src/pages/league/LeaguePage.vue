@@ -48,136 +48,132 @@ const subnavItems = computed(() => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <nav class="subnavbar">
-      <div class="subcontainer">
-        <ul class="subnav-links">
-          <li v-for="item in subnavItems" :key="item.name">
-            <router-link :to="{ name: item.name, params: { leagueSlug: route.params.leagueSlug } }" class="subnav-link">
-              {{ item.meta.subNavTitle }}
-            </router-link>
-          </li>
-        </ul>
+  <div class="min-h-screen bg-white">
+    <!-- Sub Navigation -->
+    <nav class="subnav-header">
+      <div class="subnav-container">
+        <div class="subnav-links">
+          <router-link 
+            v-for="item in subnavItems" 
+            :key="item.name"
+            :to="{ name: item.name, params: { leagueSlug: route.params.leagueSlug } }" 
+            class="subnav-item"
+          >
+            {{ item.meta.subNavTitle }}
+          </router-link>
+        </div>
       </div>
     </nav>
-  </div>
 
-  <div class="league-page">
-    <Loader v-if="showLeaguesInfoLoader" />
-    
-    <template v-else-if="currentLeague">
-      <!-- Router view for child routes -->
-      <router-view />
-    </template>
-    
-    <div v-else class="empty-state">
-      <p>League not found.</p>
-      <router-link to="/leagues">Return to leagues list</router-link>
+    <!-- Main Content -->
+    <div class="league-content">
+      <div v-if="showLeaguesInfoLoader" class="flex justify-center py-20">
+        <Loader />
+      </div>
+      
+      <template v-else-if="currentLeague">
+        <!-- Router view for child routes -->
+        <router-view />
+      </template>
+      
+      <div v-else class="text-center py-20">
+        <div class="text-gray-400 text-6xl mb-4">🏆</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">League not found</h3>
+        <p class="text-gray-600 mb-6">The league you're looking for doesn't exist or has been removed.</p>
+        <router-link 
+          to="/leagues"
+          class="inline-block bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium"
+        >
+          Return to leagues list
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.league-page {
-  padding: 1rem;
+.subnav-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 64px; /* Position below main header */
+  z-index: 900;
+  width: 100%;
+}
+
+.subnav-container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-style: italic;
-}
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-/* Your existing styles with some modifications */
-.wrapper {
-  width: 100vw; /* Use viewport width to ensure full width */
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
-  border: 0;
-  border-width: 0;
-  outline: none;
-}
-
-.subnavbar {
-  background-color: rgba(0, 0, 0, 0.8);
-  position: sticky;
-  top: 0;
-  z-index: 2100;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0 !important;
-  border-width: 0 !important;
-  outline: none;
-  box-shadow: none !important;
-}
-
-.subcontainer {
+  padding: 0 24px;
+  height: 56px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 60px;
-  border: 0 !important;
-  border-width: 0 !important;
 }
 
 .subnav-links {
   display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 20px;
-  border: 0;
+  align-items: center;
+  gap: 8px;
 }
 
-.subnav-links li {
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.subnav-link {
-  color: white; /* Change text color to white */
-  font-weight: 700; /* Make text bold (700 is bold) */
+.subnav-item {
+  color: #374151;
   text-decoration: none;
-  padding: 8px 12px;
-  transition: all 0.2s ease; /* Transition all changing properties */
-  border: 0;
-  outline: none;
-  position: relative; /* For positioning the underline indicator */
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-/* Hover effect - you can adjust this color as needed */
-.subnav-link:hover {
-  color: #f0ad4e; /* Golden color on hover */
+.subnav-item:hover {
+  color: #111827;
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
-/* Active/current page styling */
-.subnav-link.router-link-exact-active,
-.subnav-link.router-link-active {
-  color: #f0ad4e; /* Highlight color for active page */
-  font-weight: 800; /* Even bolder for active page */
+.subnav-item.router-link-active,
+.subnav-item.router-link-exact-active {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+  font-weight: 600;
 }
 
-nav, div, ul, li, a {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+.league-content {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .subnav-container {
+    padding: 0 16px;
+    height: 48px;
+  }
+  
+  .subnav-links {
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .subnav-item {
+    font-size: 13px;
+    padding: 6px 12px;
+    flex-shrink: 0;
+  }
+  
+  .league-content {
+    padding: 16px;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 </style>
