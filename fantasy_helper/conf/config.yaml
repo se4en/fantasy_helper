@@ -245,6 +245,7 @@ leagues:
     is_active: true
     xber_url: null
     betcity_url: https://betcity.ru/ru/line/soccer/602437
+    marathon_url: https://www.marathonbet.com/su/popular/Football/Clubs.+International/Club+World+Cup
     fbref_league_id: 719
     fbref_table_url: https://fbref.com/en/comps/719/FIFA-Club-World-Cup-Stats
     fbref_schedule_url: https://fbref.com/en/comps/719/schedule/FIFA-Club-World-Cup-Scores-and-Fixtures

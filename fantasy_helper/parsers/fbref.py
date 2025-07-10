@@ -936,7 +936,7 @@ class FbrefParser:
     ) -> Optional[LeagueScheduleInfo]:
         _home_team = table_row.find("td", {"data-stat": "home_team"})
         if _home_team is not None and _home_team.text.strip() != "":
-            _gameweek = table_row.find("th", {"data-stat": "gameweek"})
+            _gameweek = table_row.find("td", {"data-stat": "gameweek"})
             _away_team = table_row.find("td", {"data-stat": "away_team"})
             _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})
@@ -999,6 +999,7 @@ class FbrefParser:
                 league_schedule = WebDriverWait(driver, 3).until(
                     EC.presence_of_element_located((By.ID, f"sched_2024-2025_{league_id}_1"))
                 )
+                # todo: add sched_2025-2026_<>
             parsed_league_schedule = BeautifulSoup(
                 league_schedule.get_attribute("outerHTML"), "html.parser"
             )

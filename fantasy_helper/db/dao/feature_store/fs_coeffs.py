@@ -74,7 +74,13 @@ class FSCoeffsDAO:
         for team_name in unique_teams:
             team_2_matches[team_name] = dict()
 
-        sorted_matches = sorted(matches, key=lambda x: x.start_datetime)
+        all_matches_with_datetime = any(
+            [match.start_datetime is not None for match in matches]
+        )
+        if all_matches_with_datetime:
+            sorted_matches = sorted(matches, key=lambda x: x.start_datetime)
+        else:
+            sorted_matches = matches
 
         # split matches into tours
         all_tours_names = []

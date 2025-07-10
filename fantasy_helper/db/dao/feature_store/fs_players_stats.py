@@ -8,6 +8,8 @@ import pandas as pd
 from sqlalchemy import and_, func, union, case
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy.sql.functions import coalesce
+from sqlalchemy.orm import aliased
+from loguru import logger
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff
@@ -97,6 +99,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.match_parsed == True
             ))
         ).distinct()
+        logger.info(f"got {home_teams_matches.count()} home teams matches for {league_name}")
         away_teams_matches = (
             db_session.query(
                 FbrefSchedule.home_team.label("home_team"),
@@ -113,6 +116,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.match_parsed == True
             ))
         ).distinct()
+        logger.info(f"got {away_teams_matches.count()} away teams matches for {league_name}")
         all_teams_matches = union(home_teams_matches, away_teams_matches).alias()
         ordered_teams_matches = db_session.query(
             all_teams_matches,
@@ -193,6 +197,7 @@ class FSPlayersStatsDAO:
             ))
             .subquery()
         )
+        logger.info(f"got {db_session.query(func.count()).select_from(clean_matches_with_players).scalar()} clean matches with players for {league_name}")
 
         cumulitive_stats = db_session.query(
             # common
@@ -281,6 +286,7 @@ class FSPlayersStatsDAO:
                 order_by=clean_matches_with_players.c.match_number
             ).label("gca")
         )
+        logger.info(f"got {db_session.query(func.count()).select_from(cumulitive_stats).scalar()} cumulitive stats for {league_name}")
 
         result = []
         for row in cumulitive_stats.all():
@@ -357,12 +363,16 @@ class FSPlayersStatsDAO:
         players_stats_info: List[PlayerStatsInfo],
         add_sports_info: bool = True
     ) -> None:
+        logger.info(f"starts update players_stats_info for {league_name}")
         if add_sports_info:
+            logger.info(f"got {len(players_stats_info)} players_stats_info for {league_name}")
             sports_players = self._fs_sports_players_dao.get_sports_players(league_name)
+            logger.info(f"got {len(sports_players)} sports players for {league_name}")
             players_stats_info = self._naming_dao.add_sports_info_to_players_stats_info(
                 league_name, players_stats_info, sports_players
             )
-
+            logger.info(f"updated {len(players_stats_info)} players_stats_info for {league_name}")
+        
         db_session: SQLSession = Session()
 
         # remove all previous stats
@@ -433,7 +443,7 @@ class FSPlayersStatsDAO:
 
         return result
 
-    def update_players_stats(
+    def update_players_free_kicks_stats(
         self,
         league_name: str,
         players_stats: PlayersLeagueStats,
@@ -449,13 +459,41 @@ class FSPlayersStatsDAO:
         Returns:
             None: This function does not return anything.
         """
+        logger.info(f"start update players free kicks stats for {league_name}")
         if add_sports_info:
+            logger.info(f"got {len(players_stats.abs_stats)} players_stats for {league_name}")
             sports_players = self._fs_sports_players_dao.get_sports_players(league_name)
+            logger.info(f"got {len(sports_players)} sports players for {league_name}")
             players_stats = self._naming_dao.add_sports_info_to_players_stats(
                 league_name, players_stats, sports_players
             )
+            logger.info(f"updated {len(players_stats.abs_stats)} players_stats for {league_name}")
 
         db_session: SQLSession = Session()
+
+        # # remove all previous stats
+        # db_session.query(FSPlayersStats).filter(
+        #     FSPlayersStats.league_name == league_name
+        # ).delete()
+
+        # # add new stats
+        # for index, abs_player_stats in players_stats.abs_stats.replace(
+        #     np.nan, None
+        # ).iterrows():
+        #     db_session.add(
+        #         FSPlayersStats(type="abs", league_name=league_name, **abs_player_stats)
+        #     )
+        # db_session.commit()
+
+        # for index, norm_player_stats in players_stats.norm_stats.replace(
+        #     np.nan, None
+        # ).iterrows():
+        #     db_session.add(
+        #         FSPlayersStats(
+        #             type="norm", league_name=league_name, **norm_player_stats
+        #         )
+        #     )
+        # db_session.commit()
 
         # remove all previous stats
         db_session.query(FSPlayersFreeKicks).filter(
@@ -468,8 +506,8 @@ class FSPlayersStatsDAO:
             db_session.add(
                 FSPlayersFreeKicks(league_name=league_name, **free_kick_stats)
             )
-
         db_session.commit()
+
         db_session.close()
 
     def get_teams_names(self, league_name: str) -> List[str]:
