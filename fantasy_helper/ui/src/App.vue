@@ -23,7 +23,7 @@ export default {
 <template>
   <div class="wrapper">
     <AppHeader />
-    <main class="py-8">
+    <main class="py-8" style="position: relative;">
       <router-view />
     </main>
   </div>
