@@ -31,106 +31,60 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <h2 class="leagues-header">Available Leagues:</h2>
-
-    <Loader v-if="showLoader" />
-
-    <div v-else class="leagues-container">
-      <div v-if="leaguesInfo && leaguesInfo.length" class="leagues-grid">
-        <div v-for="league in leaguesInfo" :key="league.name" class="league-item">
-          <router-link :to="leagueRoute(league)" class="emoji-link">
-            <div class="emoji">{{ league.emoji }}</div>
-          </router-link>
-          <div>{{ league.ru_name }}</div>
-        </div>
+  <div class="min-h-screen bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <!-- Header Section -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          Choose Your League
+        </h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Select from our supported fantasy leagues to get started with advanced analytics and insights
+        </p>
       </div>
-      <div v-else class="empty-state">
-        No leagues available
+
+      <!-- Loading State -->
+      <div v-if="showLoader" class="flex justify-center py-20">
+        <Loader />
+      </div>
+
+      <!-- Leagues Grid -->
+      <div v-else-if="leaguesInfo && leaguesInfo.length" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <router-link 
+          v-for="league in leaguesInfo" 
+          :key="league.name"
+          :to="leagueRoute(league)" 
+          class="group flex flex-col items-center p-6 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
+        >
+          <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+            {{ league.emoji }}
+          </div>
+          <div class="text-center text-gray-900 font-medium text-sm leading-tight">
+            {{ league.ru_name }}
+          </div>
+        </router-link>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="text-center py-20">
+        <div class="text-gray-400 text-6xl mb-4">🏆</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No leagues available</h3>
+        <p class="text-gray-600">Check back later for more fantasy leagues</p>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-style: italic;
+/* Custom hover effects for league cards */
+.group:hover {
+  transform: translateY(-2px);
 }
 
-.leagues-header {
-  text-align: center;
-  margin: 2rem 0;
-  padding: 0.5rem;
-  font-size: 1.8rem;
-  color: #2c3e50;
-}
-
-.emoji {
-  font-size: 2rem;
-  transform: scale(1.5); 
-  display: inline-block;
-  margin-bottom: 0.5rem;
-}
-
-.emoji-link {
-  transition: transform 0.2s ease;
-}
-
-.emoji-link:hover .emoji {
-  transform: scale(1.8);
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-  cursor: pointer;
-}
-
-.leagues-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.leagues-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.league-item {
-  flex: 0 0 calc(20% - 1rem); /* 5 items per row (100% / 5 - gap) */
-  min-width: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  box-sizing: border-box;
-}
-
-@media (max-width: 1400px) {
-  .league-item {
-    flex-basis: calc(25% - 1rem); /* 4 items per row */
-  }
-}
-
-@media (max-width: 1024px) {
-  .league-item {
-    flex-basis: calc(33.33% - 1rem); /* 3 items per row */
-  }
-}
-
-@media (max-width: 768px) {
-  .league-item {
-    flex-basis: calc(50% - 1rem); /* 2 items per row */
-  }
-}
-
-@media (max-width: 480px) {
-  .league-item {
-    flex-basis: 100%; /* 1 item per row */
-  }
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
 }
 </style>
