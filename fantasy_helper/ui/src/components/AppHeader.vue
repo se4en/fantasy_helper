@@ -78,199 +78,188 @@
 </script>
 
 <template>
-  <div class="wrapper">
-    <nav class="navbar">
-      <div class="container">
-        <!-- <div class="logo">
-          <router-link :to="{ name: 'Home' }">
-            <img src="/your-logo.png" alt="Logo" class="navbar-logo" />
-          </router-link>
-        </div>
-         -->
-        <ul class="nav-links">
-          <li>
-            <router-link :to="{ name: 'Home' }" class="nav-link">
-              Home
-            </router-link>
-          </li>
-          
-          <li v-for="route in availableRoutes" :key="route.name">
-            <router-link :to="{ name: route.name }" class="nav-link">
-              {{ route.meta?.label || route.name }}
-            </router-link>
-          </li>
-        </ul>
+  <header class="header">
+    <nav class="nav-container">
+      <!-- Left Navigation -->
+      <div class="nav-left">
+        <router-link :to="{ name: 'Home' }" class="nav-item nav-home">
+          Home
+        </router-link>
+        
+        <router-link 
+          v-for="route in availableRoutes" 
+          :key="route.name"
+          :to="{ name: route.name }" 
+          class="nav-item"
+        >
+          {{ route.meta?.label || route.name }}
+        </router-link>
+      </div>
 
-        <div class="nav-center">
-          <h1 class="site-title">
-            <template v-if="showLeagueTitle">{{ currentLeague.ru_name || currentLeague.name }} <span class="league-emoji" v-if="currentLeague.emoji">{{ currentLeague.emoji }}</span></template>
-            <template v-else>Fantasy Helper</template>
-          </h1>
-        </div>
+      <!-- Center Title -->
+      <div class="nav-center">
+        <h1 class="site-title">
+          <template v-if="showLeagueTitle">
+            {{ currentLeague.ru_name || currentLeague.name }}
+            <span v-if="currentLeague.emoji" class="league-emoji">{{ currentLeague.emoji }}</span>
+          </template>
+          <template v-else>Fantasy Helper</template>
+        </h1>
+      </div>
 
-        <ul class="nav-links-right">
-          <li>
-            <router-link :to="{ name: 'Login' }" class="nav-link">
-              {{ loginButtonText }}
-            </router-link>
-          </li>
-        </ul>
+      <!-- Right Navigation -->
+      <div class="nav-right">
+        <router-link :to="{ name: 'Login' }" class="nav-item login-button">
+          {{ loginButtonText }}
+        </router-link>
       </div>
     </nav>
-  </div>
+  </header>
 </template>
 
 <style scoped>
-/* CSS Reset specifically for navigation elements */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-/* Your existing styles with some modifications */
-.wrapper {
-  width: 100vw; /* Use viewport width to ensure full width */
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
-  border: 0;
-  border-width: 0;
-  outline: none;
-}
-
-.navbar {
-  background-color: rgba(0, 0, 0, 0.8);
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
-  z-index: 2100;
+  z-index: 1000;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0 !important;
-  border-width: 0 !important;
-  outline: none;
-  box-shadow: none !important;
 }
 
-.container {
+.nav-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 60px;
-  border: 0 !important;
-  border-width: 0 !important;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
 }
 
-.nav-links, .nav-links-right {
+.nav-left,
+.nav-right {
   display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 20px;
-  border: 0;
+  align-items: center;
+  gap: 8px;
 }
 
-.nav-links li, .nav-links-right li {
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.nav-link {
-  color: white; /* Change text color to white */
-  font-weight: 700; /* Make text bold (700 is bold) */
-  text-decoration: none;
-  padding: 8px 12px;
-  transition: all 0.2s ease; /* Transition all changing properties */
-  border: 0;
-  outline: none;
-  position: relative; /* For positioning the underline indicator */
-}
-
-/* Button styling for nav-button */
-.nav-button {
-  background: none;
-  cursor: pointer;
-}
-
-/* Hover effect - you can adjust this color as needed */
-.nav-link:hover {
-  color: #f0ad4e; /* Golden color on hover */
-}
-
-/* Active/current page styling */
-.nav-link.router-link-exact-active,
-.nav-link.router-link-active {
-  color: #f0ad4e; /* Highlight color for active page */
-  font-weight: 800; /* Even bolder for active page */
-}
-
-/* Center title styling */
 .nav-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  text-align: center;
-  height: 100%;
 }
 
-.league-title {
-  margin: 0;
-  padding: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: white;
+.nav-item {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.league-emoji {
-  font-size: 1.4rem;
-  margin-left: 8px;
+.nav-item:hover {
+  color: #111827;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.nav-item.router-link-active,
+.nav-item.router-link-exact-active {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+  font-weight: 600;
+}
+
+.nav-home {
+  font-weight: 600;
+  color: #111827;
+}
+
+.login-button {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+.login-button:hover {
+  background-color: #1d4ed8;
+  color: white;
+}
+
+.login-button.router-link-active,
+.login-button.router-link-exact-active {
+  background-color: #1d4ed8;
+  color: white;
 }
 
 .site-title {
-  margin: 0;
-  padding: 0;
-  font-size: 1.3rem;
+  font-size: 20px;
   font-weight: 700;
-  color: white;
+  color: #111827;
+  margin: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  letter-spacing: -0.025em;
 }
 
-/* @media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-    height: auto;
-    padding: 10px 15px;
+.league-emoji {
+  font-size: 22px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 16px;
+    height: 56px;
   }
   
-  .nav-links, .nav-links-right {
-    width: 100%;
+  .nav-left,
+  .nav-right {
+    gap: 4px;
+  }
+  
+  .nav-item {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  
+  .site-title {
+    font-size: 18px;
+  }
+  
+  .league-emoji {
+    font-size: 20px;
+    margin-left: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-container {
+    flex-direction: column;
+    height: auto;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  .nav-center {
+    position: static;
+    transform: none;
+    order: -1;
+  }
+  
+  .nav-left,
+  .nav-right {
     justify-content: center;
+    flex-wrap: wrap;
   }
-
-  .nav-links-right {
-    margin-top: 10px;
-  }
-} */
-
-/* Add overrides for any potential framework styles */
-nav, div, ul, li, a, button {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  outline: none !important;
-  box-shadow: none !important;
 }
 </style>
