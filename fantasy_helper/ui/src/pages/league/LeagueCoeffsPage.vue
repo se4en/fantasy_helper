@@ -109,150 +109,146 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="coeffs-page">
-    <!-- <h2 class="section-title">Team Coefficients</h2> -->
+  <div class="min-h-screen bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <!-- Header Section -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Team Coefficients</h1>
+        <p class="text-gray-600">Attack and defense coefficients for upcoming matches</p>
+      </div>
 
-    <Loader v-if="showLoader" />
-    
-    <div v-else-if="error" class="error-message">
-      <p>Error loading coefficients: {{ error }}</p>
-    </div>
-    
-    <div v-else-if="!coeffs || coeffs.length === 0" class="empty-state">
-      <p>No coefficient data available for this league.</p>
-    </div>
-    
-    <div v-else class="coefficients-table">
-      <table>
-        <thead>
-          <tr>
-            <th rowspan="2" class="team-column">Team</th>
-            
-            <template v-for="(tourName, index) in tourHeaders" :key="'header-'+index">
-              <th colspan="3" class="tour-header">
-                {{ tourName || `Tour ${index + 1}` }}
-              </th>
-            </template>
-          </tr>
-          <tr>
-            <template v-for="(_, tourIndex) in maxTours" :key="'subheader-'+tourIndex">
-              <th 
-                @click="setSort('attack', tourIndex)" 
-                class="sub-header attack-header"
-                :class="{ active: sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex }"
-              >
-                <span class="header-content">
-                  <span class="header-text">Attack</span>
-                  <span class="sort-arrow" v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
-                    {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
-                  </span>
-                </span>
-              </th>
-              <th 
-                @click="setSort('defence', tourIndex)" 
-                class="sub-header defence-header"
-                :class="{ active: sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex }"
-              >
-                <span class="header-content">
-                  <span class="header-text">Defence</span>
-                  <span class="sort-arrow" v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
-                    {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
-                  </span>
-                </span>
-              </th>
-              <th class="rival-header">Rival</th>
-            </template>
-          </tr>
-        </thead>
+      <!-- Loading State -->
+      <div v-if="showLoader" class="flex justify-center py-20">
+        <Loader />
+      </div>
+      
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-20">
+        <div class="text-red-400 text-5xl mb-4">⚠️</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Error loading coefficients</h3>
+        <p class="text-gray-600">{{ error }}</p>
+      </div>
+      
+      <!-- Empty State -->
+      <div v-else-if="!coeffs || coeffs.length === 0" class="text-center py-20">
+        <div class="text-gray-400 text-5xl mb-4">📊</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No coefficient data available</h3>
+        <p class="text-gray-600">Check back later for coefficient updates</p>
+      </div>
+      
+      <!-- Table -->
+      <div v-else class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50">
+                <th rowspan="2" class="team-column">Team</th>
+                
+                <template v-for="(tourName, index) in tourHeaders" :key="'header-'+index">
+                  <th colspan="3" class="tour-header">
+                    {{ tourName || `Tour ${index + 1}` }}
+                  </th>
+                </template>
+              </tr>
+              <tr class="bg-gray-50 border-t border-gray-100">
+                <template v-for="(_, tourIndex) in maxTours" :key="'subheader-'+tourIndex">
+                  <th 
+                    @click="setSort('attack', tourIndex)" 
+                    class="sub-header attack-header"
+                    :class="{ active: sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex }"
+                  >
+                    <span class="header-content">
+                      <span class="header-text">Attack</span>
+                      <span class="sort-arrow" v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
+                        {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                      </span>
+                    </span>
+                  </th>
+                  <th 
+                    @click="setSort('defence', tourIndex)" 
+                    class="sub-header defence-header"
+                    :class="{ active: sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex }"
+                  >
+                    <span class="header-content">
+                      <span class="header-text">Defence</span>
+                      <span class="sort-arrow" v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
+                        {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
+                      </span>
+                    </span>
+                  </th>
+                  <th class="rival-header">Rival</th>
+                </template>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr v-for="(row, rowIndex) in sortedCoeffs" :key="'row-'+rowIndex">
-            <td class="team-cell">{{ row.team_name }}</td>
+            <tbody class="divide-y divide-gray-50">
+              <tr v-for="(row, rowIndex) in sortedCoeffs" :key="'row-'+rowIndex" class="hover:bg-gray-25 transition-colors">
+                <td class="team-cell">{{ row.team_name }}</td>
 
-            <template v-for="(tour, tourIndex) in maxTours" :key="`coeff-${rowIndex}-${tourIndex}`">
-              <td class="attack-cell" :style="getAttackCellStyle(row, tourIndex)">
-                {{ row.tour_attack_coeffs?.[tourIndex]?.toFixed(2) || '' }}
-              </td>
-              <td class="defence-cell" :style="getDefenceCellStyle(row, tourIndex)">
-                {{ row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '' }}
-              </td>
-              <td class="rival-cell">
-                {{ row.tour_rivals?.[tourIndex] }} {{ row.tour_match_types?.[tourIndex] || '' }}
-              </td>
-            </template>
-          </tr>
-        </tbody>
-      </table>
+                <template v-for="(tour, tourIndex) in maxTours" :key="`coeff-${rowIndex}-${tourIndex}`">
+                  <td class="attack-cell" :style="getAttackCellStyle(row, tourIndex)">
+                    {{ row.tour_attack_coeffs?.[tourIndex]?.toFixed(2) || '' }}
+                  </td>
+                  <td class="defence-cell" :style="getDefenceCellStyle(row, tourIndex)">
+                    {{ row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '' }}
+                  </td>
+                  <td class="rival-cell">
+                    {{ row.tour_rivals?.[tourIndex] }} {{ row.tour_match_types?.[tourIndex] || '' }}
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.coeffs-page {
-  padding: 1rem;
-}
-
-.section-title {
-  text-align: center;
-  margin: 1rem 0 2rem;
-  color: #2c3e50;
-}
-
-.coefficients-table {
-  overflow-x: auto;
-  margin: 1rem 0;
-  --row-height: 20px; /* Define fixed row height */
-}
-
+/* Table styling */
 table {
-  width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   min-width: 600px;
 }
 
 th {
-  padding: 0.75rem;
-  border: 1px solid #e0e0e0;
+  padding: 16px 12px;
   text-align: center;
-  background-color: #f8f9fa;
   font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 td {
-  padding: 0.75rem;
-  height: var(--row-height); /* Enforce fixed row height */
-  min-height: var(--row-height); /* Ensure minimum height */
-  max-height: var(--row-height); /* Constrain maximum height */
-  overflow: hidden; /* Hide overflow */
-  text-overflow: ellipsis; /* Truncate long text */
-  white-space: nowrap; /* Prevent wrapping */
-  border: 1px solid #e0e0e0;
+  padding: 16px 12px;
   text-align: center;
+  font-size: 14px;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .team-column {
   min-width: 150px;
   position: sticky;
   left: 0;
-  background: white;
+  background: #f9fafb;
   z-index: 2;
-  /* Center team column content both horizontally and vertically */
-  /* display: flex; */
-  align-items: center;
-  justify-content: center;
-  /* Removed fixed height for header */
+  text-align: left;
+  font-weight: 600;
+  border-right: 1px solid #e5e7eb;
 }
 
 .tour-header {
-  background-color: #f0f0f0;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 700;
+  color: #111827;
 }
 
-.attack-header {
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
+.attack-header,
 .defence-header {
   width: 100px;
   min-width: 100px;
@@ -261,22 +257,24 @@ td {
 
 .sub-header {
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.15s ease;
+  user-select: none;
 }
 
 .sub-header:hover {
-  background-color: #e9ecef;
+  background-color: #f3f4f6;
 }
 
 .sub-header.active {
-  background-color: #dee2e6;
+  background-color: #e5e7eb;
+  color: #2563eb;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .header-text {
@@ -285,7 +283,7 @@ td {
 
 .sort-arrow {
   font-weight: bold;
-  color: #2c3e50;
+  color: #2563eb;
   width: 12px;
   text-align: center;
   flex-shrink: 0;
@@ -293,45 +291,51 @@ td {
 
 .team-cell {
   background: white;
-  font-weight: 500;
+  font-weight: 600;
   position: sticky;
   left: 0;
   z-index: 1;
-  /* Team cell needs explicit vertical alignment */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Keep fixed height for data row team cells */
-  height: var(--row-height);
+  text-align: left;
+  border-right: 1px solid #f3f4f6;
 }
 
-.attack-cell {
-  /* Background color will be set dynamically via :style */
-}
-
+.attack-cell,
 .defence-cell {
-  /* Background color will be set dynamically via :style */
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', monospace;
 }
 
 .rival-cell {
-  background-color: #f8f9fa;
+  background-color: #f9fafb;
+  font-size: 13px;
+  color: #6b7280;
 }
 
-tr:nth-child(even) {
-  background-color: #fcfcfc;
+/* Hover effects */
+tbody tr:hover {
+  background-color: #f8fafc;
 }
 
-tr:hover {
-  background-color: #f5f5f5;
+tbody tr:hover .team-cell {
+  background-color: #f1f5f9;
 }
 
-.empty-state, .error-message {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-}
-
-.error-message {
-  color: #d9534f;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  th, td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  .team-column {
+    min-width: 120px;
+  }
+  
+  .attack-header,
+  .defence-header {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+  }
 }
 </style>

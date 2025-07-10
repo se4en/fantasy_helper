@@ -31,7 +31,7 @@ export default {
 
 <style>
 html, body {
-  background-color: #90e3ba!important;
+  /* background-color: #90e3ba!important; */
   margin: 0;
   padding: 0;
   overflow-x: hidden;
