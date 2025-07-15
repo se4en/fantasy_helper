@@ -176,15 +176,15 @@ jobs:
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL --no-ansi pull
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL stop
             
-            # Run database migrations before starting services
-            echo "Running database migrations..."
-            sudo docker run --rm \
-              --env-file .env \
-              --network ${{ github.event.repository.name }}_api_network \
-              ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
-              python scripts/migrate.py upgrade || echo "Migration completed with warnings"
+            # # Run database migrations before starting services
+            # echo "Running database migrations..."
+            # sudo docker run --rm \
+            #   --env-file .env \
+            #   --network ${{ github.event.repository.name }}_api_network \
+            #   ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
+            #   python scripts/migrate.py upgrade || echo "Migration completed with warnings"
             
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d
 
-            echo "Deployment completed successfully"                                                                                                                                                                                                                                                                                   
-            exit 0
+            # echo "Deployment completed successfully"                                                                                                                                                                                                                                                                                   
+            # exit 0
