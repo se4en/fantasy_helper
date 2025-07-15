@@ -8,6 +8,7 @@ from sqlalchemy import and_, func
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
+from loguru import logger
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.database import Session
@@ -86,7 +87,9 @@ class CoeffDAO:
         return result
 
     def update_coeffs(self, league_name: str) -> None:
+        logger.info(f"update coeffs for {league_name}")
         matches = self._betcity_parser.get_league_matches(league_name)
+        logger.info(f"got {len(matches)} matches for {league_name}")
 
         db_session: SQLSession = Session()
 
@@ -106,18 +109,19 @@ class CoeffDAO:
             self.update_coeffs(league.name)
 
     def update_feature_store(self) -> None:
-        print("update_feature_store")
+        logger.info(f"start update coeffs feature store")
         feature_store = FSCoeffsDAO()
 
         for league in self._leagues:
             actual_coeffs = self.get_actual_coeffs(league.name)
-            print("actual_coeffs", len(actual_coeffs))
+            logger.info(f"got {len(actual_coeffs)} actual coeffs for {league.name}")
+
             sports_matches = self._schedule_dao.get_next_matches(
                 league.name, 2
             )
-            print("sports_matches", len(sports_matches))
+            logger.info(f"got {len(sports_matches)} sports matches for {league.name}")
+
             if actual_coeffs and sports_matches:
-                print("add_sports_info_to_coeffs")
                 sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
                     league.name, actual_coeffs, sports_matches
                 )

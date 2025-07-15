@@ -1,17 +1,8 @@
-import datetime
-import logging
-import sys
-import os
-import json
-import pytz
-from typing import Any, Dict, List, Optional
+import asyncio
+from typing import List, Optional
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver import FirefoxOptions
-# from selenium.webdriver.firefox.options import Options
+from loguru import logger
+from playwright.async_api import async_playwright
 
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
@@ -25,144 +16,107 @@ class MarathonParser:
             if l.marathon_url is not None and l.is_active
         }
 
-    def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
+    async def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
         if league_name not in self._leagues:
             return None
 
-        print("PROXY", PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD)
-
         result = []
-        driver = None
-        try:
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            opts.add_argument("--disable-blink-features=AutomationControlled")
-
-            # Configure proxy settings through Firefox preferences
-            opts.set_preference("network.proxy.type", 1)  # Manual proxy configuration
-            opts.set_preference("network.proxy.http", PROXY_HOST)
-            opts.set_preference("network.proxy.http_port", int(PROXY_PORT))
-            opts.set_preference("network.proxy.ssl", PROXY_HOST)
-            opts.set_preference("network.proxy.ssl_port", int(PROXY_PORT))
-            opts.set_preference("network.proxy.no_proxies_on", "localhost,127.0.0.1")
-
-            # Add authentication for proxy
-            # opts.set_preference("network.proxy.share_proxy_settings", True)
-
-            # Create a profile with credentials for proxy authentication
-            opts.set_preference("network.proxy.http.auth.user", PROXY_USER)
-            opts.set_preference("network.proxy.http.auth.password", PROXY_PASSWORD)
-            opts.set_preference("network.proxy.ssl.auth.user", PROXY_USER)
-            opts.set_preference("network.proxy.ssl.auth.password", PROXY_PASSWORD)
-                
-                # Set auth prompt behavior
-                # opts.set_preference("network.auth.subresource-http-auth-allow", 1)
-
-            # Set connection timeouts
-            opts.set_preference("network.http.connection-timeout", 10)  # 10 seconds
-            opts.set_preference("network.http.response.timeout", 10)    # 10 seconds
-            opts.set_preference("dom.max_script_run_time", 10)          # 10 seconds
-
-            # Limit connection attempts
-            opts.set_preference("network.http.max-connections", 48)
-            opts.set_preference("network.http.max-connections-per-server", 16)
-
-            # Disable unused features
-            opts.set_preference("browser.cache.disk.enable", False)
-            opts.set_preference("browser.cache.memory.enable", True)
-            opts.set_preference("browser.cache.offline.enable", False)
-            opts.set_preference("network.dns.disablePrefetch", True)
-            opts.set_preference("network.prefetch-next", False)
-            opts.set_preference("browser.tabs.remote.autostart", False)
-            opts.set_preference("browser.tabs.remote.autostart.2", False)
-
-
-            driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context(
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+                proxy={
+                    'server': f'http://{PROXY_HOST}:{PROXY_PORT}',
+                    'username': PROXY_USER,
+                    'password': PROXY_PASSWORD
+                } if PROXY_HOST else None
             )
-            driver.get("https://httpbin.org/ip")
-            print(driver.page_source)  # Should show the proxy's IP, not yours
-
-            # driver.get(self._leagues[league_name])  
-
-            # champ_line = WebDriverWait(driver, 3).until(
-            #     EC.presence_of_element_located((By.CLASS_NAME, "foot-market"))
-            # )
-
-            # all_matches = champ_line.find_elements(By.CLASS_NAME, "bg coupon-row")
-            # print("found matches", len(all_matches))
-
-
-
-
-            # for match in all_matches:
-            #     match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
-            #     match_url = match_name_elem.get_attribute("href")
-            #     match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
-            #     if len(match_teams_names) != 2:
-            #         continue
-            #     home_team_name = match_teams_names[0].text.strip()
-            #     away_team_name = match_teams_names[1].text.strip()
-            #     # team_names = match_url_elem.text.split("—")
-            #     print(match_url, home_team_name, away_team_name)
-            #     result.append(
-            #         MatchInfo(
-            #             url=match_url,
-            #             league_name=league_name,
-            #             home_team=match_teams_names[0].text.strip(),
-            #             away_team=match_teams_names[1].text.strip(),
-            #         )
-            #     )
-        # except Exception as ex:
-        #     exc_type, exc_obj, exc_tb = sys.exc_info()
-        #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        #     print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
-        finally:
-            if driver is not None:
-                driver.quit()
+            
+            page = await context.new_page()
+            await page.goto(self._leagues[league_name], wait_until="networkidle")
+            
+            try:
+                await page.wait_for_selector("div.bg.coupon-row", timeout=10000)
+                match_rows = await page.query_selector_all("div.bg.coupon-row")
+                
+                if not match_rows:
+                    logger.warning(f"No matches found for league {league_name}")
+                    return []
+                
+                for row in match_rows:
+                    try:
+                        # Get team names from the member-area td
+                        member_area = await row.query_selector("td.member-area")
+                        if not member_area:
+                            continue
+                            
+                        # Look for team links in the player rows
+                        home_team_elem = await member_area.query_selector("div.player-row.player1 .member-name a")
+                        away_team_elem = await member_area.query_selector("div.player-row.player2 .member-name a")
+                        if not home_team_elem or not away_team_elem:
+                            continue
+                            
+                        home_team = await home_team_elem.inner_text()
+                        away_team = await away_team_elem.inner_text()
+                        match_url = await home_team_elem.get_attribute("href")
+                        
+                        # Get odds from the price columns - look for the first 3 span.selection-link elements
+                        odds_elements = await row.query_selector_all("td.price span.selection-link")
+                        if len(odds_elements) < 3:
+                            continue
+                            
+                        win1_text = await odds_elements[0].inner_text()
+                        draw_text = await odds_elements[1].inner_text()
+                        win2_text = await odds_elements[2].inner_text()
+                        
+                        match_info = MatchInfo(
+                            url=f"https://www.marathonbet.com{match_url}" if match_url and not match_url.startswith('http') else match_url,
+                            league_name=league_name,
+                            home_team=home_team.strip(),
+                            away_team=away_team.strip(),
+                            win1=float(win1_text),
+                            draw=float(draw_text),
+                            win2=float(win2_text)
+                        )
+                        
+                        result.append(match_info)
+                    except Exception as e:
+                        logger.exception(f"Failed to parse match: {e}")
+                        continue
+                
+            except Exception as ex:
+                logger.exception("Failed to parse league matches")
+                return None
+            finally:
+                await browser.close()
 
         return result
 
 
-    def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
-        driver = None
-        try:
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            opts.add_argument("--disable-blink-features=AutomationControlled")
-
-            driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts
+    async def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context(
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+                proxy={
+                    'server': f'http://{PROXY_HOST}:{PROXY_PORT}',
+                    'username': PROXY_USER,
+                    'password': PROXY_PASSWORD
+                } if PROXY_HOST else None
             )
-            driver.get(match_info.url)
-
-            bet_groups = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "dops-item"))
-            )
-            print("bet_groups", len(bet_groups))
-
-        # except Exception as ex:
-        #     exc_type, exc_obj, exc_tb = sys.exc_info()
-        #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        #     print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
-        finally:
-            if driver is not None:
-                driver.quit()
-
+            
+            page = await context.new_page()
+            try:
+                await page.goto(match_info.url, wait_until="networkidle")
+                bet_groups = await page.query_selector_all(".dops-item")
+                logging.debug(f"Found {len(bet_groups)} bet groups")
+            finally:
+                await browser.close()
+                
         return match_info
 
-    def get_league_matches(self, league_name: str) -> List[MatchInfo]:
-        result = []
-        league_matches = self._parse_league_matches(league_name)
-        # if league_matches is not None:
-        #     for match in league_matches:
-        #         parsed_match = self._parse_match(match)
-        #         if (
-        #             parsed_match.total_1_over_1_5 is not None
-        #             or parsed_match.total_1_under_0_5 is not None
-        #             or parsed_match.total_2_over_1_5 is not None
-        #             or parsed_match.total_2_under_0_5 is not None
-        #         ):
-        #             result.append(parsed_match)
-
-        return result
+    async def get_league_matches(self, league_name: str) -> List[MatchInfo]:
+        league_matches = await self._parse_league_matches(league_name)
+        if league_matches is not None:
+            return league_matches
+        return []

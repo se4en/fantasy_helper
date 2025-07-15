@@ -9,6 +9,7 @@ from sqlalchemy import func, and_
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
+from loguru import logger
 
 from fantasy_helper.db.models.player import Player
 from fantasy_helper.db.database import Session
@@ -518,10 +519,11 @@ class PlayerDAO:
             db_session.close()
 
     def update_feature_store(self) -> None:
+        logger.info(f"start update players stats feature store")
         feature_store = FSPlayersStatsDAO()
 
         for league in self.__leagues:
             players_stats = self.get_players_stats(league.name)
-            feature_store.update_players_stats(league.name, players_stats, add_sports_info=False)
+            feature_store.update_players_free_kicks_stats(league.name, players_stats, add_sports_info=True)
             players_stats_info = feature_store.compute_players_stats_info(league.name)
-            feature_store.update_players_stats_info(league.name, players_stats_info)
+            feature_store.update_players_stats_info(league.name, players_stats_info, add_sports_info=True)

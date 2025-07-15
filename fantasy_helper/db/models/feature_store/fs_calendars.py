@@ -1,7 +1,8 @@
-from typing import Optional
+from datetime import datetime
+from typing import List, Optional
 
 from sqlalchemy import Column
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, JSON, DateTime
 
 from fantasy_helper.db.database import Base
 
@@ -10,40 +11,40 @@ class FSCalendars(Base):
     __tablename__ = "fs_calendars"
 
     id = Column(Integer, primary_key=True)
+    team_name = Column(String, nullable=False)
     league_name = Column(String, nullable=False)
-    home_team = Column(String, nullable=False)
-    away_team = Column(String, nullable=False)
-    tour = Column(Integer, nullable=False)
-    home_points_color = Column(String, nullable=True)
-    away_points_color = Column(String, nullable=True)
-    home_goals_color = Column(String, nullable=True)
-    away_goals_color = Column(String, nullable=True)
-    home_xg_color = Column(String, nullable=True)
-    away_xg_color = Column(String, nullable=True)
+    tour_names = Column(JSON, nullable=True)
+    tour_numbers = Column(JSON, nullable=True)
+    tour_rivals = Column(JSON, nullable=True)
+    tour_match_types = Column(JSON, nullable=True)
+    tour_points_colors = Column(JSON, nullable=True)
+    tour_goals_colors = Column(JSON, nullable=True)
+    tour_xg_colors = Column(JSON, nullable=True)
+    timestamp = Column(DateTime, nullable=True)
 
     def __init__(
         self,
+        team_name: str,
         league_name: str,
-        home_team: str,
-        away_team: str,
-        tour: int,
-        home_points_color: Optional[str],
-        away_points_color: Optional[str],
-        home_goals_color: Optional[str],
-        away_goals_color: Optional[str],
-        home_xg_color: Optional[str],
-        away_xg_color: Optional[str],
+        tour_names: Optional[List[str]] = None,
+        tour_numbers: Optional[List[int]] = None,
+        tour_rivals: Optional[List[str]] = None,
+        tour_match_types: Optional[List[str]] = None,
+        tour_points_colors: Optional[List[str]] = None,
+        tour_goals_colors: Optional[List[str]] = None,
+        tour_xg_colors: Optional[List[str]] = None,
+        timestamp: Optional[datetime] = None
     ):
+        self.team_name = team_name
         self.league_name = league_name
-        self.home_team = home_team
-        self.away_team = away_team
-        self.tour = tour
-        self.home_points_color = home_points_color
-        self.away_points_color = away_points_color
-        self.home_goals_color = home_goals_color
-        self.away_goals_color = away_goals_color
-        self.home_xg_color = home_xg_color
-        self.away_xg_color = away_xg_color
+        self.tour_names = tour_names
+        self.tour_numbers = tour_numbers
+        self.tour_rivals = tour_rivals
+        self.tour_match_types = tour_match_types
+        self.tour_points_colors = tour_points_colors
+        self.tour_goals_colors = tour_goals_colors
+        self.tour_xg_colors = tour_xg_colors
+        self.timestamp = timestamp
 
     def __repr__(self):
-        return f"[{self.tour}] {self.home_team} vs {self.away_team}"
+        return f"{self.team_name} [{self.league_name}]"

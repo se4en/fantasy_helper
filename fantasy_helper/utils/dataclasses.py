@@ -85,6 +85,20 @@ class MatchInfo:
 
 
 @dataclass
+class CoeffTableRow:
+    team_name: str
+    league_name: str
+    tour_names: Optional[List[str]] = None
+    tour_numbers: Optional[List[int]] = None
+    tour_rivals: Optional[List[str]] = None
+    tour_match_types: Optional[List[str]] = None
+    tour_attack_coeffs: Optional[List[float]] = None
+    tour_defence_coeffs: Optional[List[float]] = None
+    tour_attack_colors: Optional[List[str]] = None
+    tour_defence_colors: Optional[List[str]] = None
+
+
+@dataclass
 class LeagueInfo:
     name: str
     ru_name: str
@@ -93,6 +107,7 @@ class LeagueInfo:
     squad_id: Optional[int] = None
     xber_url: Optional[str] = None
     betcity_url: Optional[str] = None
+    marathon_url: Optional[str] = None
     fbref_league_id: Optional[int] = None
     fbref_table_url: Optional[str] = None
     fbref_schedule_url: Optional[str] = None
@@ -153,12 +168,26 @@ class CalendarInfo:
     home_team: str
     away_team: str
     tour: int
-    home_points_color: Optional[str]
-    away_points_color: Optional[str]
-    home_goals_color: Optional[str]
-    away_goals_color: Optional[str]
-    home_xg_color: Optional[str]
-    away_xg_color: Optional[str]
+    tour_name: Optional[str] = None
+    home_points_color: Optional[str] = None
+    away_points_color: Optional[str] = None
+    home_goals_color: Optional[str] = None
+    away_goals_color: Optional[str] = None
+    home_xg_color: Optional[str] = None
+    away_xg_color: Optional[str] = None
+
+
+@dataclass
+class CalendarTableRow:
+    team_name: str
+    league_name: str
+    tour_names: Optional[List[str]] = None
+    tour_numbers: Optional[List[int]] = None
+    tour_rivals: Optional[List[str]] = None
+    tour_match_types: Optional[List[str]] = None
+    tour_points_colors: Optional[List[str]] = None
+    tour_goals_colors: Optional[List[str]] = None
+    tour_xg_colors: Optional[List[str]] = None
 
 
 @dataclass
@@ -595,6 +624,18 @@ class SportsTourInfo:
     status: str
     number: Optional[int] = None
     name: Optional[str] = None
+
+
+@dataclass
+class KeycloakUser:
+    id: str
+    email: Optional[str] = None
+    email_verified: Optional[bool] = None
+    name: Optional[str] = None
+    preferred_username: Optional[str] = None
+    given_name: Optional[str] = None
+    family_name: Optional[str] = None
+    login_timestamp: Optional[datetime.datetime] = None
 
 
 @dataclass

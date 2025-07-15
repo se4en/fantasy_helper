@@ -13,6 +13,10 @@ venv/
 .idea/
 
 postgres_data/
+keycloak_postgres_data/
 
 *.png
 *.sql
+
+# vue js
+node_modules

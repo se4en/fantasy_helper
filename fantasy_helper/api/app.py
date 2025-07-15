@@ -1,30 +1,74 @@
 from collections import defaultdict
 from dataclasses import asdict
+import os
+import sys
 from typing import Dict, List, Literal, Optional
+from urllib.parse import urlencode
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import httpx
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from hydra.utils import instantiate
 import pandas as pd
+from loguru import logger
 
 from fantasy_helper.db.dao.feature_store.fs_calendar import FSCalendarsDAO
 from fantasy_helper.utils.common import load_config
-from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.player import PlayerDAO
+from fantasy_helper.db.dao.user import UserDAO
 from fantasy_helper.db.dao.feature_store.fs_coeffs import FSCoeffsDAO
 from fantasy_helper.db.dao.feature_store.fs_lineups import FSLineupsDAO
 from fantasy_helper.db.dao.feature_store.fs_players_stats import FSPlayersStatsDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
+from fantasy_helper.api.keycloak_client import KeycloakClient
+from fantasy_helper.api.auth_dep import get_keycloak_client, get_current_user
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS, BACKEND_URL_HTTPS
 
 
 cfg = load_config(config_path="../conf", config_name="config")
 leagues = {league.ru_name: league.name for league in instantiate(cfg.leagues) if league.is_active}
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    http_client = httpx.AsyncClient()
+    app.state.keycloak_client = KeycloakClient(http_client)
+    yield
 
-create_db()
+    await http_client.aclose()
+
+app = FastAPI(lifespan=lifespan)
+
+# @app.exception_handler(HTTPException)
+# async def auth_exception_handler(request: Request, exc: HTTPException):
+#     if exc.status_code == 401:
+#         return RedirectResponse(
+#             f"{settings.auth_url}"
+#             f"?client_id={settings.CLIENT_ID}"
+#             f"&response_type=code"
+#             f"&scope=openid"
+#             f"&redirect_uri={settings.redirect_uri}"
+#         )
+#     raise exc
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        FRONTEND_URL_HTTPS, 
+        BACKEND_URL_HTTPS,
+        KEYCLOAK_SERVER_URL,
+    ],
+    # allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+User_dao = UserDAO()
 Coeff_dao = CoeffDAO()
 Player_dao = PlayerDAO()
 FS_Coeff_dao = FSCoeffsDAO()
@@ -32,6 +76,168 @@ FS_Lineup_dao = FSLineupsDAO()
 FS_Player_dao = FSPlayersStatsDAO()
 FS_Sports_Players_dao = FSSportsPlayersDAO()
 FS_Calendars_dao = FSCalendarsDAO()
+
+
+@app.get("/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    return {
+        "id": current_user["sub"],
+        "email": current_user.get("email"),
+        "name": current_user.get("name"),
+        "preferred_username": current_user.get("preferred_username"),
+        "given_name": current_user.get("given_name"),
+        "family_name": current_user.get("family_name"),
+        "roles": current_user.get("roles")
+    }
+
+
+@app.get("/login/callback/")
+async def login_callback(
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
+    keycloak: KeycloakClient = Depends(get_keycloak_client)
+) -> JSONResponse:
+    if error:
+        logger.debug(f"Keycloak error: {error}, description: {error_description}")
+        raise HTTPException(status_code=401, detail="Authorization code is required")
+
+    if not code:
+        logger.debug(f"Authorization code is required")
+        raise HTTPException(status_code=401, detail="Authorization code is required")
+
+    try:
+        # Получение токенов от Keycloak
+        token_data = await keycloak.get_tokens(code)
+        access_token = token_data.get("access_token")
+        refresh_token = token_data.get("refresh_token")
+        id_token = token_data.get("id_token")
+
+        if not access_token:
+            logger.error(f"Токен доступа не найден")
+            raise HTTPException(status_code=401, detail="Токен доступа не найден")
+        if not refresh_token:
+            logger.error(f"Refresh token не найден")
+            raise HTTPException(status_code=401, detail="Refresh token не найден")
+        if not id_token:
+            logger.error(f"ID token не найден")
+            raise HTTPException(status_code=401, detail="ID token не найден")
+
+        # Получение информации о пользователе
+        user_info = await keycloak.get_user_info(access_token)
+        user_id = user_info.get("sub")
+        if not user_id:
+            logger.error(f"ID пользователя не найден")
+            raise HTTPException(status_code=401, detail="ID пользователя не найден")
+
+        # Проверка существования пользователя, создание нового при необходимости
+        user = User_dao.get_user_by_id(user_id)
+        logger.info(f"user get_user_by_id: {user}")
+        if not user and isinstance(user_info, dict):
+            user_info["id"] = user_info.pop("sub")
+            user = KeycloakUser(
+                id=user_info["id"],
+                email=user_info["email"],
+                email_verified=user_info["email_verified"],
+                name=user_info["name"],
+                preferred_username=user_info["preferred_username"],
+                given_name=user_info["given_name"],
+                family_name=user_info["family_name"],
+            )
+            User_dao.add_user(user)
+
+        response = JSONResponse(content={"message": "Login successful"}) 
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            domain=".fantasy-helper.ru",
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("expires_in", 3600),
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            domain=".fantasy-helper.ru",
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("refresh_expires_in", 2592000),
+        )
+        response.set_cookie(
+            key="id_token",
+            value=id_token,
+            domain=".fantasy-helper.ru",
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=token_data.get("expires_in", 3600),
+        )
+        logger.debug(f"User {user_id} logged in successfully")
+        return response
+
+    except Exception as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error(f"Ошибка обработки callback'а логина: {exc_type}, {fname}, {exc_tb.tb_lineno}")
+        raise HTTPException(status_code=401, detail="Ошибка авторизации")
+
+
+@app.get("/logout")
+async def logout(
+    request: Request,
+    keycloak: KeycloakClient = Depends(get_keycloak_client)
+) -> RedirectResponse:
+    id_token = request.cookies.get("id_token")
+    keycloak_logout_url = keycloak.get_logout_url(id_token)
+
+    response = RedirectResponse(url=keycloak_logout_url)
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        domain=".fantasy-helper.ru",
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    response.delete_cookie(
+        key="id_token",
+        httponly=True,
+        domain=".fantasy-helper.ru",
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        domain=".fantasy-helper.ru",
+        secure=True,
+        samesite="none",
+        path="/",
+    )
+    return response
+
+
+@app.get("/leagues_info/")
+async def get_leagues_info() -> List[LeagueInfo]:
+    """
+    Get the names of all the leagues.
+
+    Returns:
+        A dictionary with league names as keys and league descriptions as values.
+    """
+    result = []
+    for league_config in cfg.leagues:
+        league_info = instantiate(league_config)
+        if league_info.is_active:
+            result.append(league_info)
+    return result
 
 
 @app.get("/leagues_names/")
@@ -96,16 +302,7 @@ async def get_players_stats_players_names(league_name: str, team_name: str) -> L
 
 
 @app.get("/coeffs/")
-async def get_coeffs(league_name: str) -> List[MatchInfo]:
-    """
-    Retrieve the coefficients for a given league and tour.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        List[MatchInfo]: The list of coefficients for the given league and tour.
-    """
+async def get_coeffs(league_name: str) -> List[CoeffTableRow]:
     return FS_Coeff_dao.get_coeffs(league_name)
 
 
@@ -143,16 +340,7 @@ async def get_sports_players(league_name: str) -> List[SportsPlayerDiff]:
 
 
 @app.get("/calendar/")
-async def get_calendar(league_name: str) -> List[CalendarInfo]:
-    """
-    Retrieves the calendars for a specific league.
-
-    Parameters:
-        league_name (str): The name of the league.
-
-    Returns:
-        List[CalendarInfo]: A list of CalendarInfo objects representing the calendars for the league.
-    """
+async def get_calendar(league_name: str) -> List[CalendarTableRow]:
     return FS_Calendars_dao.get_calendar(league_name)
 
 

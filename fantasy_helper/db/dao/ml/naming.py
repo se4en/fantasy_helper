@@ -348,6 +348,7 @@ class NamingDAO:
                 coeff_match.home_team = match.home_team
                 coeff_match.away_team = match.away_team
                 coeff_match.tour_number = match.gameweek
+                coeff_match.tour_name = match.tour_name
                 result.append(coeff_match)
 
         return result

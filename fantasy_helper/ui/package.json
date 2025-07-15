@@ -1,0 +1,27 @@
+{
+  "name": "fantasy-helper",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --host dev.fantasy-helper.ru --port 4173",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173 --https",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "axios": "1.8.0",
+    "package.json": "^2.0.1",
+    "pinia": "3.0.0",
+    "vue": "3.5.11",
+    "vue-router": "4.2.5",
+    "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.0.4",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "prettier": "3.2.5",
+    "tailwindcss": "^3.3.6",
+    "vite": "5.0.4"
+  }
+}

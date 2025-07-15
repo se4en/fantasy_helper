@@ -207,10 +207,6 @@ class NameMatcher:
         cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
         cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
         cur_betcity_teams_names = self.get_betcity_teams_names(league_name)
-        print()
-        print(league_name)
-        print(cur_betcity_teams_names)
-        return [], []
 
         free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names, free_betcity_teams_names = [], [], [], []
         teams_to_add, teams_to_delete = [], []

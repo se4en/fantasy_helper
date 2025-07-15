@@ -143,9 +143,12 @@ cython_debug/
 
 # data
 postgres_data
+keycloak_postgres_data
 /*.sql
+
+certs
+# vue js
+node_modules
 
 # aider
 .aider*
-
-certs

@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver import FirefoxOptions
+from loguru import logger
 
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
@@ -82,6 +83,7 @@ class BetcityParser:
             )
             # driver.get("https://httpbin.org/ip")
             # print(driver.page_source)
+            logger.info(f"driver get {self._leagues[league_name]}")
             driver.get(self._leagues[league_name])
 
             champ_line = WebDriverWait(driver, 3).until(
@@ -108,9 +110,7 @@ class BetcityParser:
                     )
                 )
         except Exception as ex:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logger.exception("An error while parse betcity league matches")
         finally:
             if driver is not None:
                 driver.quit()
@@ -482,9 +482,7 @@ class BetcityParser:
             match_info = self._parse_header_bets(driver, match_info)
             match_info = self._parse_main_bets(driver, match_info)
         except Exception as ex:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(f"Ex={ex} in file={fname} line={exc_tb.tb_lineno}")
+            logger.exception("An error while parse betcity match")
         finally:
             if driver is not None:
                 driver.quit()
@@ -493,7 +491,7 @@ class BetcityParser:
 
     def get_league_matches(self, league_name: str) -> List[MatchInfo]:
         result = []
-        print("parse league", league_name)
+        logger.info(f"get betcity matches for {league_name}")
         league_matches = self._parse_league_matches(league_name)
         if league_matches is not None:
             for match in league_matches:

@@ -4,3 +4,4 @@
 -r parsers.txt
 uvicorn==0.25.0
 fastapi==0.109.1
+PyJWT==2.10.1

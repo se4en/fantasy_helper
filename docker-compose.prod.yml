@@ -17,8 +17,9 @@ services:
     image: ghcr.io/${IMAGE_REPO}_api:${RELEASE_VERSION}
     container_name: "api"
     restart: always
-    links:
+    depends_on:
       - db
+      - keycloak
     env_file: .env
     ports:
       - 8000:8000 
@@ -47,6 +48,45 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - api_network
+
+  keycloak-db:
+    image: postgres:15-alpine
+    volumes:
+      - ./keycloak_postgres_data:/var/lib/postgresql/data
+    restart: always
+    container_name: "keycloak-db"
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_password}
+    networks:
+      - api_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: "keycloak"
+    restart: always
+    depends_on:
+      - keycloak-db
+    volumes:
+      - ./docker/keycloak:/opt/keycloak/data/import
+    env_file: .env
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/${KEYCLOAK_DB_NAME:-keycloak}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_password}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # KC_HOSTNAME_STRICT: false
+      # KC_HOSTNAME_STRICT_HTTPS: false
+      # KC_HTTP_ENABLED: true
+      KC_IMPORT: /opt/keycloak/data/import/realm-export.json
+    ports:
+      - "8080:8080"
+    command: start --import-realm
     networks:
       - api_network
 

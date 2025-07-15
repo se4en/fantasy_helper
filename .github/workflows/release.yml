@@ -43,6 +43,20 @@ jobs:
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+          echo "VITE_TELEGRAM_BOT_USERNAME=${{ secrets.VITE_TELEGRAM_BOT_USERNAME }}" >> .env
+          echo "VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }}" >> .env
+          echo "VITE_KEYCLOAK_REALM=${{ secrets.VITE_KEYCLOAK_REALM }}" >> .env
+          echo "VITE_KEYCLOAK_CLIENT_ID=${{ secrets.VITE_KEYCLOAK_CLIENT_ID }}" >> .env
+          echo "KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}" >> .env
+          echo "KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}" >> .env
+          echo "KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}" >> .env
+          echo "KEYCLOAK_ADMIN_USER=${{ secrets.KEYCLOAK_ADMIN_USER }}" >> .env
+          echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "FRONTEND_URL_HTTPS=${{ secrets.FRONTEND_URL_HTTPS }}" >> .env
+          echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >> .env
+          echo "BACKEND_URL_HTTPS=${{ secrets.BACKEND_URL_HTTPS }}" >> .env
 
           echo "IMAGE_REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
@@ -114,6 +128,20 @@ jobs:
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+          echo "VITE_TELEGRAM_BOT_USERNAME=${{ secrets.VITE_TELEGRAM_BOT_USERNAME }}" >> .env
+          echo "VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }}" >> .env
+          echo "VITE_KEYCLOAK_REALM=${{ secrets.VITE_KEYCLOAK_REALM }}" >> .env
+          echo "VITE_KEYCLOAK_CLIENT_ID=${{ secrets.VITE_KEYCLOAK_CLIENT_ID }}" >> .env
+          echo "KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}" >> .env
+          echo "KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}" >> .env
+          echo "KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}" >> .env
+          echo "KEYCLOAK_ADMIN_USER=${{ secrets.KEYCLOAK_ADMIN_USER }}" >> .env
+          echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "FRONTEND_URL_HTTPS=${{ secrets.FRONTEND_URL_HTTPS }}" >> .env
+          echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >> .env
+          echo "BACKEND_URL_HTTPS=${{ secrets.BACKEND_URL_HTTPS }}" >> .env
 
           echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
           echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env
@@ -145,4 +173,13 @@ jobs:
             cd ~/${{ github.event.repository.name }}
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL --no-ansi pull
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL stop
+            
+            # Run database migrations before starting services
+            echo "Running database migrations..."
+            sudo docker run --rm \
+              --env-file .env \
+              --network ${{ github.event.repository.name }}_api_network \
+              ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
+              python scripts/migrate.py upgrade
+            
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d
