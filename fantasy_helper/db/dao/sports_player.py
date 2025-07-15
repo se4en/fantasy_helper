@@ -22,6 +22,7 @@ class SportsPlayerDAO:
         cfg = load_config(config_path="../../conf")
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._sports_parser = SportsParser(
             leagues=self._leagues,
             queries_path=path.join(path.dirname(__file__), "../../parsers/queries")
@@ -50,14 +51,15 @@ class SportsPlayerDAO:
 
         return pd.DataFrame(result)
 
-    def get_players(self, league_name) -> List[SportsPlayerDiff]:
+    def get_players(self, league_name: str, year: str = "2024") -> List[SportsPlayerDiff]:
         current_tour = self._sports_parser.get_current_tour(league_name)
         if current_tour is None:
             return None
         db_session: SQLSession = Session()
         
         cur_tour_rows = db_session.query(SportsPlayer).filter(and_(
-            SportsPlayer.league_name == league_name, 
+            SportsPlayer.league_name == league_name,
+            SportsPlayer.year == year,
             SportsPlayer.tour == current_tour.number, 
             SportsPlayer.percent_ownership > 0
         ))
@@ -73,8 +75,10 @@ class SportsPlayerDAO:
 
         return [SportsPlayerDiff(**row[1]) for row in result.iterrows()]
 
-    def update_players(self, league_name) -> None:
+    def update_players(self, league_name: str, year: str = "2024") -> None:
+        
         players_stats = self._sports_parser.get_players_stats_info(league_name)
+
         db_session: SQLSession = Session()
         
         for player_stats in players_stats:
@@ -82,6 +86,7 @@ class SportsPlayerDAO:
                 SportsPlayer(
                     **player_stats.__dict__,
                     timestamp=datetime.now().replace(tzinfo=utc),
+                    league_year=year
                 )
             )
 
@@ -90,12 +95,14 @@ class SportsPlayerDAO:
 
     def update_players_all_leagues(self) -> None:
         for league in self._leagues:
-            self.update_players(league.name)
+            league_year = self._league_2_year.get(league.name, "2024")
+            self.update_players(league.name, league_year)
 
     def update_feature_store(self) -> None:
         feature_store = FSSportsPlayersDAO()
 
         for league in self._leagues:
-            players = self.get_players(league.name)
+            league_year = self._league_2_year.get(league.name, "2024")
+            players = self.get_players(league.name, league_year)
             if players:
                 feature_store.update_sports_players(league.name, players)

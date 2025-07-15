@@ -22,9 +22,11 @@ class NamingDAO:
     def __init__(self, logger = None):
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._name_matcher = NameMatcher()
 
     def update_league_naming(self, league_name: str) -> None:
+        year = self._league_2_year.get(league_name, "2024")
         teams_names = self._get_teams_names(league_name)
 
         # update teams names
@@ -48,11 +50,16 @@ class NamingDAO:
             self._add_players_names(players_names_to_add)
 
     def _get_teams_names(self, league_name: str) -> List[TeamName]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         teams_names = (
             db_session.query(DBTeamName)
-            .filter(DBTeamName.league_name == league_name)
+            .filter(and_(
+                DBTeamName.league_name == league_name,
+                DBTeamName.year == year
+            ))
             .all()
         )
 
@@ -77,8 +84,10 @@ class NamingDAO:
         db_session: SQLSession = Session()
 
         for team_name in teams_names:
+            year = self._league_2_year.get(team_name.league_name, "2024")
             db_session.add(DBTeamName(
                 timestamp=datetime.now().replace(tzinfo=utc), 
+                year=year,
                 **asdict(team_name)
             ))
 
@@ -89,25 +98,30 @@ class NamingDAO:
         db_session: SQLSession = Session()
 
         for team_name in teams_names:
+            year = self._league_2_year.get(team_name.league_name, "2024")
             db_session.query(DBTeamName).filter(and_(
                 DBTeamName.league_name == team_name.league_name,
                 DBTeamName.name == team_name.name,
                 DBTeamName.sports_name == team_name.sports_name,
                 DBTeamName.fbref_name == team_name.fbref_name,
                 DBTeamName.xbet_name == team_name.xbet_name,
-                DBTeamName.xbet_name == team_name.betcity_name
+                DBTeamName.xbet_name == team_name.betcity_name,
+                DBTeamName.year == year
             )).delete()
 
         db_session.commit()
         db_session.close()
 
     def _get_players_names(self, league_name: str, team_name: str) -> List[PlayerName]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         players_names = (
             db_session.query(DBPlayerName)
             .filter(and_(
                 DBPlayerName.league_name == league_name, 
+                DBPlayerName.year == year,
                 DBPlayerName.team_name == team_name
             ))
             .all()
@@ -133,8 +147,10 @@ class NamingDAO:
         db_session: SQLSession = Session()
 
         for player_name in players_names:
+            year = self._league_2_year.get(player_name.league_name, "2024")
             db_session.add(DBPlayerName(
                 timestamp=datetime.now().replace(tzinfo=utc), 
+                year=year,
                 **asdict(player_name)
             ))
 
@@ -145,12 +161,14 @@ class NamingDAO:
         db_session: SQLSession = Session()
 
         for player_name in players_names:
+            year = self._league_2_year.get(player_name.league_name, "2024")
             db_session.query(DBPlayerName).filter(and_(
                 DBPlayerName.league_name == player_name.league_name,
                 DBPlayerName.name == player_name.name,
                 DBPlayerName.team_name == player_name.team_name,
                 DBPlayerName.sports_name == player_name.sports_name,
-                DBPlayerName.fbref_name == player_name.fbref_name
+                DBPlayerName.fbref_name == player_name.fbref_name,
+                DBPlayerName.year == year
             )).delete()
 
         db_session.commit()
@@ -161,11 +179,16 @@ class NamingDAO:
             self.update_league_naming(league.name)
 
     def get_teams(self, league_name: str) -> List[TeamName]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         teams = (
             db_session.query(DBTeamName)
-            .filter(DBTeamName.league_name == league_name)
+            .filter(and_(
+                DBTeamName.league_name == league_name, 
+                DBTeamName.year == year
+            ))
             .all()
         )
 
@@ -187,11 +210,16 @@ class NamingDAO:
         return result
 
     def get_players(self, league_name: str) -> List[PlayerName]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         players = (
             db_session.query(DBPlayerName)
-            .filter(DBPlayerName.league_name == league_name)
+            .filter(and_(
+                DBPlayerName.league_name == league_name,
+                DBPlayerName.year == year
+            ))
             .all()
         )
 

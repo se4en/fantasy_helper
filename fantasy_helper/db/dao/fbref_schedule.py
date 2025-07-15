@@ -21,6 +21,7 @@ class FbrefScheduleDao:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._fbref_parser = FbrefParser(leagues=self._leagues)
         self._players_match_dao = PlayersMatchDao()
 
@@ -28,11 +29,14 @@ class FbrefScheduleDao:
         return [league.name for league in self._leagues]
     
     def remove_unparsed_matches(self, league_name: str) -> None:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         db_session.query(FbrefSchedule).filter(
             and_(
                 FbrefSchedule.league_name == league_name,
+                FbrefSchedule.year == year,
                 FbrefSchedule.match_parsed == False
             )
         ).delete()
@@ -44,21 +48,26 @@ class FbrefScheduleDao:
         db_session: SQLSession = Session()
 
         for match in matches:
+            year = self._league_2_year.get(match.league_name, "2024")
             db_session.add(FbrefSchedule(
                 **asdict(match),
-                timestamp=datetime.now().replace(tzinfo=utc)
+                timestamp=datetime.now().replace(tzinfo=utc),
+                year=year
             ))
 
         db_session.commit()
         db_session.close()
 
     def get_parsed_matches(self, league_name: str) -> List[LeagueScheduleInfo]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         parsed_matches = (
             db_session.query(FbrefSchedule)
             .filter(and_(
                 FbrefSchedule.league_name == league_name,
+                FbrefSchedule.year == year,
                 FbrefSchedule.match_parsed == True
             ))
             .all()

@@ -17,6 +17,7 @@ class PlayerName(Base):
     fbref_name = Column(String, nullable=True, index=True)
     name = Column(String, nullable=True, index=True)
     timestamp = Column(DateTime, nullable=False)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -26,6 +27,7 @@ class PlayerName(Base):
         fbref_name: Optional[str],
         name: Optional[str],
         timestamp: Optional[datetime],
+        year: str = "2024",
     ):
         self.league_name = league_name
         self.team_name = team_name
@@ -33,6 +35,7 @@ class PlayerName(Base):
         self.fbref_name = fbref_name
         self.name = name
         self.timestamp = timestamp
+        self.year = year
 
 
     def __repr__(self):

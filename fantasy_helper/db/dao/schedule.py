@@ -22,6 +22,7 @@ class ScheduleDao:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._sports_parser = SportsParser(
             leagues=self._leagues,
             queries_path=path.join(path.dirname(__file__), "../../parsers/queries"),
@@ -30,7 +31,7 @@ class ScheduleDao:
     def get_leagues(self) -> List[str]:
         return [league.name for league in self._leagues]
 
-    def get_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
+    def get_schedule(self, league_name: str, year: str = "2024") -> List[LeagueScheduleInfo]:
         current_datetime = datetime.now()
 
         db_session: SQLSession = Session()
@@ -39,6 +40,7 @@ class ScheduleDao:
             db_session.query(Schedule)
             .filter(and_(
                 Schedule.league_name == league_name,
+                Schedule.year == year,
                 Schedule.date >= current_datetime.date()
             ))
             .subquery()
@@ -92,7 +94,8 @@ class ScheduleDao:
         return result
 
     def get_current_tour_number(self, league_name: str) -> Optional[int]:
-        schedule = self.get_schedule(league_name)
+        league_year = self._league_2_year.get(league_name)
+        schedule = self.get_schedule(league_name, league_year)
         if not schedule:
             return None
 
@@ -102,7 +105,8 @@ class ScheduleDao:
         return min_gameweek
 
     def get_next_tour_number(self, league_name: str) -> Optional[int]:
-        schedule = self.get_schedule(league_name)
+        league_year = self._league_2_year.get(league_name)
+        schedule = self.get_schedule(league_name, league_year)
         if not schedule:
             return None
 
@@ -112,7 +116,8 @@ class ScheduleDao:
         return min_gameweek + 1
 
     def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[LeagueScheduleInfo]]:
-        schedule = self.get_schedule(league_name)
+        league_year = self._league_2_year.get(league_name)
+        schedule = self.get_schedule(league_name, league_year)
         if not schedule:
             return None
 
@@ -127,6 +132,8 @@ class ScheduleDao:
 
     def update_schedules_all_leagues(self) -> None:
         for league_name in self._sports_parser.get_leagues():
+            league_year = self._league_2_year.get(league_name)
+
             schedule_rows: List[SportsMatchInfo] = self._sports_parser.get_next_matches(
                 league_name=league_name, tour_count=5
             )
@@ -142,7 +149,8 @@ class ScheduleDao:
                         gameweek=match.tour_number,
                         tour_name=match.tour_name,
                         date=match.scheduled_at_datetime.date() if match.scheduled_at_datetime else None,
-                        timestamp=datetime.now().replace(tzinfo=utc)
+                        timestamp=datetime.now().replace(tzinfo=utc),
+                        year=league_year
                     )
                 )
 

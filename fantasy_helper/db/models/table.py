@@ -23,6 +23,7 @@ class Table(Base):
     goals_against = Column(Integer, nullable=False)
     xg_for = Column(Float, nullable=True)
     xg_against = Column(Float, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -38,6 +39,7 @@ class Table(Base):
         goals_against: int,
         xg_for: Optional[float],
         xg_against: Optional[float],
+        year: str = "2024",
     ):
         self.league_name = league_name
         self.team_name = team_name
@@ -51,6 +53,7 @@ class Table(Base):
         self.goals_against = goals_against
         self.xg_for = xg_for
         self.xg_against = xg_against
+        self.year = year
 
     def __repr__(self):
         return f"{self.team_name}: {self.rank}"

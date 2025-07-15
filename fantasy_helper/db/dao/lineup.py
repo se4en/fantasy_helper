@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime, timezone
 from dataclasses import asdict
 
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.orm import Session as SQLSession
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
@@ -23,9 +23,12 @@ class LineupDAO:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self.__leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self.__leagues}
         self.__mole_parser = MoleParser(leagues=self.__leagues)
 
     def get_lineups(self, league_name: str) -> List[TeamLineup]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         last_row = db_session.query(Lineup).order_by(Lineup.timestamp.desc()).first()
@@ -36,9 +39,11 @@ class LineupDAO:
 
         cur_league_rows = (
             db_session.query(Lineup)
-            .filter(
-                Lineup.league_name == league_name, Lineup.update_id == last_update_id
-            )
+            .filter(and_(
+                Lineup.league_name == league_name, 
+                Lineup.year == year, 
+                Lineup.update_id == last_update_id
+            ))
             .subquery()
         )
 
@@ -81,11 +86,13 @@ class LineupDAO:
             new_update_id = 0
 
         for lineup in new_lineups:
+            year = self._league_2_year.get(lineup.league_name, "2024")
             db_session.add(
                 Lineup(
                     **asdict(lineup),
                     update_id=new_update_id,
-                    timestamp=datetime.now().replace(tzinfo=utc)
+                    timestamp=datetime.now().replace(tzinfo=utc),
+                    year=year
                 )
             )
 

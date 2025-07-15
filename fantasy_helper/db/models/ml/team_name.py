@@ -18,6 +18,7 @@ class TeamName(Base):
     betcity_name = Column(String, nullable=True, index=True)
     name = Column(String, nullable=True, index=True)
     timestamp = Column(DateTime, nullable=False)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -28,6 +29,7 @@ class TeamName(Base):
         betcity_name: Optional[str],
         name: Optional[str],
         timestamp: Optional[datetime],
+        year: str = "2024",
     ):
         self.league_name = league_name
         self.sports_name = sports_name
@@ -36,7 +38,7 @@ class TeamName(Base):
         self.betcity_name = betcity_name
         self.name = name
         self.timestamp = timestamp
-
+        self.year = year
 
     def __repr__(self):
         return f"{self.sports_name}|{self.fbref_name}|{self.xbet_name}|{self.betcity_name}"

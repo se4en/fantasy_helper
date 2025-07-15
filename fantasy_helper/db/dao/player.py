@@ -33,6 +33,7 @@ class PlayerDAO:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self.__leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self.__leagues}
         self.__fbref_parser = FbrefParser(leagues=self.__leagues)
 
     def _compute_diff_value(
@@ -442,11 +443,13 @@ class PlayerDAO:
         return sorted([player_name[0] for player_name in player_names])
 
     def get_players_stats(self, league_name: str) -> PlayersLeagueStats:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         cur_league_players = (
             db_session.query(Player)
-            .filter(Player.league_name == league_name)
+            .filter(and_(Player.league_name == league_name, Player.year == year))
             .subquery()
         )
 
@@ -492,6 +495,8 @@ class PlayerDAO:
 
     def update_players_stats_all_leagues(self) -> None:
         for league_name in self.__fbref_parser.get_all_leagues():
+            year = self._league_2_year.get(league_name, "2024")
+
             players_stats: List[PlayerStats] = self.__fbref_parser.get_stats_league(
                 league_name
             )
@@ -500,7 +505,9 @@ class PlayerDAO:
             for player in players_stats:
                 db_session.add(
                     Player(
-                        **asdict(player), timestamp=datetime.now().replace(tzinfo=utc)
+                        **asdict(player), 
+                        timestamp=datetime.now().replace(tzinfo=utc),
+                        year=year
                     )
                 )
 
@@ -511,7 +518,8 @@ class PlayerDAO:
                         league_name=player.league_name,
                         team_name=player.team_name,
                         position=player.position,
-                        timestamp=datetime.now().replace(tzinfo=utc)
+                        timestamp=datetime.now().replace(tzinfo=utc),
+                        year=year
                     )
                 )
 
