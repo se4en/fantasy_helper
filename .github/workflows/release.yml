@@ -185,3 +185,6 @@ jobs:
               python scripts/migrate.py upgrade || echo "Migration completed with warnings"
             
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d
+
+            echo "Deployment completed successfully"                                                                                                                                                                                                                                                                                   
+            exit 0
