@@ -11,6 +11,9 @@ COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
 COPY ./fantasy_helper/parsers /fantasy_helper/fantasy_helper/parsers
 COPY ./fantasy_helper/db /fantasy_helper/fantasy_helper/db
 COPY ./fantasy_helper/ml /fantasy_helper/fantasy_helper/ml
+COPY ./scripts /fantasy_helper/scripts                                                                                                                                                                                                                                                                                       
+COPY ./alembic /fantasy_helper/alembic                                                                                                                                                                                                                                                                                       
+COPY ./alembic.ini /fantasy_helper/alembic.ini
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
 CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
