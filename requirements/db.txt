@@ -4,3 +4,4 @@ sqlalchemy==1.4.2
 sqlalchemy-utils==0.38.3
 psycopg2-binary==2.9.5
 iso8601==1.1.0
+alembic==1.16.4

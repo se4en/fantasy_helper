@@ -145,4 +145,13 @@ jobs:
             cd ~/${{ github.event.repository.name }}
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL --no-ansi pull
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL stop
+            
+            # Run database migrations before starting services
+            echo "Running database migrations..."
+            sudo docker run --rm \
+              --env-file .env \
+              --network ${{ github.event.repository.name }}_api_network \
+              ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
+              python scripts/migrate.py upgrade
+            
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d

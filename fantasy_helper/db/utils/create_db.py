@@ -1,5 +1,4 @@
-from fantasy_helper.db.database import Base, db_engine
-from fantasy_helper.db.models.squad import Squad
+from fantasy_helper.db.database import Base, db_
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.source import Source
 from fantasy_helper.db.models.user import User
@@ -24,8 +23,17 @@ from fantasy_helper.db.models.ml.player_name import PlayerName
 
 
 def create_db():
+    """
+    Legacy function for creating database tables.
+    NOTE: This is deprecated in favor of Alembic migrations.
+    Use 'alembic upgrade head' instead.
+    """
+    print("WARNING: create_db() is deprecated. Use Alembic migrations instead.")
+    print("Run: alembic upgrade head")
     Base.metadata.create_all(db_engine)
 
 
 if __name__ == "__main__":
+    print("This script is deprecated. Please use Alembic for database migrations.")
+    print("To initialize the database, run: alembic upgrade head")
     create_db()
