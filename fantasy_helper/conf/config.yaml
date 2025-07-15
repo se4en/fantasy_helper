@@ -242,7 +242,7 @@ leagues:
     ru_name: КЧМ
     emoji: 🌍
     squad_id: 414835
-    is_active: true
+    is_active: false
     xber_url: null
     betcity_url: https://betcity.ru/ru/line/soccer/602437
     marathon_url: https://www.marathonbet.com/su/popular/Football/Clubs.+International/Club+World+Cup
