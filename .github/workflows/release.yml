@@ -53,6 +53,10 @@ jobs:
           echo "KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}" >> .env
           echo "KEYCLOAK_ADMIN_USER=${{ secrets.KEYCLOAK_ADMIN_USER }}" >> .env
           echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "FRONTEND_URL_HTTPS=${{ secrets.FRONTEND_URL_HTTPS }}" >> .env
+          echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >> .env
+          echo "BACKEND_URL_HTTPS=${{ secrets.BACKEND_URL_HTTPS }}" >> .env
 
           echo "IMAGE_REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
@@ -134,6 +138,10 @@ jobs:
           echo "KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}" >> .env
           echo "KEYCLOAK_ADMIN_USER=${{ secrets.KEYCLOAK_ADMIN_USER }}" >> .env
           echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "FRONTEND_URL_HTTPS=${{ secrets.FRONTEND_URL_HTTPS }}" >> .env
+          echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >> .env
+          echo "BACKEND_URL_HTTPS=${{ secrets.BACKEND_URL_HTTPS }}" >> .env
 
           echo "IMAGE_REPO=${{ env.image_repository_name }}" >> .env
           echo "RELEASE_VERSION=${{ env.TAG_NAME }}" >> .env

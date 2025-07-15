@@ -27,7 +27,7 @@ from fantasy_helper.api.keycloak_client import KeycloakClient
 from fantasy_helper.api.auth_dep import get_keycloak_client, get_current_user
 
 from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
-from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS
+from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS, BACKEND_URL_HTTPS
 
 
 cfg = load_config(config_path="../conf", config_name="config")
@@ -58,9 +58,9 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://dev.fantasy-helper.ru",
-        "https://api-dev.fantasy-helper.ru",
-        "https://keycloak-dev.fantasy-helper.ru",
+        FRONTEND_URL_HTTPS, 
+        BACKEND_URL_HTTPS,
+        KEYCLOAK_SERVER_URL,
     ],
     # allow_origins=["*"],
     allow_credentials=True,
@@ -81,8 +81,6 @@ FS_Calendars_dao = FSCalendarsDAO()
 @app.get("/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
     """Get current user information"""
-    print("User info:")
-    print(current_user)
     return {
         "id": current_user["sub"],
         "email": current_user.get("email"),

@@ -33,6 +33,8 @@ OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
 # keycloak
 FRONTEND_URL=str(os.getenv("FRONTEND_URL"))
 FRONTEND_URL_HTTPS=str(os.getenv("FRONTEND_URL_HTTPS"))
+BACKEND_URL=str(os.getenv("FRONTEND_URL"))
+BACKEND_URL_HTTPS=str(os.getenv("FRONTEND_URL_HTTPS"))
 KEYCLOAK_BASE_URL=str(os.getenv("KEYCLOAK_BASE_URL"))
 KEYCLOAK_SERVER_URL=str(os.getenv("KEYCLOAK_SERVER_URL"))                                                                                                                                                                                                                                                                                                                                     
 KEYCLOAK_REALM=str(os.getenv("KEYCLOAK_REALM"))                                                                                                                                                                                                                                                                                                                                               
