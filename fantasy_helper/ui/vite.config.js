@@ -49,7 +49,7 @@ export default defineConfig({
   proxy: {
     '/': {
       // target: 'https://dev.fantasy-helper.ru',
-      target: 'https://fantasy-helper.ru',
+      target: 'http://fantasy-helper.ru',
       ws: true,
       changeOrigin: true
     }
