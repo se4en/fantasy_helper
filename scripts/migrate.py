@@ -19,16 +19,19 @@ def run_command(command, description):
     
     result = subprocess.run(command, capture_output=True, text=True)
     
-    if result.returncode != 0:
-        print(f"Error: {description} failed")
-        print(f"STDOUT: {result.stdout}")
+    # Print both stdout and stderr for debugging                                                                                                                                                                                                                                                                             
+    if result.stdout:                                                                                                                                                                                                                                                                                                        
+        print(f"STDOUT: {result.stdout}")                                                                                                                                                                                                                                                                                    
+    if result.stderr:                                                                                                                                                                                                                                                                                                        
         print(f"STDERR: {result.stderr}")
+
+    if result.returncode != 0:                                                                                                                                                                                                                                                                                               
+        print(f"Error: {description} failed with return code {result.returncode}")                                                                                                                                                                                                                                           
         sys.exit(1)
     
-    print(f"Success: {description}")
-    if result.stdout:
-        print(f"Output: {result.stdout}")
-    print("-" * 50)
+    print(f"Success: {description}")                                                                                                                                                                                                                                                                                         
+    print("-" * 50)                                                                                                                                                                                                                                                                                                          
+    return result
 
 
 def main():
