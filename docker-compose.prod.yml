@@ -9,7 +9,7 @@ services:
       - api
     env_file: .env
     ports:
-      - 8501:8501
+      - 8501:4173
     networks:
       - api_network
 

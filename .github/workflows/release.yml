@@ -10,6 +10,7 @@ on:
     paths:
       - "fantasy_helper/**"
       - "scripts/**"
+      - "alembic/**"
       - ".github/workflows/**"
       - "docker/**"
       - "docker-compose.prod.yml"

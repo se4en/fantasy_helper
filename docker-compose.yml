@@ -16,7 +16,7 @@ services:
     links:
       - api
     ports:
-      - 4173:4173
+      - 8501:4173
     networks:
       - api_network
 
