@@ -16,7 +16,6 @@ from loguru import logger
 
 from fantasy_helper.db.dao.feature_store.fs_calendar import FSCalendarsDAO
 from fantasy_helper.utils.common import load_config
-from fantasy_helper.db.utils.create_db import create_db
 from fantasy_helper.db.dao.coeff import CoeffDAO
 from fantasy_helper.db.dao.player import PlayerDAO
 from fantasy_helper.db.dao.user import UserDAO
@@ -69,8 +68,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"]
 )
-
-create_db()
 User_dao = UserDAO()
 Coeff_dao = CoeffDAO()
 Player_dao = PlayerDAO()
