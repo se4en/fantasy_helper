@@ -20,6 +20,7 @@ class Schedule(Base):
     date = Column(Date, nullable=True)
     home_goals = Column(Integer, nullable=True)
     away_goals = Column(Integer, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -32,6 +33,7 @@ class Schedule(Base):
         date: Optional[datetime.date] = None,
         home_goals: Optional[int] = None,
         away_goals: Optional[int] = None,
+        year: str = "2024",
     ):
         self.league_name = league_name
         self.timestamp = timestamp
@@ -42,6 +44,7 @@ class Schedule(Base):
         self.date = date
         self.home_goals = home_goals
         self.away_goals = away_goals
+        self.year = year
 
     def __repr__(self):
         return f"[{self.gameweek}] {self.home_team} vs {self.away_team}"

@@ -119,6 +119,7 @@ class LeagueInfo:
     fbref_possesion_url: Optional[str] = None
     fbref_shot_creation_url: Optional[str] = None
     sportsmole_name: Optional[str] = None
+    year: str = "2024"
 
 
 @dataclass

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import List
 
 from sqlalchemy.orm import Session as SQLSession
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.table import Table
@@ -20,17 +20,18 @@ class TableDao:
         cfg = load_config(config_path="../../conf", config_name="config")
 
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._fbref_parser = FbrefParser(leagues=self._leagues)
 
     def get_leagues(self) -> List[str]:
         return [league.name for league in self._leagues]
 
-    def get_table(self, league_name: str) -> List[LeagueTableInfo]:
+    def get_table(self, league_name: str, year: str = "2024") -> List[LeagueTableInfo]:
         db_session: SQLSession = Session()
 
         all_league_tables_rows = (
             db_session.query(Table)
-            .filter(Table.league_name == league_name)
+            .filter(and_(Table.league_name == league_name, Table.year == year))
             .subquery()
         )
 
@@ -71,8 +72,9 @@ class TableDao:
 
     def update_tables_all_leagues(self) -> None:
         for league_name in self._fbref_parser.get_all_leagues():
+            league_year = self._league_2_year.get(league_name, "2024")
             table_rows: List[LeagueTableInfo] = self._fbref_parser.get_league_table(
-                league_name
+                league_name, league_year
             )
 
             db_session: SQLSession = Session()
@@ -80,7 +82,9 @@ class TableDao:
             for table_row in table_rows:
                 db_session.add(
                     Table(
-                        **asdict(table_row), timestamp=datetime.now().replace(tzinfo=utc)
+                        **asdict(table_row), 
+                        timestamp=datetime.now().replace(tzinfo=utc),
+                        year=league_year
                     )
                 )
 

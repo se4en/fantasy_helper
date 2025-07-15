@@ -30,6 +30,7 @@ class SportsPlayer(Base):
     red_cards = Column(Integer, nullable=True)
     field_minutes = Column(Integer, nullable=True)
     saves = Column(Integer, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -52,6 +53,7 @@ class SportsPlayer(Base):
         red_cards: Optional[int],
         field_minutes: Optional[int],
         saves: Optional[int],
+        year: str = "2024",
     ):
         self.sports_id = sports_id
         self.name = name
@@ -72,6 +74,7 @@ class SportsPlayer(Base):
         self.red_cards = red_cards
         self.field_minutes = field_minutes
         self.saves = saves
+        self.year = year
 
     def __repr__(self):
         return f"{self.name} [{self.role}] from {self.team_name}"

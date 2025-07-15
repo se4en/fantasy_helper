@@ -24,6 +24,7 @@ class FbrefSchedule(Base):
     away_xg = Column(Float, nullable=True)
     match_url = Column(String, nullable=True)
     match_parsed = Column(Boolean, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -39,7 +40,8 @@ class FbrefSchedule(Base):
         home_xg: Optional[float] = None,
         away_xg: Optional[float] = None,
         match_url: Optional[str] = None,
-        match_parsed: Optional[bool] = None
+        match_parsed: Optional[bool] = None,
+        year: str = "2024",
     ):
         self.league_name = league_name
         self.timestamp = timestamp
@@ -54,6 +56,7 @@ class FbrefSchedule(Base):
         self.away_xg = away_xg
         self.match_url = match_url
         self.match_parsed = match_parsed
+        self.year = year
 
     def __repr__(self):
         return f"[{self.gameweek}] {self.home_team} vs {self.away_team}"

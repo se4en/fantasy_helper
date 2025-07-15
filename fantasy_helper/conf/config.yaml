@@ -11,10 +11,10 @@ cookie:
 leagues:
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Russia
-    ru_name: Россия
+    ru_name: РПЛ
     emoji: 🇷🇺
-    squad_id: 316902
-    is_active: false
+    squad_id: 423173
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
     betcity_url: https://betcity.ru/ru/line/soccer/74979
     fbref_league_id: 30
@@ -28,6 +28,7 @@ leagues:
     fbref_possesion_url: null
     fbref_shot_creation_url: null
     sportsmole_name: null
+    year: "2025"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: England
     ru_name: Англия

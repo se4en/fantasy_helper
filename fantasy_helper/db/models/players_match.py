@@ -150,6 +150,7 @@ class PlayersMatch(Base):
     gk_crosses_stopped_pct = Column(Float, nullable=True)
     gk_def_actions_outside_pen_area = Column(Integer, nullable=True)
     gk_avg_distance_def_actions = Column(Float, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -292,6 +293,7 @@ class PlayersMatch(Base):
         gk_crosses_stopped_pct: Optional[float],
         gk_def_actions_outside_pen_area: Optional[int],
         gk_avg_distance_def_actions: Optional[float],
+        year: str = "2024",
     ):
         self.name = name
         self.player_id = player_id
@@ -431,6 +433,7 @@ class PlayersMatch(Base):
         self.gk_crosses_stopped_pct = gk_crosses_stopped_pct
         self.gk_def_actions_outside_pen_area = gk_def_actions_outside_pen_area
         self.gk_avg_distance_def_actions = gk_avg_distance_def_actions
+        self.year = year
         
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"

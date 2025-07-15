@@ -29,7 +29,9 @@ class CoeffDAO:
 
     def __init__(self):
         cfg = load_config(config_path="../../conf", config_name="config")
+
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
 
         self._betcity_parser = BetcityParser(leagues=self._leagues)
         self._schedule_dao = ScheduleDao()
@@ -37,6 +39,7 @@ class CoeffDAO:
 
     def get_actual_coeffs(self, league_name: str) -> List[MatchInfo]:
         current_datetime = datetime.now()
+        year = self._league_2_year.get(league_name, "2024")
 
         db_session: SQLSession = Session()
 
@@ -45,6 +48,7 @@ class CoeffDAO:
             db_session.query(Coeff)
             .filter(and_(
                 Coeff.league_name == league_name,
+                Coeff.year == year,
                 Coeff.timestamp >= week_ago
             ))
             .subquery()
@@ -88,6 +92,9 @@ class CoeffDAO:
 
     def update_coeffs(self, league_name: str) -> None:
         logger.info(f"update coeffs for {league_name}")
+
+        year = self._league_2_year.get(league_name, "2024")
+
         matches = self._betcity_parser.get_league_matches(league_name)
         logger.info(f"got {len(matches)} matches for {league_name}")
 
@@ -98,6 +105,7 @@ class CoeffDAO:
                 Coeff(
                     **match.__dict__,
                     timestamp=datetime.now().replace(tzinfo=utc),
+                    year=year
                 )
             )
 

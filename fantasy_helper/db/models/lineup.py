@@ -16,6 +16,7 @@ class Lineup(Base):
     team_name = Column(String, nullable=True)
     lineup = Column(String, nullable=True)
     timestamp = Column(DateTime, nullable=False)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -24,12 +25,14 @@ class Lineup(Base):
         team_name: Optional[str],
         lineup: Optional[str],
         timestamp: Optional[datetime],
+        year: str = "2024",
     ):
         self.update_id = update_id
         self.league_name = league_name
         self.team_name = team_name
         self.lineup = lineup
         self.timestamp = timestamp
+        self.year = year
 
     def __repr__(self):
         return f"{self.team_name}: {self.lineup}"

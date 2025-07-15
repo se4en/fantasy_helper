@@ -88,6 +88,8 @@ class Coeff(Base):
     total_2_under_2 = Column(Float, nullable=True)
     total_2_under_2_5 = Column(Float, nullable=True)
 
+    year = Column(String, nullable=True, default="2024")
+
     def __init__(
         self,
         home_team: str,
@@ -159,6 +161,7 @@ class Coeff(Base):
         total_2_under_1_5: Optional[float],
         total_2_under_2: Optional[float],
         total_2_under_2_5: Optional[float],
+        year: str = "2024",
     ):
         self.home_team = home_team
         self.away_team = away_team
@@ -229,6 +232,7 @@ class Coeff(Base):
         self.total_2_under_1_5 = total_2_under_1_5
         self.total_2_under_2 = total_2_under_2
         self.total_2_under_2_5 = total_2_under_2_5
+        self.year = year
 
     def __repr__(self):
         return f"{self.home_team} vs {self.away_team} [{self.start_datetime.isoformat(timespec='hours')}]"

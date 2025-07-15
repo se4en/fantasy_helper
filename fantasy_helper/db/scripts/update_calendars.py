@@ -1,5 +1,7 @@
 import sys
 
+from loguru import logger
+
 sys.path.insert(0, "/fantasy_helper")
 
 from fantasy_helper.db.dao.table import TableDao
@@ -15,6 +17,10 @@ if __name__ == "__main__":
     table_dao = TableDao()
     calendar_dao = FSCalendarsDAO()
 
+    logger.info(f"Start update sports schedules")
     schedule_dao.update_schedules_all_leagues()
+    logger.info(f"Start update fbref tables")
     table_dao.update_tables_all_leagues()
+    logger.info(f"Start update calendars")
     calendar_dao.update_calendar_all_leagues()
+    logger.info(f"Finish calendars and scledules updates")

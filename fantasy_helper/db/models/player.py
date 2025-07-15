@@ -139,6 +139,7 @@ class Player(Base):
     # cards
     yellow_cards = Column(Integer, nullable=True)
     red_cards = Column(Integer, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -270,6 +271,7 @@ class Player(Base):
         # cards
         yellow_cards: Optional[int],
         red_cards: Optional[int],
+        year: str = "2024",
     ):
         self.name = name
         self.league_name = league_name
@@ -399,6 +401,7 @@ class Player(Base):
         # cards
         self.yellow_cards = yellow_cards
         self.red_cards = red_cards
+        self.year = year
         
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"

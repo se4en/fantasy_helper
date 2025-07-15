@@ -27,6 +27,7 @@ class PlayersMatchDao:
             self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
         else:
             self._leagues = leagues
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._fbref_parser = FbrefParser(leagues=self._leagues)
 
     def get_leagues(self) -> List[str]:
@@ -77,7 +78,9 @@ class PlayersMatchDao:
         for players_match in players_matches:
             db_session.add(
                 PlayersMatch(
-                    **asdict(players_match), timestamp=datetime.now().replace(tzinfo=utc)
+                    **asdict(players_match), 
+                    timestamp=datetime.now().replace(tzinfo=utc),
+                    year=self._league_2_year.get(players_match.league_name, "2024")
                 )
             )
 
@@ -154,12 +157,15 @@ class PlayersMatchDao:
         )
 
     def get_players_match_stats(self, league_name: str) -> List[PlayerMatchStats]:
+        year = self._league_2_year.get(league_name, "2024")
+        
         db_session: SQLSession = Session()
 
         cur_league_players = (
             db_session.query(PlayersMatch)
             .filter(and_(
                 PlayersMatch.league_name == league_name,
+                PlayersMatch.year == year,
                 PlayersMatch.date != None
             ))
             .subquery()

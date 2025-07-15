@@ -16,6 +16,7 @@ class ActualPlayer(Base):
     team_name = Column(String, nullable=True, index=True)
     position = Column(String, nullable=True)
     timestamp = Column(DateTime, nullable=True)
+    year = Column(String, nullable=True, default="2024")
 
     def __init__(
         self,
@@ -23,13 +24,15 @@ class ActualPlayer(Base):
         league_name: Optional[str],
         team_name: Optional[str],
         position: Optional[str],
-        timestamp: Optional[datetime]
+        timestamp: Optional[datetime],
+        year: str = "2024",
     ):
         self.name = name
         self.league_name = league_name
         self.team_name = team_name
         self.position = position
         self.timestamp = timestamp
+        self.year = year
 
     def __repr__(self):
         return f"{self.name} [{self.position}] from {self.team_name}"
