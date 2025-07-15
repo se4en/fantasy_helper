@@ -171,9 +171,16 @@ jobs:
           envs: APPTOKEN,USERNAME
           command_timeout: 120m
           script: |
+            set -e  # Exit on any error                                                                                                                                                                                                                                                                                                
+            echo "Logging into Docker registry..."
             echo $APPTOKEN | sudo docker login ghcr.io -u $USERNAME --password-stdin
+
+            echo "Changing to project directory..."
             cd ~/${{ github.event.repository.name }}
+
+            echo "Pulling latest images..."
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL --no-ansi pull
+            echo "Stopping existing containers..."
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL stop
             
             # # Run database migrations before starting services
@@ -184,7 +191,8 @@ jobs:
             #   ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
             #   python scripts/migrate.py upgrade || echo "Migration completed with warnings"
             
+            echo "Starting containers..."
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d
 
-            # echo "Deployment completed successfully"                                                                                                                                                                                                                                                                                   
+            echo "Deployment completed successfully"                                                                                                                                                                                                                                                                                   
             # exit 0

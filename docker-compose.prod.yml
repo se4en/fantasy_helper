@@ -5,7 +5,7 @@ services:
     image: ghcr.io/${IMAGE_REPO}_ui:${RELEASE_VERSION}
     container_name: "ui"
     restart: always
-    links:
+    depends_on:
       - api
     env_file: .env
     ports:
@@ -30,7 +30,7 @@ services:
     image: ghcr.io/${IMAGE_REPO}_cron:${RELEASE_VERSION}
     container_name: "cron"
     restart: always
-    links:
+    depends_on:
       - db
     env_file: .env
     networks:
