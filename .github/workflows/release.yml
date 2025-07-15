@@ -9,6 +9,7 @@ on:
       - master
     paths:
       - "fantasy_helper/**"
+      - "scripts/**"
       - ".github/workflows/**"
       - "docker/**"
       - "docker-compose.prod.yml"
