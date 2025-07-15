@@ -86,7 +86,7 @@ class SportsPlayerDAO:
                 SportsPlayer(
                     **player_stats.__dict__,
                     timestamp=datetime.now().replace(tzinfo=utc),
-                    league_year=year
+                    year=year
                 )
             )
 

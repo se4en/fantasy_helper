@@ -95,11 +95,12 @@ class FbrefScheduleDao:
 
     def update_schedules_all_leagues(self) -> None:
         for league_name, _ in self._fbref_parser.get_schedule_leagues().items():
+            year = self._league_2_year.get(league_name, "2024")
             cup = False
             if league_name == "ChampionsLeague" or league_name == "EuropaLeague" or league_name == "ClubWorldCup":
                 cup = True
             schedule_rows: List[LeagueScheduleInfo] = self._fbref_parser.get_league_schedule(
-                league_name=league_name, cup=cup
+                league_name=league_name, cup=cup, league_year=year
             )
 
             parsed_matches = set(map(hash, self.get_parsed_matches(league_name=league_name)))

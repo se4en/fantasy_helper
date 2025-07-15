@@ -1,4 +1,4 @@
-from fantasy_helper.db.database import Base, db_
+from fantasy_helper.db.database import Base, db_engine
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.source import Source
 from fantasy_helper.db.models.user import User
@@ -28,8 +28,6 @@ def create_db():
     NOTE: This is deprecated in favor of Alembic migrations.
     Use 'alembic upgrade head' instead.
     """
-    print("WARNING: create_db() is deprecated. Use Alembic migrations instead.")
-    print("Run: alembic upgrade head")
     Base.metadata.create_all(db_engine)
 
 

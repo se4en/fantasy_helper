@@ -977,7 +977,7 @@ class FbrefParser:
         else:
             return None
 
-    def get_league_schedule(self, league_name: str, cup: bool = False) -> List[LeagueScheduleInfo]:
+    def get_league_schedule(self, league_name: str, cup: bool = False, league_year: str = "2024") -> List[LeagueScheduleInfo]:
         if league_name not in self._schedule_leagues:
             return []
         if league_name not in self._leagues_ids:
@@ -1000,7 +1000,10 @@ class FbrefParser:
                 )
             else:
                 league_schedule = WebDriverWait(driver, 3).until(
-                    EC.presence_of_element_located((By.ID, f"sched_2024-2025_{league_id}_1"))
+                    EC.presence_of_element_located((
+                        By.ID, 
+                        f"sched_{cast_to_int(league_year)}-{cast_to_int(league_year)+1}_{league_id}_1"
+                    ))
                 )
                 # todo: add sched_2025-2026_<>
             parsed_league_schedule = BeautifulSoup(
