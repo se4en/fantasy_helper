@@ -37,8 +37,8 @@ class BetcityParser:
         }
         
         self._max_retries = 3
-        self._retry_delay = 5  # seconds
-        self._page_timeout = 30  # seconds
+        self._retry_delay = 10  # seconds - increased delay
+        self._page_timeout = 60  # seconds - increased timeout
 
     def _create_driver(self, use_proxy: bool = True) -> webdriver.Firefox:
         """Create a Firefox driver with optional proxy configuration."""
@@ -46,9 +46,22 @@ class BetcityParser:
         opts.add_argument("--headless")
         opts.add_argument("--disable-blink-features=AutomationControlled")
         
-        # Set timeouts
-        opts.set_preference("network.http.connection-timeout", self._page_timeout)
-        opts.set_preference("network.http.response.timeout", self._page_timeout)
+        # Add user agent to avoid detection
+        opts.set_preference("general.useragent.override", 
+                          "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0")
+        
+        # Set timeouts - increase for better reliability
+        opts.set_preference("network.http.connection-timeout", 60)
+        opts.set_preference("network.http.response.timeout", 60)
+        opts.set_preference("dom.max_script_run_time", 60)
+        opts.set_preference("dom.max_chrome_script_run_time", 60)
+        
+        # Disable images and CSS for faster loading
+        opts.set_preference("permissions.default.image", 2)
+        opts.set_preference("permissions.default.stylesheet", 2)
+        
+        # Disable JavaScript (if not needed for basic content)
+        # opts.set_preference("javascript.enabled", False)
         
         if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
             proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
@@ -79,36 +92,126 @@ class BetcityParser:
         
         for attempt in range(self._max_retries):
             try:
-                driver = self._create_driver(use_proxy=False)  # Try without proxy first
+                # Alternate between proxy and no proxy
+                use_proxy = attempt % 2 == 1
+                driver = self._create_driver(use_proxy=use_proxy)
                 driver.set_page_load_timeout(self._page_timeout)
                 
-                logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]}")
+                logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]} (proxy: {use_proxy})")
                 driver.get(self._leagues[league_name])
+                
+                # Wait for page to load and check for different possible structures
+                time.sleep(3)  # Give page time to fully load
+                
+                # Try multiple selectors for the matches container
+                champ_line = None
+                selectors_to_try = [
+                    (By.CLASS_NAME, "line__champ"),
+                    (By.TAG_NAME, "table"),  # Based on HTML structure
+                    (By.CSS_SELECTOR, "table tbody"),
+                    (By.CSS_SELECTOR, "[data-testid*='match'], [class*='match'], [class*='event']")
+                ]
+                
+                for selector_type, selector_value in selectors_to_try:
+                    try:
+                        champ_line = WebDriverWait(driver, 5).until(
+                            EC.presence_of_element_located((selector_type, selector_value))
+                        )
+                        logger.info(f"Found matches container using selector: {selector_type}={selector_value}")
+                        break
+                    except TimeoutException:
+                        continue
+                
+                if champ_line is None:
+                    logger.warning("Could not find matches container with any known selector")
+                    # Log page source for debugging
+                    logger.debug(f"Page source preview: {driver.page_source[:1000]}")
+                    continue
 
-                champ_line = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
-                )
+                # Try different selectors for individual matches
+                all_matches = []
+                match_selectors = [
+                    (By.CLASS_NAME, "line-event"),
+                    (By.TAG_NAME, "tr"),  # Table rows
+                    (By.CSS_SELECTOR, "[href*='/line/soccer/']"),  # Links to match pages
+                ]
+                
+                for selector_type, selector_value in match_selectors:
+                    try:
+                        all_matches = champ_line.find_elements(selector_type, selector_value)
+                        if all_matches:
+                            logger.info(f"Found {len(all_matches)} matches using selector: {selector_type}={selector_value}")
+                            break
+                    except Exception:
+                        continue
 
-                all_matches = champ_line.find_elements(By.CLASS_NAME, "line-event")
+                if not all_matches:
+                    logger.warning("No matches found with any selector")
+                    continue
 
                 for match in all_matches:
-                    match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
-                    match_url = match_name_elem.get_attribute("href")
-                    match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
-                    if len(match_teams_names) != 2:
+                    try:
+                        # Try different ways to extract match info based on HTML structure
+                        match_url = None
+                        home_team_name = None
+                        away_team_name = None
+                        
+                        # Method 1: Original approach
+                        try:
+                            match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
+                            match_url = match_name_elem.get_attribute("href")
+                            match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
+                            if len(match_teams_names) == 2:
+                                home_team_name = match_teams_names[0].text.strip()
+                                away_team_name = match_teams_names[1].text.strip()
+                        except Exception:
+                            pass
+                        
+                        # Method 2: Direct link extraction from table row
+                        if not match_url:
+                            try:
+                                link_elem = match.find_element(By.CSS_SELECTOR, "a[href*='/line/soccer/']")
+                                match_url = link_elem.get_attribute("href")
+                                # Extract team names from link text or nearby elements
+                                link_text = link_elem.text.strip()
+                                if link_text:
+                                    # Try to parse team names from text
+                                    teams = link_text.split()
+                                    if len(teams) >= 2:
+                                        home_team_name = teams[0]
+                                        away_team_name = teams[-1]
+                            except Exception:
+                                pass
+                        
+                        # Method 3: Extract from href attribute if it contains team info
+                        if match_url and (not home_team_name or not away_team_name):
+                            try:
+                                # Look for bold text elements in the row
+                                bold_elements = match.find_elements(By.TAG_NAME, "b")
+                                if len(bold_elements) >= 2:
+                                    home_team_name = bold_elements[0].text.strip()
+                                    away_team_name = bold_elements[1].text.strip()
+                            except Exception:
+                                pass
+                        
+                        if match_url and home_team_name and away_team_name:
+                            result.append(
+                                MatchInfo(
+                                    url=match_url,
+                                    league_name=league_name,
+                                    home_team=home_team_name,
+                                    away_team=away_team_name,
+                                )
+                            )
+                    except Exception as match_ex:
+                        logger.debug(f"Failed to parse individual match: {str(match_ex)}")
                         continue
-                    home_team_name = match_teams_names[0].text.strip()
-                    away_team_name = match_teams_names[1].text.strip()
 
-                    result.append(
-                        MatchInfo(
-                            url=match_url,
-                            league_name=league_name,
-                            home_team=home_team_name,
-                            away_team=away_team_name,
-                        )
-                    )
-                break  # Success, exit retry loop
+                if result:
+                    logger.info(f"Successfully parsed {len(result)} matches")
+                    break  # Success, exit retry loop
+                else:
+                    logger.warning("No matches were successfully parsed")
                 
             except (WebDriverException, TimeoutException) as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for league {league_name}: {str(ex)}")
