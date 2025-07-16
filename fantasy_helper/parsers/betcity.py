@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver import FirefoxOptions
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from loguru import logger
 
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
@@ -34,6 +35,40 @@ class BetcityParser:
             "ИНДИВИДУАЛЬНЫЙ ТОТАЛ": self._parse_individual_total_bets,
             "ГОЛЫ": self._parse_goals_bets
         }
+        
+        self._max_retries = 3
+        self._retry_delay = 5  # seconds
+        self._page_timeout = 30  # seconds
+
+    def _create_driver(self, use_proxy: bool = True) -> webdriver.Firefox:
+        """Create a Firefox driver with optional proxy configuration."""
+        opts = FirefoxOptions()
+        opts.add_argument("--headless")
+        opts.add_argument("--disable-blink-features=AutomationControlled")
+        
+        # Set timeouts
+        opts.set_preference("network.http.connection-timeout", self._page_timeout)
+        opts.set_preference("network.http.response.timeout", self._page_timeout)
+        
+        if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
+            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            proxy = Proxy({
+                'proxyType': ProxyType.MANUAL,
+                'httpProxy': proxy_url,
+                'ftpProxy': proxy_url,
+                'sslProxy': proxy_url,
+                'noProxy': ''
+            })
+            return webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], 
+                options=opts, 
+                proxy=proxy
+            )
+        else:
+            return webdriver.Firefox(
+                executable_path=os.environ["GECKODRIVER_PATH"], 
+                options=opts
+            )
 
     def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
         if league_name not in self._leagues:
@@ -41,79 +76,54 @@ class BetcityParser:
 
         result = []
         driver = None
-        try:
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            opts.add_argument("--disable-blink-features=AutomationControlled")
+        
+        for attempt in range(self._max_retries):
+            try:
+                driver = self._create_driver(use_proxy=False)  # Try without proxy first
+                driver.set_page_load_timeout(self._page_timeout)
+                
+                logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]}")
+                driver.get(self._leagues[league_name])
 
-            # proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-            # proxy = Proxy({
-            #     'proxyType': ProxyType.MANUAL,
-            #     'httpProxy': proxy_url,
-            #     'ftpProxy': proxy_url,
-            #     'sslProxy': proxy_url,
-            #     'noProxy': ''
-            # })
-            # opts.set_preference("network.proxy.type", 1)
-            # opts.set_preference("network.proxy.http", PROXY_HOST)
-            # opts.set_preference("network.proxy.http_port", int(PROXY_PORT))
-            # opts.set_preference("network.proxy.ssl", PROXY_HOST)
-            # opts.set_preference("network.proxy.ssl_port", int(PROXY_PORT))
-            # opts.set_preference("network.proxy.ftp", PROXY_HOST)
-            # opts.set_preference("network.proxy.ftp_port", int(PROXY_PORT))
-            # opts.set_preference("network.proxy.socks", PROXY_HOST)
-            # opts.set_preference("network.proxy.socks_port", int(PROXY_PORT))
-            # opts.set_preference("network.proxy.no_proxies_on", "localhost,127.0.0.1")
-
-            # Add authentication
-            # opts.set_preference("network.proxy.http.auth.user", PROXY_USER)
-            # opts.set_preference("network.proxy.http.auth.password", PROXY_PASSWORD)
-            # opts.set_preference("network.proxy.ssl.auth.user", PROXY_USER)
-            # opts.set_preference("network.proxy.ssl.auth.password", PROXY_PASSWORD)
-            # opts.set_preference("network.proxy.ftp.auth.user", PROXY_USER)
-            # opts.set_preference("network.proxy.ftp.auth.password", PROXY_PASSWORD)
-            # opts.set_preference("network.proxy.socks.auth.user", PROXY_USER)
-            # opts.set_preference("network.proxy.socks.auth.password", PROXY_PASSWORD)
-
-            # os.environ['HTTP_PROXY'] = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-            # os.environ['HTTPS_PROXY'] = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-
-            driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts #, proxy=proxy
-            )
-            # driver.get("https://httpbin.org/ip")
-            # print(driver.page_source)
-            logger.info(f"driver get {self._leagues[league_name]}")
-            driver.get(self._leagues[league_name])
-
-            champ_line = WebDriverWait(driver, 3).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
-            )
-
-            all_matches = champ_line.find_elements(By.CLASS_NAME, "line-event")
-
-            for match in all_matches:
-                match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
-                match_url = match_name_elem.get_attribute("href")
-                match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
-                if len(match_teams_names) != 2:
-                    continue
-                home_team_name = match_teams_names[0].text.strip()
-                away_team_name = match_teams_names[1].text.strip()
-
-                result.append(
-                    MatchInfo(
-                        url=match_url,
-                        league_name=league_name,
-                        home_team=home_team_name,
-                        away_team=away_team_name,
-                    )
+                champ_line = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
                 )
-        except Exception as ex:
-            logger.exception("An error while parse betcity league matches")
-        finally:
-            if driver is not None:
-                driver.quit()
+
+                all_matches = champ_line.find_elements(By.CLASS_NAME, "line-event")
+
+                for match in all_matches:
+                    match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
+                    match_url = match_name_elem.get_attribute("href")
+                    match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
+                    if len(match_teams_names) != 2:
+                        continue
+                    home_team_name = match_teams_names[0].text.strip()
+                    away_team_name = match_teams_names[1].text.strip()
+
+                    result.append(
+                        MatchInfo(
+                            url=match_url,
+                            league_name=league_name,
+                            home_team=home_team_name,
+                            away_team=away_team_name,
+                        )
+                    )
+                break  # Success, exit retry loop
+                
+            except (WebDriverException, TimeoutException) as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for league {league_name}: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    time.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for league {league_name}")
+            except Exception as ex:
+                logger.exception("An unexpected error while parsing betcity league matches")
+                break
+            finally:
+                if driver is not None:
+                    driver.quit()
+                    driver = None
 
         return result
 
@@ -461,31 +471,35 @@ class BetcityParser:
 
     def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
         driver = None
-        try:
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            opts.add_argument("--disable-blink-features=AutomationControlled")
+        
+        for attempt in range(self._max_retries):
+            try:
+                # Try with proxy first, then without if it fails
+                use_proxy = attempt == 0
+                driver = self._create_driver(use_proxy=use_proxy)
+                driver.set_page_load_timeout(self._page_timeout)
+                
+                logger.info(f"Attempt {attempt + 1}: Parsing match {match_info.url} (proxy: {use_proxy})")
+                driver.get(match_info.url)
 
-            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-            proxy = Proxy({
-                'proxyType': ProxyType.MANUAL,
-                'httpProxy': proxy_url,
-                'ftpProxy': proxy_url,
-                'sslProxy': proxy_url,
-                'noProxy': ''
-            })
-            driver = webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], options=opts, proxy=proxy
-            )
-            driver.get(match_info.url)
-
-            match_info = self._parse_header_bets(driver, match_info)
-            match_info = self._parse_main_bets(driver, match_info)
-        except Exception as ex:
-            logger.exception("An error while parse betcity match")
-        finally:
-            if driver is not None:
-                driver.quit()
+                match_info = self._parse_header_bets(driver, match_info)
+                match_info = self._parse_main_bets(driver, match_info)
+                break  # Success, exit retry loop
+                
+            except (WebDriverException, TimeoutException) as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url}: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    time.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for match {match_info.url}")
+            except Exception as ex:
+                logger.exception("An unexpected error while parsing betcity match")
+                break
+            finally:
+                if driver is not None:
+                    driver.quit()
+                    driver = None
 
         return match_info
 
