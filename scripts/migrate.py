@@ -17,7 +17,8 @@ def run_command(command, description):
     print(f"Running: {description}")
     print(f"Command: {' '.join(command)}")
     
-    result = subprocess.run(command, capture_output=True, text=True)
+    cwd = str(project_root)    
+    result = subprocess.run(command, capture_output=True, text=True, cwd=cwd)
     
     # Print both stdout and stderr for debugging                                                                                                                                                                                                                                                                             
     if result.stdout:                                                                                                                                                                                                                                                                                                        
