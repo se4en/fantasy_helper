@@ -176,7 +176,15 @@ jobs:
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL --no-ansi pull
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL stop
             
-            # Run database migrations before starting services
+            echo "Starting database..."
+            sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d db
+            
+            echo "Waiting for database to be ready..."
+            sleep 30
+            
+            echo "Testing database connectivity..."
+            sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL exec -T db pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || sleep 15
+            
             echo "Running database migrations..."
             sudo docker run --rm \
               --env-file .env \
@@ -184,4 +192,5 @@ jobs:
               ghcr.io/${{ env.image_repository_name }}_api:${{ env.TAG_NAME }} \
               python scripts/migrate.py upgrade
             
+            echo "Starting all services..."
             sudo docker-compose -f ./docker-compose.prod.yml --log-level=CRITICAL up -d
