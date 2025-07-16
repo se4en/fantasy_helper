@@ -142,7 +142,7 @@ onMounted(async () => {
           <table class="w-full">
             <thead>
               <tr class="bg-gray-50">
-                <th rowspan="2" class="team-column">Team</th>
+                <th rowspan="2" class="team-column">Команда</th>
                 
                 <template v-for="(tourName, index) in tourHeaders" :key="'header-'+index">
                   <th colspan="3" class="tour-header">
@@ -158,7 +158,7 @@ onMounted(async () => {
                     :class="{ active: sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex }"
                   >
                     <span class="header-content">
-                      <span class="header-text">Attack</span>
+                      <span class="header-text">Атака</span>
                       <span class="sort-arrow" v-if="sortCoeffsBy === 'attack' && sortCoeffsTourIndex === tourIndex">
                         {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
                       </span>
@@ -170,13 +170,13 @@ onMounted(async () => {
                     :class="{ active: sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex }"
                   >
                     <span class="header-content">
-                      <span class="header-text">Defence</span>
+                      <span class="header-text">Защита</span>
                       <span class="sort-arrow" v-if="sortCoeffsBy === 'defence' && sortCoeffsTourIndex === tourIndex">
                         {{ sortCoeffsDirection === 'asc' ? '↑' : '↓' }}
                       </span>
                     </span>
                   </th>
-                  <th class="rival-header">Rival</th>
+                  <th class="rival-header">Соперник</th>
                 </template>
               </tr>
             </thead>
@@ -214,18 +214,18 @@ table {
 }
 
 th {
-  padding: 16px 12px;
+  padding: 8px 6px;
   text-align: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   color: #374151;
   border-bottom: 1px solid #e5e7eb;
 }
 
 td {
-  padding: 16px 12px;
+  padding: 8px 6px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
   color: #111827;
   border-bottom: 1px solid #f3f4f6;
 }
@@ -250,9 +250,9 @@ td {
 
 .attack-header,
 .defence-header {
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
 }
 
 .sub-header {
@@ -307,8 +307,12 @@ td {
 
 .rival-cell {
   background-color: #f9fafb;
-  font-size: 13px;
+  font-size: 11px;
   color: #6b7280;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Hover effects */
@@ -323,19 +327,24 @@ tbody tr:hover .team-cell {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   th, td {
-    padding: 12px 8px;
-    font-size: 13px;
+    padding: 6px 4px;
+    font-size: 11px;
   }
   
   .team-column {
-    min-width: 120px;
+    min-width: 100px;
   }
   
   .attack-header,
   .defence-header {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+  }
+  
+  .rival-cell {
+    font-size: 10px;
+    max-width: 100px;
   }
 }
 </style>

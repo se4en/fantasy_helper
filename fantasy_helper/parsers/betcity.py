@@ -132,21 +132,51 @@ class BetcityParser:
                 all_matches = []
                 match_selectors = [
                     (By.CLASS_NAME, "line-event"),
-                    (By.TAG_NAME, "tr"),  # Table rows
-                    (By.CSS_SELECTOR, "[href*='/line/soccer/']"),  # Links to match pages
+                    (By.CSS_SELECTOR, "tr[data-event-id]"),  # Table rows with event IDs
+                    (By.CSS_SELECTOR, "tr:has(a[href*='/line/soccer/'])"),  # Rows containing soccer links
+                    (By.CSS_SELECTOR, "a[href*='/line/soccer/74979/']"),  # Direct links to matches
+                    (By.TAG_NAME, "tr"),  # All table rows as fallback
                 ]
                 
                 for selector_type, selector_value in match_selectors:
                     try:
-                        all_matches = champ_line.find_elements(selector_type, selector_value)
-                        if all_matches:
+                        if selector_type == By.CSS_SELECTOR and "a[href*=" in selector_value:
+                            # For direct link selection, search in entire page
+                            all_matches = driver.find_elements(selector_type, selector_value)
+                        else:
+                            all_matches = champ_line.find_elements(selector_type, selector_value)
+                        
+                        # Filter out header rows and empty rows
+                        filtered_matches = []
+                        for match in all_matches:
+                            try:
+                                # Check if row contains match data (has links or team names)
+                                links = match.find_elements(By.CSS_SELECTOR, "a[href*='/line/soccer/74979/']")
+                                bold_elements = match.find_elements(By.TAG_NAME, "b")
+                                if links or len(bold_elements) >= 2:
+                                    filtered_matches.append(match)
+                            except Exception:
+                                continue
+                        
+                        if filtered_matches:
+                            all_matches = filtered_matches
                             logger.info(f"Found {len(all_matches)} matches using selector: {selector_type}={selector_value}")
                             break
-                    except Exception:
+                    except Exception as e:
+                        logger.debug(f"Selector {selector_type}={selector_value} failed: {str(e)}")
                         continue
 
                 if not all_matches:
                     logger.warning("No matches found with any selector")
+                    # Log more detailed debug info
+                    try:
+                        page_links = driver.find_elements(By.CSS_SELECTOR, "a[href*='/line/soccer/74979/']")
+                        logger.debug(f"Found {len(page_links)} soccer links on entire page")
+                        if page_links:
+                            for i, link in enumerate(page_links[:3]):  # Log first 3 links
+                                logger.debug(f"Link {i}: {link.get_attribute('href')}")
+                    except Exception:
+                        pass
                     continue
 
                 for match in all_matches:
@@ -156,37 +186,11 @@ class BetcityParser:
                         home_team_name = None
                         away_team_name = None
                         
-                        # Method 1: Original approach
-                        try:
-                            match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
-                            match_url = match_name_elem.get_attribute("href")
-                            match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
-                            if len(match_teams_names) == 2:
-                                home_team_name = match_teams_names[0].text.strip()
-                                away_team_name = match_teams_names[1].text.strip()
-                        except Exception:
-                            pass
-                        
-                        # Method 2: Direct link extraction from table row
-                        if not match_url:
+                        # Method 1: If match is already a link element
+                        if match.tag_name == "a":
                             try:
-                                link_elem = match.find_element(By.CSS_SELECTOR, "a[href*='/line/soccer/']")
-                                match_url = link_elem.get_attribute("href")
-                                # Extract team names from link text or nearby elements
-                                link_text = link_elem.text.strip()
-                                if link_text:
-                                    # Try to parse team names from text
-                                    teams = link_text.split()
-                                    if len(teams) >= 2:
-                                        home_team_name = teams[0]
-                                        away_team_name = teams[-1]
-                            except Exception:
-                                pass
-                        
-                        # Method 3: Extract from href attribute if it contains team info
-                        if match_url and (not home_team_name or not away_team_name):
-                            try:
-                                # Look for bold text elements in the row
+                                match_url = match.get_attribute("href")
+                                # Extract team names from bold elements within the link
                                 bold_elements = match.find_elements(By.TAG_NAME, "b")
                                 if len(bold_elements) >= 2:
                                     home_team_name = bold_elements[0].text.strip()
@@ -194,15 +198,79 @@ class BetcityParser:
                             except Exception:
                                 pass
                         
+                        # Method 2: Original approach for line-event elements
+                        if not match_url:
+                            try:
+                                match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
+                                match_url = match_name_elem.get_attribute("href")
+                                match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
+                                if len(match_teams_names) == 2:
+                                    home_team_name = match_teams_names[0].text.strip()
+                                    away_team_name = match_teams_names[1].text.strip()
+                            except Exception:
+                                pass
+                        
+                        # Method 3: Table row approach - find link within the row
+                        if not match_url:
+                            try:
+                                link_elem = match.find_element(By.CSS_SELECTOR, "a[href*='/line/soccer/74979/']")
+                                match_url = link_elem.get_attribute("href")
+                                
+                                # Try to get team names from bold elements in the link
+                                bold_elements = link_elem.find_elements(By.TAG_NAME, "b")
+                                if len(bold_elements) >= 2:
+                                    home_team_name = bold_elements[0].text.strip()
+                                    away_team_name = bold_elements[1].text.strip()
+                                else:
+                                    # Try to get team names from the row itself
+                                    row_bold_elements = match.find_elements(By.TAG_NAME, "b")
+                                    if len(row_bold_elements) >= 2:
+                                        home_team_name = row_bold_elements[0].text.strip()
+                                        away_team_name = row_bold_elements[1].text.strip()
+                            except Exception:
+                                pass
+                        
+                        # Method 4: Extract team names from text content if we have URL but no team names
+                        if match_url and (not home_team_name or not away_team_name):
+                            try:
+                                # Look for bold text elements anywhere in the match element
+                                bold_elements = match.find_elements(By.TAG_NAME, "b")
+                                if len(bold_elements) >= 2:
+                                    home_team_name = bold_elements[0].text.strip()
+                                    away_team_name = bold_elements[1].text.strip()
+                                elif len(bold_elements) == 1:
+                                    # Sometimes teams are in one bold element separated by some text
+                                    text = bold_elements[0].text.strip()
+                                    # Try to split on common separators
+                                    for separator in [' - ', ' vs ', ' против ']:
+                                        if separator in text:
+                                            teams = text.split(separator)
+                                            if len(teams) == 2:
+                                                home_team_name = teams[0].strip()
+                                                away_team_name = teams[1].strip()
+                                                break
+                            except Exception:
+                                pass
+                        
+                        # Validate and add the match
                         if match_url and home_team_name and away_team_name:
-                            result.append(
-                                MatchInfo(
-                                    url=match_url,
-                                    league_name=league_name,
-                                    home_team=home_team_name,
-                                    away_team=away_team_name,
+                            # Clean up team names
+                            home_team_name = home_team_name.replace('\n', ' ').strip()
+                            away_team_name = away_team_name.replace('\n', ' ').strip()
+                            
+                            if home_team_name and away_team_name:
+                                result.append(
+                                    MatchInfo(
+                                        url=match_url,
+                                        league_name=league_name,
+                                        home_team=home_team_name,
+                                        away_team=away_team_name,
+                                    )
                                 )
-                            )
+                                logger.debug(f"Successfully parsed match: {home_team_name} vs {away_team_name}")
+                        else:
+                            logger.debug(f"Incomplete match data - URL: {bool(match_url)}, Home: {bool(home_team_name)}, Away: {bool(away_team_name)}")
+                            
                     except Exception as match_ex:
                         logger.debug(f"Failed to parse individual match: {str(match_ex)}")
                         continue
