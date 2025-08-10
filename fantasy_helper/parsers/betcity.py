@@ -37,8 +37,8 @@ class BetcityParser:
         }
         
         self._max_retries = 3
-        self._retry_delay = 5  # seconds
-        self._page_timeout = 30  # seconds
+        self._retry_delay = 10  # seconds - increased delay
+        self._page_timeout = 60  # seconds - increased timeout
 
     def _create_driver(self, use_proxy: bool = True) -> webdriver.Firefox:
         """Create a Firefox driver with optional proxy configuration."""
@@ -46,9 +46,24 @@ class BetcityParser:
         opts.add_argument("--headless")
         opts.add_argument("--disable-blink-features=AutomationControlled")
         
-        # Set timeouts
-        opts.set_preference("network.http.connection-timeout", self._page_timeout)
-        opts.set_preference("network.http.response.timeout", self._page_timeout)
+        # Add user agent to avoid detection
+        opts.set_preference("general.useragent.override", 
+                          "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0")                                                                                                                                                                            
+        opts.set_preference("network.http.accept.default", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")                                                                                                         
+        opts.set_preference("network.http.accept-language.default", "en-US,en;q=0.5")
+
+        # Set timeouts - increase for better reliability
+        opts.set_preference("network.http.connection-timeout", 60)
+        opts.set_preference("network.http.response.timeout", 60)
+        opts.set_preference("dom.max_script_run_time", 60)
+        opts.set_preference("dom.max_chrome_script_run_time", 60)
+        
+        # Disable images and CSS for faster loading
+        opts.set_preference("permissions.default.image", 2)
+        opts.set_preference("permissions.default.stylesheet", 2)
+        
+        # Disable JavaScript (if not needed for basic content)
+        # opts.set_preference("javascript.enabled", False)
         
         if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
             proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
@@ -76,21 +91,25 @@ class BetcityParser:
 
         result = []
         driver = None
-        
+        use_proxy = True
+
         for attempt in range(self._max_retries):
             try:
-                driver = self._create_driver(use_proxy=False)  # Try without proxy first
+                driver = self._create_driver(use_proxy=use_proxy)
                 driver.set_page_load_timeout(self._page_timeout)
                 
-                logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]}")
+                logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]} (proxy: {use_proxy})")
                 driver.get(self._leagues[league_name])
-
+                time.sleep(3)
                 champ_line = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
                 )
-
+                
+                if champ_line is None:
+                    logger.warning(f"Attempt {attempt + 1} failed: No matches found on page {self._leagues[league_name]}")
+                    continue
+            
                 all_matches = champ_line.find_elements(By.CLASS_NAME, "line-event")
-
                 for match in all_matches:
                     match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
                     match_url = match_name_elem.get_attribute("href")
@@ -108,7 +127,12 @@ class BetcityParser:
                             away_team=away_team_name,
                         )
                     )
-                break  # Success, exit retry loop
+
+                if result:
+                    logger.info(f"Successfully parsed {len(result)} matches")
+                    break  # Success, exit retry loop
+                else:
+                    logger.warning("No matches were successfully parsed")
                 
             except (WebDriverException, TimeoutException) as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for league {league_name}: {str(ex)}")
