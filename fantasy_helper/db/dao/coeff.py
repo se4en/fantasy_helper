@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Literal, Optional, Tuple
 import os.path as path
@@ -90,12 +91,12 @@ class CoeffDAO:
 
         return result
 
-    def update_coeffs(self, league_name: str) -> None:
+    async def update_coeffs(self, league_name: str) -> None:
         logger.info(f"update coeffs for {league_name}")
 
         year = self._league_2_year.get(league_name, "2024")
 
-        matches = self._betcity_parser.get_league_matches(league_name)
+        matches = await self._betcity_parser.get_league_matches(league_name)
         logger.info(f"got {len(matches)} matches for {league_name}")
 
         db_session: SQLSession = Session()
@@ -112,9 +113,9 @@ class CoeffDAO:
         db_session.commit()
         db_session.close()
 
-    def update_coeffs_all_leagues(self) -> None:
+    async def update_coeffs_all_leagues(self) -> None:
         for league in self._leagues:
-            self.update_coeffs(league.name)
+            await self.update_coeffs(league.name)
 
     def update_feature_store(self) -> None:
         logger.info(f"start update coeffs feature store")

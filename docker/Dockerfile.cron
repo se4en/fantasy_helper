@@ -29,6 +29,7 @@ RUN echo "===> Remove build dependencies..." && \
 WORKDIR /fantasy_helper
 COPY ./requirements /fantasy_helper/requirements
 RUN pip install --no-cache-dir --upgrade -r requirements/db.txt -r requirements/parsers.txt -r requirements/ml.txt
+RUN playwright install --with-deps chromium
 
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
