@@ -1,5 +1,6 @@
 import datetime
 import logging
+import random
 import sys
 import os
 import json
@@ -66,6 +67,8 @@ class BetcityParser:
         # opts.set_preference("javascript.enabled", False)
         
         if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
+            # get random froxy port from 10001 to 10999
+            PROXY_PORT = str(random.randint(10001, 10999))
             proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
             proxy = Proxy({
                 'proxyType': ProxyType.MANUAL,
@@ -101,10 +104,10 @@ class BetcityParser:
                 logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]} (proxy: {use_proxy})")
                 driver.get(self._leagues[league_name])
                 time.sleep(3)
+
                 champ_line = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
-                )
-                
+                )                
                 if champ_line is None:
                     logger.warning(f"Attempt {attempt + 1} failed: No matches found on page {self._leagues[league_name]}")
                     continue
@@ -378,7 +381,7 @@ class BetcityParser:
         return match_info
     
     def _parse_main_bets(self, driver: Any, match_info: MatchInfo) -> MatchInfo:
-        bet_groups = WebDriverWait(driver, 3).until(
+        bet_groups = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "dops-item"))
         )
 
@@ -480,10 +483,10 @@ class BetcityParser:
         return match_info
 
     def _parse_header_bets(self, driver: Any, match_info: MatchInfo) -> MatchInfo:
-        line_header = WebDriverWait(driver, 3).until(
+        line_header = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "line__header"))
         )
-        main_bets = WebDriverWait(driver, 3).until(
+        main_bets = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "line-event__main-bets"))
         )
 
@@ -495,16 +498,16 @@ class BetcityParser:
 
     def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
         driver = None
-        
+        use_proxy = True
+
         for attempt in range(self._max_retries):
             try:
-                # Try with proxy first, then without if it fails
-                use_proxy = attempt == 0
                 driver = self._create_driver(use_proxy=use_proxy)
                 driver.set_page_load_timeout(self._page_timeout)
                 
                 logger.info(f"Attempt {attempt + 1}: Parsing match {match_info.url} (proxy: {use_proxy})")
                 driver.get(match_info.url)
+                time.sleep(3)
 
                 match_info = self._parse_header_bets(driver, match_info)
                 match_info = self._parse_main_bets(driver, match_info)
