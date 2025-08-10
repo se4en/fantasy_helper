@@ -68,8 +68,8 @@ class BetcityParser:
         
         if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
             # get random froxy port from 10001 to 10999
-            PROXY_PORT = str(random.randint(10001, 10999))
-            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+            proxy_port = str(random.randint(10001, 10999))
+            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{proxy_port}"
             proxy = Proxy({
                 'proxyType': ProxyType.MANUAL,
                 'httpProxy': proxy_url,
@@ -511,8 +511,8 @@ class BetcityParser:
 
                 match_info = self._parse_header_bets(driver, match_info)
                 match_info = self._parse_main_bets(driver, match_info)
-                break  # Success, exit retry loop
-                
+                logger.info(f"Successfully parsed match {match_info.url}")
+                break
             except (WebDriverException, TimeoutException) as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url}: {str(ex)}")
                 if attempt < self._max_retries - 1:
