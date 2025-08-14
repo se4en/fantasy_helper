@@ -150,6 +150,8 @@ class BetcityParser:
                     await asyncio.sleep(self._retry_delay)
                 else:
                     logger.error(f"All {self._max_retries} attempts failed for league {league_name}")
+            # TBD: catch playwright._impl._errors.Error: Page.goto: net::ERR_TUNNEL_CONNECTION_FAILED at https://betcity.ru/ru/line/soccer/74979
+            # playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 3000ms exceeded.
             except Exception as ex:
                 logger.exception("An unexpected error while parsing betcity league matches")
                 break
