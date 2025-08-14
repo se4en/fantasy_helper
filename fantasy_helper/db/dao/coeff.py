@@ -126,7 +126,7 @@ class CoeffDAO:
             logger.info(f"got {len(actual_coeffs)} actual coeffs for {league.name}")
 
             sports_matches = self._schedule_dao.get_next_matches(
-                league.name, 2
+                league.name, 3
             )
             logger.info(f"got {len(sports_matches)} sports matches for {league.name}")
 

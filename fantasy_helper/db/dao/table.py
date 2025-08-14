@@ -4,6 +4,7 @@ from typing import List
 
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import func, and_
+from loguru import logger
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.table import Table
@@ -90,3 +91,5 @@ class TableDao:
 
             db_session.commit()
             db_session.close()
+
+            logger.info(f"Updated {len(table_rows)} table rows for {league_name}")
