@@ -29,6 +29,7 @@ RUN echo "===> Remove build dependencies..." && \
 WORKDIR /fantasy_helper
 COPY ./requirements /fantasy_helper/requirements
 RUN pip install --no-cache-dir --upgrade -r requirements/db.txt -r requirements/parsers.txt -r requirements/ml.txt
+RUN apt-get update && apt-get install -y fonts-unifont fonts-freefont-ttf
 RUN playwright install --with-deps chromium
 
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf

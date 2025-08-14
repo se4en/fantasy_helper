@@ -93,7 +93,7 @@ class BetcityParser:
         result = []
         browser = None
         context = None
-        use_proxy = False
+        use_proxy = True
 
         for attempt in range(self._max_retries):
             try:
@@ -563,7 +563,7 @@ class BetcityParser:
     async def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
         browser = None
         context = None
-        use_proxy = False
+        use_proxy = True
 
         for attempt in range(self._max_retries):
             try:
