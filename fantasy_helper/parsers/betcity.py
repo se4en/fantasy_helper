@@ -33,6 +33,7 @@ class BetcityParser:
             "голы": self._parse_goals_bets
         }
         
+        self._use_random_port = False
         self._max_retries = 3
         self._retry_delay = 10  # seconds - increased delay
         self._page_timeout = 60  # seconds - increased timeout
@@ -71,7 +72,10 @@ class BetcityParser:
         # Add proxy if configured
         if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
             # get random proxy port from 10001 to 10999
-            proxy_port = str(random.randint(10001, 10999))
+            if self._use_random_port:
+                proxy_port = str(random.randint(10001, 10999))
+            else:
+                proxy_port = PROXY_PORT
             context_options["proxy"] = {
                 "server": f"http://{PROXY_HOST}:{proxy_port}",
                 "username": PROXY_USER,
@@ -579,6 +583,8 @@ class BetcityParser:
 
                 match_info = await self._parse_header_bets(page, match_info)
                 match_info = await self._parse_main_bets(page, match_info)
+
+                logger.info(f"Match {match_info.url} parsed successfully")
                 break
             except PlaywrightTimeoutError as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url}: {str(ex)}")
@@ -605,7 +611,6 @@ class BetcityParser:
         if league_matches is not None:
             for match in league_matches:
                 parsed_match = await self._parse_match(match)
-                logger.info(f"Successfully parsed match: {parsed_match}")
                 if (
                     parsed_match.total_1_over_1_5 is not None
                     or parsed_match.total_1_under_0_5 is not None
