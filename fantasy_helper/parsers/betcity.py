@@ -10,6 +10,7 @@ import pytz
 from typing import Any, Dict, List, Optional, Tuple
 
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+from bs4 import BeautifulSoup
 from loguru import logger
 
 from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
@@ -25,11 +26,11 @@ class BetcityParser:
         }
 
         self._bet_group_methods = {
-            "ОБЕ ЗАБЬЮТ": self._parse_both_scores_bets,
-            "ТОТАЛ": self._parse_total_bets,
-            "ФОРА": self._parse_handicap_bets,
-            "ИНДИВИДУАЛЬНЫЙ ТОТАЛ": self._parse_individual_total_bets,
-            "ГОЛЫ": self._parse_goals_bets
+            "обе забьют": self._parse_both_scores_bets,
+            "тотал": self._parse_total_bets,
+            "фора": self._parse_handicap_bets,
+            "индивидуальный тотал": self._parse_individual_total_bets,
+            "голы": self._parse_goals_bets
         }
         
         self._max_retries = 3
@@ -92,7 +93,7 @@ class BetcityParser:
         result = []
         browser = None
         context = None
-        use_proxy = True
+        use_proxy = False
 
         for attempt in range(self._max_retries):
             try:
@@ -164,20 +165,23 @@ class BetcityParser:
             match_info.both_score_no = value
         return match_info
     
-    async def _parse_both_scores_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_blocks = await bet_group.query_selector_all(".dops-item-row__block")
+    def _parse_both_scores_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
+        group_blocks = bet_group.find_all(class_="dops-item-row__block")
         if len(group_blocks) != 2:
             return match_info
 
-        type_1_elem = await group_blocks[0].query_selector(".dops-item-row__block-left")
-        value_1_elem = await group_blocks[0].query_selector(".dops-item-row__block-right")
-        type_2_elem = await group_blocks[1].query_selector(".dops-item-row__block-left")
-        value_2_elem = await group_blocks[1].query_selector(".dops-item-row__block-right")
+        type_1_elem = group_blocks[0].find(class_="dops-item-row__block-left")
+        value_1_elem = group_blocks[0].find(class_="dops-item-row__block-right")
+        type_2_elem = group_blocks[1].find(class_="dops-item-row__block-left")
+        value_2_elem = group_blocks[1].find(class_="dops-item-row__block-right")
 
-        type_1 = (await type_1_elem.text_content()).strip()
-        value_1 = float((await value_1_elem.text_content()).strip())
-        type_2 = (await type_2_elem.text_content()).strip()
-        value_2 = float((await value_2_elem.text_content()).strip())
+        if type_1_elem is None or value_1_elem is None or type_2_elem is None or value_2_elem is None:
+            return match_info
+
+        type_1 = type_1_elem.text.strip()
+        value_1 = float(value_1_elem.text.strip())
+        type_2 = type_2_elem.text.strip()
+        value_2 = float(value_2_elem.text.strip())
 
         match_info = self._add_both_scores_value(match_info, type_1, value_1)
         match_info = self._add_both_scores_value(match_info, type_2, value_2)
@@ -224,27 +228,31 @@ class BetcityParser:
             match_info.total_over_4_5 = value
         return match_info
     
-    async def _parse_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = await bet_group.query_selector_all(".dops-item-row__section")
+    def _parse_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = await group_row.query_selector_all(".dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
-            base = (await row_blocks[0].text_content()).strip()
+            base = row_blocks[0].text.strip()
             for row_block in row_blocks[1:]:
-                type_elem = await row_block.query_selector(".dops-item-row__block-left")
-                value_elem = await row_block.query_selector(".dops-item-row__block-right")
-                type = (await type_elem.text_content()).strip()
-                value = float((await value_elem.text_content()).strip())
+                type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if type_elem is None or value_elem is None:
+                    continue
+
+                type = type_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_total_bet_value(match_info, base, type, value)
 
         return match_info
 
     @staticmethod
     def _parse_handicap_base_type(base_type: str) -> Tuple[str, str]:
-        base, type = base_type.split(" ")
+        base, type = base_type.split()
         return base.strip(), type[1:-1].strip()
 
     @staticmethod
@@ -287,19 +295,24 @@ class BetcityParser:
             match_info.handicap_2_plus_2_5 = value
         return match_info
     
-    async def _parse_handicap_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = await bet_group.query_selector_all(".dops-item-row__section")
+    def _parse_handicap_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = await group_row.query_selector_all(".dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) == 0:
                 continue
 
             for row_block in row_blocks:
-                base_type_elem = await row_block.query_selector(".dops-item-row__block-left")
-                value_elem = await row_block.query_selector(".dops-item-row__block-right")
-                base_type = (await base_type_elem.text_content()).strip()
-                value = float((await value_elem.text_content()).strip())
+                base_type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if base_type_elem is None or value_elem is None:
+                    continue
+
+                base_type = base_type_elem.text.strip()
+                value = float(value_elem.text.strip())
+
                 base, type = self._parse_handicap_base_type(base_type)
                 match_info = self._add_handicap_bet_value(match_info, base, type, value)
 
@@ -307,7 +320,7 @@ class BetcityParser:
 
     @staticmethod
     def _parse_individual_total_base_type(base_type: str) -> Tuple[str, str]:
-        base, type = base_type.split(" ")
+        base, type = base_type.split()
         return base.strip(), type[1:-1].strip()
 
     @staticmethod
@@ -346,21 +359,26 @@ class BetcityParser:
             match_info.total_2_under_2_5 = value
         return match_info
 
-    async def _parse_individual_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = await bet_group.query_selector_all(".dops-item-row__section")
+    def _parse_individual_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = await group_row.query_selector_all(".dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
-            base_type = (await row_blocks[0].text_content()).strip()
+            base_type = row_blocks[0].text.strip()
+
             base, type = self._parse_handicap_base_type(base_type)
             for row_block in row_blocks[1:]:
-                subtype_elem = await row_block.query_selector(".dops-item-row__block-left")
-                value_elem = await row_block.query_selector(".dops-item-row__block-right")
-                subtype = (await subtype_elem.text_content()).strip()
-                value = float((await value_elem.text_content()).strip())
+                subtype_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if subtype_elem is None or value_elem is None:
+                    continue
+
+                subtype = subtype_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_individual_total_bet_value(match_info, base, type, subtype, value)
 
         return match_info
@@ -377,35 +395,47 @@ class BetcityParser:
             match_info.total_2_under_0_5 = value
         return match_info
 
-    async def _parse_goals_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = await bet_group.query_selector_all(".dops-item-row__section")
+    def _parse_goals_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = await group_row.query_selector_all(".dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
-            base = (await row_blocks[0].text_content()).strip()
+            base = row_blocks[0].text.strip()
             for row_block in row_blocks[1:]:
-                type_elem = await row_block.query_selector(".dops-item-row__block-left")
-                value_elem = await row_block.query_selector(".dops-item-row__block-right")
-                type = (await type_elem.text_content()).strip()
-                value = float((await value_elem.text_content()).strip())
+                type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if type_elem is None or value_elem is None:
+                    continue
+
+                type = type_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_goals_bet_value(match_info, base, type, value)
 
         return match_info
     
     async def _parse_main_bets(self, page: Page, match_info: MatchInfo) -> MatchInfo:
-        bet_groups = await page.wait_for_selector(".dops-item", timeout=10000)
-        all_bet_groups = await page.query_selector_all(".dops-item")
+        bet_groups = await page.wait_for_selector(".dops-item", timeout=3000)
+        if bet_groups is None:
+            logger.warning(f"Line header not found for match: {match_info.url}")
+            return match_info
+
+        page_content = await page.content()
+        soup = BeautifulSoup(page_content, 'html.parser')
+        all_bet_groups = soup.find_all(class_="dops-item")
 
         for bet_group in all_bet_groups:
-            group_title_elem = await bet_group.query_selector(".dops-item__title")
+            group_title_elem = bet_group.find(class_="dops-item__title")
+            
             if group_title_elem is None:
                 continue
-            group_title = (await group_title_elem.text_content()).strip()
-            if group_title in self._bet_group_methods:
-                match_info = await self._bet_group_methods[group_title](bet_group, match_info)
+            group_title = group_title_elem.text.strip()
+
+            if group_title.lower() in self._bet_group_methods:
+                match_info = self._bet_group_methods[group_title.lower()](bet_group, match_info)
 
         return match_info
 
@@ -432,8 +462,8 @@ class BetcityParser:
                 type=prev_value, 
                 value=float(cur_value)
             )
-        elif prev_title is not None and prev_title == "ТОТ":
-            if cur_title == "М":
+        elif prev_title is not None and (prev_title == "ТОТ" or prev_title == "TOT"):
+            if cur_title == "М" or cur_title == "M":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_value, 
@@ -447,15 +477,15 @@ class BetcityParser:
                     type="Бол", 
                     value=float(cur_value)
                 )
-        elif prev_prev_title is not None and prev_prev_title == "ТОТ":
-            if prev_title == "М":
+        elif prev_prev_title is not None and (prev_prev_title == "ТОТ" or prev_prev_title == "TOT"):
+            if cur_title == "М" or cur_title == "M":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_prev_value, 
                     type="Мен", 
                     value=float(cur_value)
                 )
-            elif prev_title == "Б":
+            elif cur_title == "Б":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_prev_value, 
@@ -464,20 +494,18 @@ class BetcityParser:
                 )
         return match_info
     
-    async def _parse_header_bets_titles(self, line_header: Any) -> List[str]:
-        header_items = await line_header.query_selector_all(".line__header-item_dop")
+    def _parse_header_bets_titles(self, line_header: Any) -> List[str]:
+        header_items = line_header.find_all("span", {"class": "line__header-item_dop"})
         result = []
         for header_item in header_items:
-            text = await header_item.text_content()
-            result.append(text.strip())
+            result.append(header_item.text.strip())
         return result
 
-    async def _parse_header_bets_values(self, main_bets: Any) -> List[str]:
-        bets_buttons = await main_bets.query_selector_all(".line-event__main-bets-button")
+    def _parse_header_bets_values(self, main_bets: Any) -> List[str]:
+        bets_buttons = main_bets.find_all(class_="line-event__main-bets-button")
         result = []
         for bet_button in bets_buttons:
-            text = await bet_button.text_content()
-            result.append(text.strip())
+            result.append(bet_button.text.strip())
         return result
 
     def _merge_header_bets(self, bets_titles: Any, bets_values: Any, match_info: MatchInfo) -> MatchInfo:
@@ -502,33 +530,55 @@ class BetcityParser:
         return match_info
 
     async def _parse_header_bets(self, page: Page, match_info: MatchInfo) -> MatchInfo:
-        line_header = await page.wait_for_selector(".line__header", timeout=10000)
-        main_bets = await page.wait_for_selector(".line-event__main-bets", timeout=10000)
+        try:
+            await page.wait_for_load_state('networkidle', timeout=30000)
+            
+            line_header = await page.wait_for_selector(".line__header", timeout=3000)
+            if line_header is None:
+                logger.warning(f"Line header not found for match: {match_info.url}")
+                return match_info
+            main_bets = await page.wait_for_selector(".line-event__main-bets", timeout=3000)
+            if main_bets is None:
+                logger.warning(f"Main bets not found for match: {match_info.url}")
+                return match_info
 
-        bets_titles = await self._parse_header_bets_titles(line_header)
-        bets_values = await self._parse_header_bets_values(main_bets)
-        match_info = self._merge_header_bets(bets_titles, bets_values, match_info)
+            page_content = await page.content()
+            soup = BeautifulSoup(page_content, 'html.parser')
+
+            line_header = soup.find("div", {"class": "line__header"})
+            main_bets = soup.find("div", {"class": "line-event__main-bets"})
+            
+            if line_header is None or main_bets is None:
+                logger.warning(f"Line header or main bets not found for match: {match_info.url}")
+                return match_info
+
+            bets_titles = self._parse_header_bets_titles(line_header)
+            bets_values = self._parse_header_bets_values(main_bets)
+            match_info = self._merge_header_bets(bets_titles, bets_values, match_info)
+        except Exception as e:
+            logger.exception(f"Error in _parse_header_bets for match: {match_info.url}: {e}")
 
         return match_info
 
     async def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
         browser = None
         context = None
-        use_proxy = True
+        use_proxy = False
 
         for attempt in range(self._max_retries):
             try:
                 browser, context = await self._create_browser_context(use_proxy=use_proxy)
                 page = await context.new_page()
-                page.set_default_timeout(self._page_timeout * 1000)  # Playwright uses milliseconds
-                
+                page.set_default_timeout(self._page_timeout * 1000)
+
                 logger.info(f"Attempt {attempt + 1}: Parsing match {match_info.url} (proxy: {use_proxy})")
-                await page.goto(match_info.url)
-                await page.wait_for_timeout(3000)  # 3 seconds
+                
+                response = await page.goto(match_info.url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(3000)
+                await page.wait_for_load_state('networkidle', timeout=30000)
 
                 match_info = await self._parse_header_bets(page, match_info)
                 match_info = await self._parse_main_bets(page, match_info)
-                logger.info(f"Successfully parsed match {match_info.url}")
                 break
             except PlaywrightTimeoutError as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url}: {str(ex)}")
@@ -555,6 +605,7 @@ class BetcityParser:
         if league_matches is not None:
             for match in league_matches:
                 parsed_match = await self._parse_match(match)
+                logger.info(f"Successfully parsed match: {parsed_match}")
                 if (
                     parsed_match.total_1_over_1_5 is not None
                     or parsed_match.total_1_under_0_5 is not None
@@ -562,5 +613,7 @@ class BetcityParser:
                     or parsed_match.total_2_under_0_5 is not None
                 ):
                     result.append(parsed_match)
+
+                return result
 
         return result

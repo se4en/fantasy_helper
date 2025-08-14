@@ -1,21 +1,24 @@
 from typing import List
 
 import pytest
+import pytest_asyncio
 
 from fantasy_helper.tests.fixtures import leagues
 from fantasy_helper.parsers.betcity import BetcityParser
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def parser(leagues: List[LeagueInfo]) -> BetcityParser:
     return BetcityParser(leagues)
 
 
-def test_empty_matches(leagues: List[LeagueInfo], parser: BetcityParser):
+@pytest.mark.asyncio
+async def test_empty_matches(leagues: List[LeagueInfo], parser: BetcityParser):
     for league in leagues:
-        matches = parser.get_league_matches(league.name)
+        matches = await parser.get_league_matches(league.name)
         assert len(matches) > 0
+        assert False
         for match in matches:
             assert isinstance(match, MatchInfo)
             assert match.away_team is not None and match.away_team != ""
