@@ -614,6 +614,4 @@ class BetcityParser:
                 ):
                     result.append(parsed_match)
 
-                return result
-
         return result
