@@ -45,6 +45,7 @@ jobs:
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
           echo "VITE_TELEGRAM_BOT_USERNAME=${{ secrets.VITE_TELEGRAM_BOT_USERNAME }}" >> .env
           echo "VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }}" >> .env
@@ -130,6 +131,7 @@ jobs:
           echo "PROXY_USER=${{ secrets.PROXY_USER }}" >> .env
           echo "PROXY_PASSWORD=${{ secrets.PROXY_PASSWORD }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
           echo "VITE_TELEGRAM_BOT_USERNAME=${{ secrets.VITE_TELEGRAM_BOT_USERNAME }}" >> .env
           echo "VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }}" >> .env
