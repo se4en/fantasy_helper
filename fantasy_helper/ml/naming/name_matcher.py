@@ -7,20 +7,22 @@ from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_
 from openai import OpenAI
 import httpx
+from loguru import logger
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.actual_player import ActualPlayer
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.database import Session
-from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENAI_API_KEY
+from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENROUTER_API_KEY
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "gpt-4o-mini-2024-07-18"):
+    def __init__(self, openai_model: str = "deepseek/deepseek-chat-v3-0324:free"):
         proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
         self._openai_client = OpenAI(
-            api_key=OPENAI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+            api_key=OPENROUTER_API_KEY,
             http_client=httpx.Client(proxy=proxy_url)
         )
         self._openai_model = openai_model
@@ -151,11 +153,19 @@ class NameMatcher:
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
             messages=self._teams_names_prompt + [user_message],
+            response_format={"type": "json_object"},
         )
 
+        if completion.choices is None:
+            logger.warning(f"Failed to match teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
+            return {}
+
         try:
-            return json.loads(completion.choices[0].message.content)
+            result = json.loads(completion.choices[0].message.content)
+            logger.info(f"Successfully matched {len(result)} teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
+            return result
         except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse response for {teams_names_1[0]}... {teams_names_2[0]}...")
             return {}
 
     def match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
@@ -173,11 +183,19 @@ class NameMatcher:
         completion = self._openai_client.chat.completions.create(
             model=self._openai_model,
             messages=self._players_names_prompt + [user_message],
+            response_format={"type": "json_object"},
         )
 
+        if completion.choices is None:
+            logger.warning(f"Failed to match players names for {players_names_1[0]}... {players_names_2[0]}...")
+            return {}
+
         try:
-            return json.loads(completion.choices[0].message.content)
+            result = json.loads(completion.choices[0].message.content)
+            logger.info(f"Successfully matched {len(result)} players names for {players_names_1[0]}... {players_names_2[0]}...")
+            return result
         except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse response for {players_names_1[0]}... {players_names_2[0]}...")
             return {}
 
     def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
@@ -207,6 +225,7 @@ class NameMatcher:
         cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
         cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
         cur_betcity_teams_names = self.get_betcity_teams_names(league_name)
+        logger.info(f"Cur teams names for {league_name}: sports({len(cur_sports_teams_names)}), fbref({len(cur_fbref_teams_names)}), xbet({len(cur_xbet_teams_names)}), betcity({len(cur_betcity_teams_names)})")
 
         free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names, free_betcity_teams_names = [], [], [], []
         teams_to_add, teams_to_delete = [], []
@@ -288,6 +307,8 @@ class NameMatcher:
         ) -> Tuple[List[PlayerName], List[PlayerName]]:
         cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
         cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
+        logger.info(f"Cur players names for {team_name} in {league_name}: sports({len(cur_sports_players_names)}), fbref({len(cur_fbref_players_names)})")
+
         free_sports_players_names, free_fbref_players_names = [], []
         players_to_add, players_to_delete = [], []
 

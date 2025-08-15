@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 import pandas as pd
+from loguru import logger
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, MatchInfo, PlayerName, PlayerStatsInfo, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
@@ -26,14 +27,17 @@ class NamingDAO:
         self._name_matcher = NameMatcher()
 
     def update_league_naming(self, league_name: str) -> None:
+        logger.info(f"Updating naming for league {league_name}")
         year = self._league_2_year.get(league_name, "2024")
         teams_names = self._get_teams_names(league_name)
+        logger.info(f"Found {len(teams_names)} teams names for league {league_name}")
 
         # update teams names
         teams_names_to_add, teams_names_to_delete = self._name_matcher.match_teams(
             league_name=league_name, 
             teams_names=teams_names
         )
+        logger.info(f"Adding {len(teams_names_to_add)}, deleting {len(teams_names_to_delete)} teams names for league {league_name}")
         self._delete_teams_names(teams_names_to_delete)
         self._add_teams_names(teams_names_to_add)
 
@@ -41,11 +45,13 @@ class NamingDAO:
         new_teams_names = self._get_teams_names(league_name)
         for team_name in new_teams_names:
             players_names = self._get_players_names(league_name, team_name.name)
+            logger.info(f"Found {len(players_names)} players names for team {team_name.name} in {league_name}")
             players_names_to_add, players_names_to_delete = self._name_matcher.match_players(
                 league_name=league_name, 
                 team_name=team_name,
                 players_names=players_names
             )
+            logger.info(f"Adding {len(players_names_to_add)}, deleting {len(players_names_to_delete)} players names for team {team_name.name} in {league_name}")
             self._delete_players_names(players_names_to_delete)
             self._add_players_names(players_names_to_add)
 

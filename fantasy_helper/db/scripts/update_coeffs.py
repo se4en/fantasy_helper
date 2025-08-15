@@ -17,7 +17,7 @@ async def main():
     
     logger.info(f"Start update coeffs")
     dao = CoeffDAO()
-    await dao.update_coeffs_all_leagues()
+    # await dao.update_coeffs_all_leagues()
     dao.update_feature_store()
     logger.info(f"Finish update coeffs")
 

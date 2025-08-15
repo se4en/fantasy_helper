@@ -9,106 +9,106 @@ cookie:
   key: random_signature_key
   expiry_days: 30
 leagues:
-  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-  #   name: Russia
-  #   ru_name: РПЛ
-  #   emoji: 🇷🇺
-  #   squad_id: 423173
-  #   is_active: true
-  #   xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
-  #   betcity_url: https://betcity.ru/ru/line/soccer/74979
-  #   fbref_league_id: 30
-  #   fbref_table_url: https://fbref.com/en/comps/30/Russian-Premier-League-Stats
-  #   fbref_schedule_url: https://fbref.com/en/comps/30/schedule/Russian-Premier-League-Scores-and-Fixtures
-  #   fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
-  #   fbref_standart_url: https://fbref.com/en/comps/30/stats/Russian-Premier-League-Stats
-  #   fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
-  #   fbref_passing_url: null
-  #   fbref_pass_types_url: null
-  #   fbref_possesion_url: null
-  #   fbref_shot_creation_url: null
-  #   sportsmole_name: null
-  #   year: "2025"
-  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-  #   name: England
-  #   ru_name: Англия
-  #   emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
-  #   squad_id: 457888
-  #   is_active: true
-  #   xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
-  #   betcity_url: https://betcity.ru/ru/line/soccer/445
-  #   fbref_league_id: 9
-  #   fbref_table_url: https://fbref.com/en/comps/9/Premier-League-Stats
-  #   fbref_schedule_url: https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures
-  #   fbref_playing_time_url: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
-  #   fbref_standart_url: https://fbref.com/en/comps/9/stats/Premier-League-Stats
-  #   fbref_shooting_url: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
-  #   fbref_passing_url: https://fbref.com/en/comps/9/passing/Premier-League-Stats
-  #   fbref_pass_types_url: https://fbref.com/en/comps/9/passing_types/Premier-League-Stats
-  #   fbref_possesion_url: https://fbref.com/en/comps/9/possession/Premier-League-Stats
-  #   fbref_shot_creation_url: https://fbref.com/en/comps/9/gca/Premier-League-Stats
-  #   sportsmole_name: "Premier League"
-  #   year: "2025"
-  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-  #   name: Spain
-  #   ru_name: Испания
-  #   emoji: 🇪🇸
-  #   squad_id: 446353
-  #   is_active: true
-  #   xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
-  #   betcity_url: https://betcity.ru/ru/line/soccer/75175
-  #   fbref_league_id: 12
-  #   fbref_table_url: https://fbref.com/en/comps/12/La-Liga-Stats
-  #   fbref_schedule_url: https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures
-  #   fbref_playing_time_url: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
-  #   fbref_standart_url: https://fbref.com/en/comps/12/stats/La-Liga-Stats
-  #   fbref_shooting_url: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
-  #   fbref_passing_url: https://fbref.com/en/comps/12/passing/La-Liga-Stats
-  #   fbref_pass_types_url: https://fbref.com/en/comps/12/passing_types/La-Liga-Stats
-  #   fbref_possesion_url: https://fbref.com/en/comps/12/possession/La-Liga-Stats
-  #   fbref_shot_creation_url: https://fbref.com/en/comps/12/gca/La-Liga-Stats
-  #   sportsmole_name: "La Liga"
-  #   year: "2025"
-  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-  #   name: France
-  #   ru_name: Франция
-  #   emoji: 🇫🇷
-  #   squad_id: 457880
-  #   is_active: true
-  #   xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
-  #   betcity_url: https://betcity.ru/ru/line/soccer/433
-  #   fbref_league_id: 13
-  #   fbref_table_url: https://fbref.com/en/comps/13/Ligue-1-Stats
-  #   fbref_schedule_url: https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures
-  #   fbref_playing_time_url: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
-  #   fbref_standart_url: https://fbref.com/en/comps/13/stats/Ligue-1-Stats
-  #   fbref_shooting_url: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
-  #   fbref_passing_url: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
-  #   fbref_pass_types_url: https://fbref.com/en/comps/13/passing_types/Ligue-1-Stats
-  #   fbref_possesion_url: https://fbref.com/en/comps/13/possession/Ligue-1-Stats
-  #   fbref_shot_creation_url: https://fbref.com/en/comps/13/gca/Ligue-1-Stats
-  #   sportsmole_name: "Ligue 1"
-  #   year: "2025"
-  # - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
-  #   name: Portugal
-  #   ru_name: Португалия
-  #   emoji: 🇵🇹
-  #   squad_id: 446384
-  #   is_active: true
-  #   xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
-  #   betcity_url: https://betcity.ru/ru/line/soccer/1324
-  #   fbref_league_id: 32
-  #   fbref_table_url: https://fbref.com/en/comps/32/Primeira-Liga-Stats
-  #   fbref_schedule_url: https://fbref.com/en/comps/32/schedule/Primeira-Liga-Scores-and-Fixtures
-  #   fbref_playing_time_url: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
-  #   fbref_standart_url: https://fbref.com/en/comps/32/stats/Primeira-Liga-Stats
-  #   fbref_shooting_url: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
-  #   fbref_passing_url: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
-  #   fbref_pass_types_url: https://fbref.com/en/comps/32/passing_types/Primeira-Liga-Stats
-  #   fbref_possesion_url: https://fbref.com/en/comps/32/possession/Primeira-Liga-Stats
-  #   fbref_shot_creation_url: https://fbref.com/en/comps/32/gca/Primeira-Liga-Stats
-  #   sportsmole_name: "Primeira Liga"
-  #   year: "2025"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Russia
+    ru_name: РПЛ
+    emoji: 🇷🇺
+    squad_id: 423173
+    is_active: true
+    xber_url: https://1xstavka.ru/line/football/225733-russia-premier-league
+    betcity_url: https://betcity.ru/ru/line/soccer/74979
+    fbref_league_id: 30
+    fbref_table_url: https://fbref.com/en/comps/30/Russian-Premier-League-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/30/schedule/Russian-Premier-League-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/30/playingtime/Russian-Premier-League-Stats
+    fbref_standart_url: https://fbref.com/en/comps/30/stats/Russian-Premier-League-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/30/shooting/Russian-Premier-League-Stats
+    fbref_passing_url: null
+    fbref_pass_types_url: null
+    fbref_possesion_url: null
+    fbref_shot_creation_url: null
+    sportsmole_name: null
+    year: "2025"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: England
+    ru_name: Англия
+    emoji: 🏴󠁧󠁢󠁥󠁮󠁧󠁿
+    squad_id: 457888
+    is_active: true
+    xber_url: https://1xstavka.ru/line/football/88637-england-premier-league
+    betcity_url: https://betcity.ru/ru/line/soccer/445
+    fbref_league_id: 9
+    fbref_table_url: https://fbref.com/en/comps/9/Premier-League-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
+    fbref_standart_url: https://fbref.com/en/comps/9/stats/Premier-League-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
+    fbref_passing_url: https://fbref.com/en/comps/9/passing/Premier-League-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/9/passing_types/Premier-League-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/9/possession/Premier-League-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/9/gca/Premier-League-Stats
+    sportsmole_name: "Premier League"
+    year: "2025"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Spain
+    ru_name: Испания
+    emoji: 🇪🇸
+    squad_id: 446353
+    is_active: true
+    xber_url: https://1xstavka.ru/line/football/127733-spain-la-liga
+    betcity_url: https://betcity.ru/ru/line/soccer/75175
+    fbref_league_id: 12
+    fbref_table_url: https://fbref.com/en/comps/12/La-Liga-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
+    fbref_standart_url: https://fbref.com/en/comps/12/stats/La-Liga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/12/passing/La-Liga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/12/passing_types/La-Liga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/12/possession/La-Liga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/12/gca/La-Liga-Stats
+    sportsmole_name: "La Liga"
+    year: "2025"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: France
+    ru_name: Франция
+    emoji: 🇫🇷
+    squad_id: 457880
+    is_active: true
+    xber_url: https://1xstavka.ru/line/football/12821-france-ligue-1
+    betcity_url: https://betcity.ru/ru/line/soccer/433
+    fbref_league_id: 13
+    fbref_table_url: https://fbref.com/en/comps/13/Ligue-1-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
+    fbref_standart_url: https://fbref.com/en/comps/13/stats/Ligue-1-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
+    fbref_passing_url: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/13/passing_types/Ligue-1-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/13/possession/Ligue-1-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/13/gca/Ligue-1-Stats
+    sportsmole_name: "Ligue 1"
+    year: "2025"
+  - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
+    name: Portugal
+    ru_name: Португалия
+    emoji: 🇵🇹
+    squad_id: 446384
+    is_active: true
+    xber_url: https://1xstavka.ru/line/football/118663-portugal-primeira-liga
+    betcity_url: https://betcity.ru/ru/line/soccer/1324
+    fbref_league_id: 32
+    fbref_table_url: https://fbref.com/en/comps/32/Primeira-Liga-Stats
+    fbref_schedule_url: https://fbref.com/en/comps/32/schedule/Primeira-Liga-Scores-and-Fixtures
+    fbref_playing_time_url: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
+    fbref_standart_url: https://fbref.com/en/comps/32/stats/Primeira-Liga-Stats
+    fbref_shooting_url: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
+    fbref_passing_url: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
+    fbref_pass_types_url: https://fbref.com/en/comps/32/passing_types/Primeira-Liga-Stats
+    fbref_possesion_url: https://fbref.com/en/comps/32/possession/Primeira-Liga-Stats
+    fbref_shot_creation_url: https://fbref.com/en/comps/32/gca/Primeira-Liga-Stats
+    sportsmole_name: "Primeira Liga"
+    year: "2025"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: Netherlands
     ru_name: Нидерланды

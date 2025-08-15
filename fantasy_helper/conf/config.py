@@ -29,6 +29,7 @@ PROXY_PASSWORD = str(os.getenv("PROXY_PASSWORD"))
 
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
+OPENROUTER_API_KEY = str(os.getenv("OPENROUTER_API_KEY"))
 
 # keycloak
 FRONTEND_URL=str(os.getenv("FRONTEND_URL"))
