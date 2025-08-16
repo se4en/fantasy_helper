@@ -41,6 +41,7 @@ watch(
 )
 
 const subnavItems = computed(() => {
+  // return this.$router.getRoutes()
   return router.options.routes
     .find(r => r.path === '/league/:leagueSlug')
     .children.filter(route => route.meta?.showInSubNavigation)
