@@ -8,4 +8,11 @@
 # 15 23 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_players_stats.py > /proc/1/fd/1 2>/proc/1/fd/2
 40 9 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Russia > /proc/1/fd/1 2>/proc/1/fd/2
 40 10 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Championship > /proc/1/fd/1 2>/proc/1/fd/2
+0 23 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py England > /proc/1/fd/1 2>/proc/1/fd/2
+30 0 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Spain > /proc/1/fd/1 2>/proc/1/fd/2
+0 2 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py France > /proc/1/fd/1 2>/proc/1/fd/2
+30 3 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Portugal > /proc/1/fd/1 2>/proc/1/fd/2
+0 5 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Netherlands > /proc/1/fd/1 2>/proc/1/fd/2
+30 6 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Turkey > /proc/1/fd/1 2>/proc/1/fd/2
+0 8 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Germany > /proc/1/fd/1 2>/proc/1/fd/2
 # END CRON JOB
