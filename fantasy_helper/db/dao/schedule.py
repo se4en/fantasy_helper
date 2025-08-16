@@ -133,6 +133,11 @@ class ScheduleDao:
 
     def update_schedules_all_leagues(self) -> None:
         for league_name in self._sports_parser.get_leagues():
+            self.update_schedules(league_name)
+
+    def update_schedules(self, league_name: str) -> None:
+        if league_name in self._sports_parser.get_leagues():
+            logger.info(f"Start update sports schedules for {league_name}")
             league_year = self._league_2_year.get(league_name)
 
             schedule_rows: List[SportsMatchInfo] = self._sports_parser.get_next_matches(
@@ -159,3 +164,5 @@ class ScheduleDao:
             db_session.close()
 
             logger.info(f"Updated {len(schedule_rows)} sports schedule rows for {league_name}")
+        else:
+            logger.info(f"{league_name} not in sports parser")

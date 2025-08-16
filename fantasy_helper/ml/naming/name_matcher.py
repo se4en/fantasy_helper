@@ -149,18 +149,18 @@ class NameMatcher:
         if len(teams_names_1) == 0 or len(teams_names_2) == 0:
             return {}
 
-        user_message = {"role": "user", "content": f"list 1: {teams_names_1}, list 2: {teams_names_2}"}
-        completion = self._openai_client.chat.completions.create(
-            model=self._openai_model,
-            messages=self._teams_names_prompt + [user_message],
-            response_format={"type": "json_object"},
-        )
-
-        if completion.choices is None:
-            logger.warning(f"Failed to match teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
-            return {}
-
         try:
+            user_message = {"role": "user", "content": f"list 1: {teams_names_1}, list 2: {teams_names_2}"}
+            completion = self._openai_client.chat.completions.create(
+                model=self._openai_model,
+                messages=self._teams_names_prompt + [user_message],
+                response_format={"type": "json_object"},
+            )
+
+            if completion.choices is None:
+                logger.warning(f"Failed to match teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
+                return {}
+
             result = json.loads(completion.choices[0].message.content)
             logger.info(f"Successfully matched {len(result)} teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
             return result
@@ -179,18 +179,18 @@ class NameMatcher:
         if len(players_names_1) == 0 or len(players_names_2) == 0:
             return {}
 
-        user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
-        completion = self._openai_client.chat.completions.create(
-            model=self._openai_model,
-            messages=self._players_names_prompt + [user_message],
-            response_format={"type": "json_object"},
-        )
-
-        if completion.choices is None:
-            logger.warning(f"Failed to match players names for {players_names_1[0]}... {players_names_2[0]}...")
-            return {}
-
         try:
+            user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
+            completion = self._openai_client.chat.completions.create(
+                model=self._openai_model,
+                messages=self._players_names_prompt + [user_message],
+                response_format={"type": "json_object"},
+            )
+
+            if completion.choices is None:
+                logger.warning(f"Failed to match players names for {players_names_1[0]}... {players_names_2[0]}...")
+                return {}
+
             result = json.loads(completion.choices[0].message.content)
             logger.info(f"Successfully matched {len(result)} players names for {players_names_1[0]}... {players_names_2[0]}...")
             return result
@@ -307,7 +307,7 @@ class NameMatcher:
         ) -> Tuple[List[PlayerName], List[PlayerName]]:
         cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
         cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
-        logger.info(f"Cur players names for {team_name} in {league_name}: sports({len(cur_sports_players_names)}), fbref({len(cur_fbref_players_names)})")
+        logger.info(f"Cur players names for {team_name.name} in {league_name}: sports({len(cur_sports_players_names)}), fbref({len(cur_fbref_players_names)})")
 
         free_sports_players_names, free_fbref_players_names = [], []
         players_to_add, players_to_delete = [], []

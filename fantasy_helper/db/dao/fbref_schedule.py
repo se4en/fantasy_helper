@@ -5,6 +5,7 @@ import os.path as path
 
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_, func, or_
+from loguru import logger
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.fbref_schedule import FbrefSchedule
@@ -95,6 +96,11 @@ class FbrefScheduleDao:
 
     def update_schedules_all_leagues(self) -> None:
         for league_name, _ in self._fbref_parser.get_schedule_leagues().items():
+            self.update_schedule(league_name)
+
+    def update_schedule(self, league_name: str) -> None:
+        if league_name in self._fbref_parser.get_schedule_leagues():
+            logger.info(f"Start update fbref schedule for {league_name}")
             year = self._league_2_year.get(league_name, "2024")
             cup = False
             if league_name == "ChampionsLeague" or league_name == "EuropaLeague" or league_name == "ClubWorldCup":
@@ -119,3 +125,6 @@ class FbrefScheduleDao:
 
             self.remove_unparsed_matches(league_name=league_name)
             self.add_new_matches(matches_after_parse + matches_2_add)
+            logger.info(f"Updated {len(matches_after_parse) + len(matches_2_add)} fbref schedule rows for {league_name}")
+        else:
+            logger.info(f"League {league_name} not found in fbref schedule")

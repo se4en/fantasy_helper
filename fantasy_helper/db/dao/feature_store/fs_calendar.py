@@ -274,11 +274,12 @@ class FSCalendarsDAO:
         return result
 
     def update_calendar(self, league_name: str) -> None:
+        logger.info(f"Start update calendar feature store for {league_name}")
         if league_name not in self._valid_leagues:
             return None
         new_calendar_rows = self._compute_new_calendar(league_name)
         if len(new_calendar_rows) == 0:
-            logger.info(f"Calendar is empty for {league_name}")
+            logger.warning(f"Calendar is empty for {league_name}")
             return None
 
         db_session: SQLSession = Session()

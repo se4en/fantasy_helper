@@ -73,6 +73,12 @@ class TableDao:
 
     def update_tables_all_leagues(self) -> None:
         for league_name in self._fbref_parser.get_all_leagues():
+            self.update_tables(league_name)
+
+    def update_tables(self, league_name: str) -> None:
+        if league_name in self._fbref_parser.get_all_leagues():
+            logger.info(f"Start update fbref tables for {league_name}")
+
             league_year = self._league_2_year.get(league_name, "2024")
             table_rows: List[LeagueTableInfo] = self._fbref_parser.get_league_table(
                 league_name, league_year
@@ -93,3 +99,5 @@ class TableDao:
             db_session.close()
 
             logger.info(f"Updated {len(table_rows)} table rows for {league_name}")
+        else:
+            logger.error(f"League {league_name} not found in fbref parser")

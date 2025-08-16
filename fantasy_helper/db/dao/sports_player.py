@@ -5,6 +5,7 @@ import os.path as path
 import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
+from loguru import logger
 
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
 from fantasy_helper.db.models.sports_player import SportsPlayer
@@ -52,6 +53,7 @@ class SportsPlayerDAO:
         return pd.DataFrame(result)
 
     def get_players(self, league_name: str, year: str = "2024") -> List[SportsPlayerDiff]:
+        league_year = self._league_2_year.get(league_name, "2024")
         current_tour = self._sports_parser.get_current_tour(league_name)
         if current_tour is None:
             return None
@@ -59,7 +61,7 @@ class SportsPlayerDAO:
         
         cur_tour_rows = db_session.query(SportsPlayer).filter(and_(
             SportsPlayer.league_name == league_name,
-            SportsPlayer.year == year,
+            SportsPlayer.year == league_year,
             SportsPlayer.tour == current_tour.number, 
             SportsPlayer.percent_ownership > 0
         ))
@@ -75,8 +77,10 @@ class SportsPlayerDAO:
 
         return [SportsPlayerDiff(**row[1]) for row in result.iterrows()]
 
-    def update_players(self, league_name: str, year: str = "2024") -> None:
-        
+    def update_players(self, league_name: str) -> None:
+        logger.info(f"Start update sports players for {league_name}")
+
+        league_year = self._league_2_year.get(league_name, "2024")        
         players_stats = self._sports_parser.get_players_stats_info(league_name)
 
         db_session: SQLSession = Session()
@@ -86,23 +90,31 @@ class SportsPlayerDAO:
                 SportsPlayer(
                     **player_stats.__dict__,
                     timestamp=datetime.now().replace(tzinfo=utc),
-                    year=year
+                    year=league_year
                 )
             )
 
         db_session.commit()
         db_session.close()
 
+        logger.info(f"Updated {len(players_stats)} players for {league_name}")
+
     def update_players_all_leagues(self) -> None:
         for league in self._leagues:
-            league_year = self._league_2_year.get(league.name, "2024")
-            self.update_players(league.name, league_year)
+            self.update_players(league.name)
 
-    def update_feature_store(self) -> None:
+    def update_feature_store(self, league_name: str) -> None:
+        logger.info(f"Start update sports players feature store for {league_name}")
         feature_store = FSSportsPlayersDAO()
 
-        for league in self._leagues:
-            league_year = self._league_2_year.get(league.name, "2024")
-            players = self.get_players(league.name, league_year)
+        if league_name in [x.name for x in self._leagues]:
+            players = self.get_players(league_name)
             if players:
-                feature_store.update_sports_players(league.name, players)
+                feature_store.update_sports_players(league_name, players)
+            logger.info(f"Updated {len(players)} players for {league_name}")
+        else:
+            logger.info(f"League {league_name} not found in sports")
+
+    def update_feature_store_all_leagues(self) -> None:
+        for league in self._leagues:
+            self.update_feature_store(league.name)
