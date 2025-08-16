@@ -55,6 +55,18 @@ const getCalendarCellStyle = (row, tourIndex) => {
   }
 }
 
+watch(                                                                                                                                                                                                                                                                                                                                
+  () => route.params.leagueSlug,                                                                                                                                                                                                                                                                                                      
+  async (newLeagueSlug) => {                                                                                                                                                                                                                                                                                                          
+    if (newLeagueSlug) {                                                                                                                                                                                                                                                                                                            
+      calendarType.value = 'points'                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                       
+      await coeffStore.fetchCalendar(newLeagueSlug)                                                                                                                                                                                                                                                                                     
+    }                                                                                                                                                                                                                                                                                                                                 
+  },                                                                                                                                                                                                                                                                                                                                  
+  { immediate: false }                                                                                                                                                                                                                                                                                                                
+)
+
 onMounted(async () => {
   try {
     if (!calendar.value?.length && route.params.leagueSlug) {

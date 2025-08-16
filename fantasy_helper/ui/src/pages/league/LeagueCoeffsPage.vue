@@ -97,6 +97,20 @@ function getDefenceCellStyle(row, tourIndex) {
   return { backgroundColor: color }
 }
 
+watch(                                                                                                                                                                                                                                                                                                                                
+  () => route.params.leagueSlug,                                                                                                                                                                                                                                                                                                      
+  async (newLeagueSlug) => {                                                                                                                                                                                                                                                                                                          
+    if (newLeagueSlug) {                                                                                                                                                                                                                                                                                                              
+      sortCoeffsBy.value = null                                                                                                                                                                                                                                                                                                       
+      sortCoeffsTourIndex.value = null                                                                                                                                                                                                                                                                                                
+      sortCoeffsDirection.value = 'asc'                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                       
+      await coeffStore.fetchCoeffs(newLeagueSlug)                                                                                                                                                                                                                                                                                     
+    }                                                                                                                                                                                                                                                                                                                                 
+  },                                                                                                                                                                                                                                                                                                                                  
+  { immediate: false }                                                                                                                                                                                                                                                                                                                
+)
+
 onMounted(async () => {
   try {
     if (!coeffs.value?.length && route.params.leagueSlug) {
