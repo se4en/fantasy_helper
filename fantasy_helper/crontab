@@ -6,6 +6,6 @@
 # 0,30 * * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_lineups.py > /proc/1/fd/1 2>/proc/1/fd/2
 # 20 10 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_naming.py > /proc/1/fd/1 2>/proc/1/fd/2
 # 15 23 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_players_stats.py > /proc/1/fd/1 2>/proc/1/fd/2
-30 9 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Russia > /proc/1/fd/1 2>/proc/1/fd/2
-30 10 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Championship > /proc/1/fd/1 2>/proc/1/fd/2
+40 9 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Russia > /proc/1/fd/1 2>/proc/1/fd/2
+40 10 * * * source /fantasy_helper/.env; /usr/local/bin/python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Championship > /proc/1/fd/1 2>/proc/1/fd/2
 # END CRON JOB
