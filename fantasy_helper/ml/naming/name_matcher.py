@@ -164,6 +164,12 @@ class NameMatcher:
             result = json.loads(completion.choices[0].message.content)
             logger.info(f"Successfully matched {len(result)} teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
             return result
+        except self._openai_client.APIConnectionError as e:
+            logger.warning(f"API connection error when matching teams names: {e}")
+            return {}
+        except self._openai_client.APITimeoutError as e:
+            logger.warning(f"API timeout error when matching teams names: {e}")
+            return {}
         except json.JSONDecodeError as e:
             logger.warning(f"Failed to parse response for {teams_names_1[0]}... {teams_names_2[0]}...")
             return {}
@@ -194,6 +200,12 @@ class NameMatcher:
             result = json.loads(completion.choices[0].message.content)
             logger.info(f"Successfully matched {len(result)} players names for {players_names_1[0]}... {players_names_2[0]}...")
             return result
+        except self._openai_client.APIConnectionError as e:
+            logger.warning(f"API connection error when matching players names: {e}")
+            return {}
+        except self._openai_client.APITimeoutError as e:
+            logger.warning(f"API timeout error when matching players names: {e}")
+            return {}
         except json.JSONDecodeError as e:
             logger.warning(f"Failed to parse response for {players_names_1[0]}... {players_names_2[0]}...")
             return {}

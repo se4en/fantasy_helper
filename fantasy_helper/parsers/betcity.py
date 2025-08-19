@@ -10,6 +10,7 @@ import pytz
 from typing import Any, Dict, List, Optional, Tuple
 
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+from playwright._impl._errors import Error as PlaywrightError
 from bs4 import BeautifulSoup
 from loguru import logger
 
@@ -150,8 +151,13 @@ class BetcityParser:
                     await asyncio.sleep(self._retry_delay)
                 else:
                     logger.error(f"All {self._max_retries} attempts failed for league {league_name}")
-            # TBD: catch playwright._impl._errors.Error: Page.goto: net::ERR_TUNNEL_CONNECTION_FAILED at https://betcity.ru/ru/line/soccer/74979
-            # playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 3000ms exceeded.
+            except PlaywrightError as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for league {league_name} with Playwright error: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    await asyncio.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for league {league_name} with Playwright errors")
             except Exception as ex:
                 logger.exception("An unexpected error while parsing betcity league matches")
                 break
@@ -595,6 +601,13 @@ class BetcityParser:
                     await asyncio.sleep(self._retry_delay)
                 else:
                     logger.error(f"All {self._max_retries} attempts failed for match {match_info.url}")
+            except PlaywrightError as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url} with Playwright error: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    await asyncio.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for match {match_info.url} with Playwright errors")
             except Exception as ex:
                 logger.exception("An unexpected error while parsing betcity match")
                 break
