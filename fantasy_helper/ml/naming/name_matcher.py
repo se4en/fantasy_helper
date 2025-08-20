@@ -9,6 +9,7 @@ import time
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_
 from openai import OpenAI
+import openai
 import httpx
 from loguru import logger
 
@@ -175,11 +176,11 @@ class NameMatcher:
                 result = json.loads(completion.choices[0].message.content)
                 logger.info(f"Successfully matched {len(result)} teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
                 return result
-            except self._openai_client.APIConnectionError as e:
+            except openai.error.APIConnectionError as e:
                 logger.warning(f"API connection error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
-            except self._openai_client.APITimeoutError as e:
+            except openai.error.APITimeoutError as e:
                 logger.warning(f"API timeout error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
@@ -224,11 +225,11 @@ class NameMatcher:
                 result = json.loads(completion.choices[0].message.content)
                 logger.info(f"Successfully matched {len(result)} players names for {players_names_1[0]}... {players_names_2[0]}...")
                 return result
-            except self._openai_client.APIConnectionError as e:
+            except openai.error.APIConnectionError as e:
                 logger.warning(f"API connection error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
-            except self._openai_client.APITimeoutError as e:
+            except openai.error.APITimeoutError as e:
                 logger.warning(f"API timeout error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
