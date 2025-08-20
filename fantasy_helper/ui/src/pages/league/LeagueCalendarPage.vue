@@ -64,7 +64,7 @@ watch(
       await coeffStore.fetchCalendar(newLeagueSlug)                                                                                                                                                                                                                                                                                     
     }                                                                                                                                                                                                                                                                                                                                 
   },                                                                                                                                                                                                                                                                                                                                  
-  { immediate: false }                                                                                                                                                                                                                                                                                                                
+  { immediate: true }                                                                                                                                                                                                                                                                                                                
 )
 
 onMounted(async () => {

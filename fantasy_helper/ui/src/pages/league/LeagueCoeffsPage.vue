@@ -108,7 +108,7 @@ watch(
       await coeffStore.fetchCoeffs(newLeagueSlug)                                                                                                                                                                                                                                                                                     
     }                                                                                                                                                                                                                                                                                                                                 
   },                                                                                                                                                                                                                                                                                                                                  
-  { immediate: false }                                                                                                                                                                                                                                                                                                                
+  { immediate: true }                                                                                                                                                                                                                                                                                                                
 )
 
 onMounted(async () => {
