@@ -14,6 +14,7 @@ export const useLeaguesInfoStore = defineStore('leaguesInfo', {
       try {
         if (this.isLoading) return
         this.isLoading = true
+        this.error = null
 
         const response = await httpClient.get(
           ENDPOINTS.LEAGUES_INFO
@@ -21,7 +22,7 @@ export const useLeaguesInfoStore = defineStore('leaguesInfo', {
         this.leaguesInfo = response.data
       } catch (error) {
         this.error = error.message
-        throw error 
+        console.error('Error fetching leagues info:', error)
       } finally {
         this.isLoading = false
       }
