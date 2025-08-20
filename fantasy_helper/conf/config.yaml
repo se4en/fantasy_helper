@@ -173,8 +173,8 @@ leagues:
     name: Italy
     ru_name: Италия
     emoji: 🇮🇹
-    squad_id: 347720
-    is_active: false
+    squad_id: 486377
+    is_active: true
     xber_url: https://1xstavka.ru/line/football/110163-italy-serie-a
     betcity_url: https://betcity.ru/ru/line/soccer/75173
     fbref_league_id: 11
