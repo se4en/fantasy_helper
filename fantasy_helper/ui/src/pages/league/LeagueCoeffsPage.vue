@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useLoaderDelay } from '@/composables/useLoaderDelay'
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useCoeffStore } from '@/stores/coeffs.store'
 import Loader from '@/components/Loader.vue'
 
