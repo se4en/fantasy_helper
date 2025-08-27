@@ -184,6 +184,10 @@ class NameMatcher:
                 logger.warning(f"API timeout error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
+            except openai.RateLimitError as e:
+                logger.warning(f"API rate limit error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
             except json.JSONDecodeError as e:
                 logger.warning(f"Failed to parse response for {teams_names_1[0]}... {teams_names_2[0]}... (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
@@ -231,6 +235,10 @@ class NameMatcher:
                     time.sleep(self._retry_delay)
             except openai.APITimeoutError as e:
                 logger.warning(f"API timeout error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except openai.RateLimitError as e:
+                logger.warning(f"API rate limit error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(self._retry_delay)
             except json.JSONDecodeError as e:
