@@ -1,11 +1,66 @@
 import os
 import ast
+from typing import Any, List
 
 from dotenv import load_dotenv
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.utils.common import load_config, instantiate_leagues
+
+
+def parse_env_list(var_name: str) -> List[Any]:
+    value = os.getenv(var_name)
+    if not value or not value.strip():
+        return []
+    
+    value = value.strip()
+    
+    if value.startswith('[') and value.endswith(']'):
+        try:
+            return ast.literal_eval(value)
+        except (SyntaxError, ValueError):
+            pass
+    
+    if value.startswith('[') and value.endswith(']'):
+        inner_content = value[1:-1].strip()
+        if not inner_content:
+            return []
+        
+        items = []
+        for item in inner_content.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            
+            try:
+                parsed_item = ast.literal_eval(item)
+            except (SyntaxError, ValueError):
+                parsed_item = item
+            
+            items.append(parsed_item)
+        
+        return items
+    elif ',' in value:
+        items = []
+        for item in value.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            
+            try:
+                parsed_item = ast.literal_eval(item)
+            except (SyntaxError, ValueError):
+                parsed_item = item
+            
+            items.append(parsed_item)
+        
+        return items
+    else:
+        try:
+            return [ast.literal_eval(value)]
+        except (SyntaxError, ValueError):
+            return [value]
 
 
 load_dotenv()
@@ -23,10 +78,10 @@ POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 # proxy
-PROXY_HOSTS = ast.literal_eval(os.getenv("PROXY_HOSTS"))
-PROXY_PORTS = ast.literal_eval(os.getenv("PROXY_PORTS"))
-PROXY_USERS = ast.literal_eval(os.getenv("PROXY_USERS"))
-PROXY_PASSWORDS = ast.literal_eval(os.getenv("PROXY_PASSWORDS"))
+PROXY_HOSTS = parse_env_list(os.getenv("PROXY_HOSTS"))
+PROXY_PORTS = parse_env_list(os.getenv("PROXY_PORTS"))
+PROXY_USERS = parse_env_list(os.getenv("PROXY_USERS"))
+PROXY_PASSWORDS = parse_env_list(os.getenv("PROXY_PASSWORDS"))
 
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
