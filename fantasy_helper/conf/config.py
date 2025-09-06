@@ -1,4 +1,5 @@
 import os
+import ast
 
 from dotenv import load_dotenv
 from hydra import compose, initialize
@@ -22,10 +23,10 @@ POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 # proxy
-PROXY_HOST = str(os.getenv("PROXY_HOST"))
-PROXY_PORT = str(os.getenv("PROXY_PORT"))
-PROXY_USER = str(os.getenv("PROXY_USER"))
-PROXY_PASSWORD = str(os.getenv("PROXY_PASSWORD"))
+PROXY_HOSTS = ast.literal_eval(os.getenv("PROXY_HOSTS"))
+PROXY_PORTS = ast.literal_eval(os.getenv("PROXY_PORTS"))
+PROXY_USERS = ast.literal_eval(os.getenv("PROXY_USERS"))
+PROXY_PASSWORDS = ast.literal_eval(os.getenv("PROXY_PASSWORDS"))
 
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))

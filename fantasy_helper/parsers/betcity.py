@@ -14,7 +14,7 @@ from playwright._impl._errors import Error as PlaywrightError
 from bs4 import BeautifulSoup
 from loguru import logger
 
-from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
+from fantasy_helper.conf.config import PROXY_HOSTS, PROXY_PORTS, PROXY_USERS, PROXY_PASSWORDS
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 
@@ -39,7 +39,7 @@ class BetcityParser:
         self._retry_delay = 10  # seconds - increased delay
         self._page_timeout = 60  # seconds - increased timeout
 
-    async def _create_browser_context(self, use_proxy: bool = True) -> tuple[Browser, BrowserContext]:
+    async def _create_browser_context(self, use_proxy: bool = True, attempt: int = 0) -> tuple[Browser, BrowserContext]:
         """Create a Playwright browser context with optional proxy configuration."""
         playwright = await async_playwright().start()
         
@@ -71,16 +71,26 @@ class BetcityParser:
         }
         
         # Add proxy if configured
-        if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
+        if use_proxy and PROXY_HOSTS and PROXY_PORTS and PROXY_USERS and PROXY_PASSWORDS:
             # get random proxy port from 10001 to 10999
+            if attempt == 0:
+                proxy_host = PROXY_HOSTS[0]
+                proxy_port = PROXY_PORTS[0]
+                proxy_user = PROXY_USERS[0]
+                proxy_password = PROXY_PASSWORDS[0]
+            else:
+                proxy_host = PROXY_HOSTS[attempt % len(PROXY_HOSTS)]
+                proxy_port = PROXY_PORTS[attempt % len(PROXY_PORTS)]
+                proxy_user = PROXY_USERS[attempt % len(PROXY_USERS)]
+                proxy_password = PROXY_PASSWORDS[attempt % len(PROXY_PASSWORDS)]
+
             if self._use_random_port:
                 proxy_port = str(random.randint(10001, 10999))
-            else:
-                proxy_port = PROXY_PORT
+
             context_options["proxy"] = {
-                "server": f"http://{PROXY_HOST}:{proxy_port}",
-                "username": PROXY_USER,
-                "password": PROXY_PASSWORD
+                "server": f"http://{proxy_host}:{proxy_port}",
+                "username": proxy_user,
+                "password": proxy_password
             }
         
         browser = await playwright.chromium.launch(**launch_options)
@@ -102,7 +112,7 @@ class BetcityParser:
 
         for attempt in range(self._max_retries):
             try:
-                browser, context = await self._create_browser_context(use_proxy=use_proxy)
+                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
                 page = await context.new_page()
                 page.set_default_timeout(self._page_timeout * 1000)  # Playwright uses milliseconds
                 
@@ -579,7 +589,7 @@ class BetcityParser:
 
         for attempt in range(self._max_retries):
             try:
-                browser, context = await self._create_browser_context(use_proxy=use_proxy)
+                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
                 page = await context.new_page()
                 page.set_default_timeout(self._page_timeout * 1000)
 

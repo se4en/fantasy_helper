@@ -17,13 +17,13 @@ from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.actual_player import ActualPlayer
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.database import Session
-from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENROUTER_API_KEY
+from fantasy_helper.conf.config import PROXY_HOSTS, PROXY_PORTS, PROXY_USERS, PROXY_PASSWORDS, OPENROUTER_API_KEY
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "deepseek/deepseek-chat-v3-0324:free"):
-        proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+    def __init__(self, openai_model: str = "deepseek/deepseek-r1-0528:free"):
+        proxy_url = f"http://{PROXY_USERS[-1]}:{PROXY_PASSWORDS[-1]}@{PROXY_HOSTS[-1]}:{PROXY_PORTS[-1]}"
         self._openai_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=OPENROUTER_API_KEY,
