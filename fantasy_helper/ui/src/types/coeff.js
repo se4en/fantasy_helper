@@ -17,14 +17,14 @@ import { z } from 'zod'
 export const CoeffTableRowSchema = z.object({
   team_name: z.string(),
   league_name: z.string(),
-  tour_names: z.array(z.string()).optional(),
+  tour_names: z.array(z.string().nullable()).optional(),
   tour_numbers: z.array(z.number().nullable()).optional(),
-  tour_rivals: z.array(z.string()).optional(),
-  tour_match_types: z.array(z.string()).optional(),
-  tour_attack_coeffs: z.array(z.number()).optional(),
-  tour_defence_coeffs: z.array(z.number()).optional(),
-  tour_attack_colors: z.array(z.string()).optional(),
-  tour_defence_colors: z.array(z.string()).optional()
+  tour_rivals: z.array(z.string().nullable()).optional(),
+  tour_match_types: z.array(z.string().nullable()).optional(),
+  tour_attack_coeffs: z.array(z.number().nullable()).optional(),
+  tour_defence_coeffs: z.array(z.number().nullable()).optional(),
+  tour_attack_colors: z.array(z.string().nullable()).optional(),
+  tour_defence_colors: z.array(z.string().nullable()).optional()
 })
 
 export default {

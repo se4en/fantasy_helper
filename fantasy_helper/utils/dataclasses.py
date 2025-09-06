@@ -7,10 +7,10 @@ import pandas as pd
 
 @dataclass
 class MatchInfo:
-    url: str
     league_name: str
     home_team: str
     away_team: str
+    url: Optional[str] = None
     start_datetime: Optional[datetime.datetime] = None
     tour_number: Optional[int] = None
     tour_name: Optional[str] = None

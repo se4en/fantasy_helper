@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import deepcopy
 from dataclasses import asdict
 from typing import List
@@ -390,5 +391,13 @@ class NamingDAO:
                 coeff_match.tour_number = match.gameweek
                 coeff_match.tour_name = match.tour_name
                 result.append(coeff_match)
+            else:  # add match with None coeffs
+                result.append(MatchInfo(
+                    league_name=league_name,
+                    home_team=match.home_team,
+                    away_team=match.away_team,
+                    tour_number=match.gameweek,
+                    tour_name=match.tour_name
+                ))
 
         return result

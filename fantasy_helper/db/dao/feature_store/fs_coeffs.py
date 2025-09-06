@@ -13,8 +13,7 @@ utc = timezone.utc
 
 
 class FSCoeffsDAO:
-    def get_coeffs(
-        self, league_name: str) -> List[CoeffTableRow]:
+    def get_coeffs(self, league_name: str) -> List[CoeffTableRow]:
         db_session: SQLSession = Session()
 
         cur_tour_matches = (
@@ -66,7 +65,23 @@ class FSCoeffsDAO:
 
         return color
         # return f"background-color: {color}"
+
+    @staticmethod
+    def _is_null_match(match: MatchInfo) -> bool:
+        return (
+            match.total_1_over_1_5 is None
+            and match.total_2_under_0_5 is None
+            and match.total_2_over_1_5 is None
+            and match.total_1_under_0_5 is None
+        )
     
+    @staticmethod
+    def _get_tour_sort_key(tour_name: str) -> int:
+        base_key = int(tour_name.split(" ")[0])
+        if tour_name.endswith(" доп"):
+            base_key += 0.5
+        return base_key
+
     def _get_coeffs_rows_from_mathes(
         self, league_name: str, matches: List[MatchInfo], unique_teams: List[str]
     ) -> List[CoeffTableRow]:
@@ -83,7 +98,7 @@ class FSCoeffsDAO:
             sorted_matches = matches
 
         # split matches into tours
-        all_tours_names = []
+        all_tours_names = set()
         for match in sorted_matches:
             if match.tour_name is not None:
                 cur_tour_name = match.tour_name
@@ -107,8 +122,13 @@ class FSCoeffsDAO:
             team_2_matches[match.home_team][cur_tour_name] = match
             team_2_matches[match.away_team][cur_tour_name] = match
 
-            if cur_tour_name not in all_tours_names:
-                all_tours_names.append(cur_tour_name)
+            if not self._is_null_match(match):
+                all_tours_names.add(cur_tour_name)
+
+        if len(all_tours_names) > 1:
+            all_tours_names = sorted(list(all_tours_names), key=self._get_tour_sort_key)
+        else:
+            all_tours_names = list(all_tours_names)
 
         result = []
         for team_name, team_matches in team_2_matches.items():
@@ -121,26 +141,37 @@ class FSCoeffsDAO:
             tour_attack_colors = []
             tour_defence_colors = []
 
-            for tour_name, tour_match in team_matches.items():
-                if team_name == tour_match.home_team:
-                    match_type = "[д]"
-                    attack_coeff = tour_match.total_1_over_1_5
-                    defence_coeff = tour_match.total_2_under_0_5
-                    rival_name = tour_match.away_team
-                else:
-                    match_type = "[г]"
-                    attack_coeff = tour_match.total_2_over_1_5
-                    defence_coeff = tour_match.total_1_under_0_5
-                    rival_name = tour_match.home_team
+            for tour_name in all_tours_names:
+                if tour_name in team_matches:
+                    tour_match = team_matches[tour_name]
+                    if team_name == tour_match.home_team:
+                        match_type = "[д]"
+                        attack_coeff = tour_match.total_1_over_1_5
+                        defence_coeff = tour_match.total_2_under_0_5
+                        rival_name = tour_match.away_team
+                    else:
+                        match_type = "[г]"
+                        attack_coeff = tour_match.total_2_over_1_5
+                        defence_coeff = tour_match.total_1_under_0_5
+                        rival_name = tour_match.home_team
 
-                tour_names.append(tour_name)
-                tour_numbers.append(tour_match.tour_number)
-                tour_rivals.append(rival_name)
-                tour_match_types.append(match_type)
-                tour_attack_coeffs.append(attack_coeff)
-                tour_defence_coeffs.append(defence_coeff)
-                tour_attack_colors.append(self._color_coeff(attack_coeff))
-                tour_defence_colors.append(self._color_coeff(defence_coeff))
+                    tour_names.append(tour_name)
+                    tour_numbers.append(tour_match.tour_number)
+                    tour_rivals.append(rival_name)
+                    tour_match_types.append(match_type)
+                    tour_attack_coeffs.append(attack_coeff)
+                    tour_defence_coeffs.append(defence_coeff)
+                    tour_attack_colors.append(self._color_coeff(attack_coeff))
+                    tour_defence_colors.append(self._color_coeff(defence_coeff))
+                else:  # add blank matches
+                    tour_names.append(None)
+                    tour_numbers.append(None)
+                    tour_rivals.append(None)
+                    tour_match_types.append(None)
+                    tour_attack_coeffs.append(None)
+                    tour_defence_coeffs.append(None)
+                    tour_attack_colors.append(None)
+                    tour_defence_colors.append(None)
 
             result.append(
                 CoeffTableRow(
