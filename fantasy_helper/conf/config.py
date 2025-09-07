@@ -11,18 +11,22 @@ from fantasy_helper.utils.common import load_config, instantiate_leagues
 
 def parse_env_list(var_name: str) -> List[Any]:
     value = os.getenv(var_name)
+    print("value", value)
     if not value or not value.strip():
+        print("fork 0")
         return []
     
     value = value.strip()
     
     if value.startswith('[') and value.endswith(']'):
+        print("fork 1")
         try:
             return ast.literal_eval(value)
         except (SyntaxError, ValueError):
             pass
     
     if value.startswith('[') and value.endswith(']'):
+        print("fork 2")
         inner_content = value[1:-1].strip()
         if not inner_content:
             return []
@@ -42,6 +46,7 @@ def parse_env_list(var_name: str) -> List[Any]:
         
         return items
     elif ',' in value:
+        print("fork 3")
         items = []
         for item in value.split(','):
             item = item.strip()
@@ -57,6 +62,7 @@ def parse_env_list(var_name: str) -> List[Any]:
         
         return items
     else:
+        print("fork 4")
         try:
             return [ast.literal_eval(value)]
         except (SyntaxError, ValueError):
@@ -78,10 +84,10 @@ POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 # proxy
-PROXY_HOSTS = parse_env_list(os.getenv("PROXY_HOSTS"))
-PROXY_PORTS = parse_env_list(os.getenv("PROXY_PORTS"))
-PROXY_USERS = parse_env_list(os.getenv("PROXY_USERS"))
-PROXY_PASSWORDS = parse_env_list(os.getenv("PROXY_PASSWORDS"))
+PROXY_HOSTS = parse_env_list("PROXY_HOSTS")
+PROXY_PORTS = parse_env_list("PROXY_PORTS")
+PROXY_USERS = parse_env_list("PROXY_USERS")
+PROXY_PASSWORDS = parse_env_list("PROXY_PASSWORDS")
 
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
