@@ -1,10 +1,16 @@
-FROM python:3.9-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essential
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    python3-dev \
+    build-essential \
+    libpq-dev \
+    postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /fantasy_helper
-COPY ./requirements /fantasy_helper/requirements
-RUN pip install --no-cache-dir --upgrade -r requirements/api.txt -r requirements/ml.txt
+COPY pyproject.toml uv.lock /fantasy_helper/
+RUN uv sync --extra api --extra ml --frozen
 COPY ./fantasy_helper/api /fantasy_helper/fantasy_helper/api
 COPY ./fantasy_helper/conf /fantasy_helper/fantasy_helper/conf
 COPY ./fantasy_helper/utils /fantasy_helper/fantasy_helper/utils
@@ -16,4 +22,4 @@ COPY ./alembic /fantasy_helper/alembic
 COPY ./alembic.ini /fantasy_helper/alembic.ini
 ENV PYTHONPATH "${PYTHONPATH}:/fantasy_helper"
 
-CMD ["uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "fantasy_helper.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

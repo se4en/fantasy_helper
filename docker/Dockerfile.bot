@@ -1,11 +1,15 @@
-FROM python:3.8-buster
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-RUN apt-get update -y && apt-get install -y python3-pip python3-dev build-essential
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    python3-dev \
+    build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /bot
-COPY requirements.txt /bot/
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock /bot/
+RUN uv sync --extra bot --frozen
 
 COPY . /bot
 
-CMD ["python", "fantasy_helper/bot.py"]
+CMD ["uv", "run", "python", "fantasy_helper/bot.py"]
