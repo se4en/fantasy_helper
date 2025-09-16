@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
+from loguru import logger
 
 from fantasy_helper.db.dao.table import TableDao
 from fantasy_helper.db.dao.schedule import ScheduleDao
@@ -273,10 +274,12 @@ class FSCalendarsDAO:
         return result
 
     def update_calendar(self, league_name: str) -> None:
+        logger.info(f"Start update calendar feature store for {league_name}")
         if league_name not in self._valid_leagues:
             return None
         new_calendar_rows = self._compute_new_calendar(league_name)
         if len(new_calendar_rows) == 0:
+            logger.warning(f"Calendar is empty for {league_name}")
             return None
 
         db_session: SQLSession = Session()
@@ -295,6 +298,8 @@ class FSCalendarsDAO:
 
         db_session.commit()
         db_session.close()
+
+        logger.info(f"Updated {len(new_calendar_rows)} calendar rows for {league_name}")
 
     def update_calendar_all_leagues(self) -> None:
         for league_name in self._valid_leagues:

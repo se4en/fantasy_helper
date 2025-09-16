@@ -939,7 +939,7 @@ class FbrefParser:
     ) -> Optional[LeagueScheduleInfo]:
         _home_team = table_row.find("td", {"data-stat": "home_team"})
         if _home_team is not None and _home_team.text.strip() != "":
-            _gameweek = table_row.find("td", {"data-stat": "gameweek"})
+            _gameweek = table_row.find("th", {"data-stat": "gameweek"})
             _away_team = table_row.find("td", {"data-stat": "away_team"})
             _date = table_row.find("td", {"data-stat": "date"})
             _score = table_row.find("td", {"data-stat": "score"})

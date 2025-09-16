@@ -138,10 +138,10 @@ class SportsParser:
 
         return result
 
-    def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[SportsMatchInfo]]:
+    def get_next_matches(self, league_name: str, tour_count: int) -> List[SportsMatchInfo]:
         schedule = self.get_schedule(league_name)
         if schedule is None:
-            return None
+            return []
 
         tour_index = 0
         while tour_index < len(schedule) and schedule[tour_index].status != "OPENED":

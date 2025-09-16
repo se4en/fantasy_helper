@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import deepcopy
 from dataclasses import asdict
 from typing import List
@@ -6,6 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy import and_
 from sqlalchemy.orm import Session as SQLSession
 import pandas as pd
+from loguru import logger
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.utils.dataclasses import LeagueInfo, LeagueScheduleInfo, MatchInfo, PlayerName, PlayerStatsInfo, SportsMatchInfo, SportsPlayerDiff, TeamName, PlayersLeagueStats
@@ -26,14 +28,17 @@ class NamingDAO:
         self._name_matcher = NameMatcher()
 
     def update_league_naming(self, league_name: str) -> None:
+        logger.info(f"Updating naming for league {league_name}")
         year = self._league_2_year.get(league_name, "2024")
         teams_names = self._get_teams_names(league_name)
+        logger.info(f"Found {len(teams_names)} teams names for league {league_name}")
 
         # update teams names
         teams_names_to_add, teams_names_to_delete = self._name_matcher.match_teams(
             league_name=league_name, 
             teams_names=teams_names
         )
+        logger.info(f"Adding {len(teams_names_to_add)}, deleting {len(teams_names_to_delete)} teams names for league {league_name}")
         self._delete_teams_names(teams_names_to_delete)
         self._add_teams_names(teams_names_to_add)
 
@@ -41,11 +46,13 @@ class NamingDAO:
         new_teams_names = self._get_teams_names(league_name)
         for team_name in new_teams_names:
             players_names = self._get_players_names(league_name, team_name.name)
+            logger.info(f"Found {len(players_names)} players names for team {team_name.name} in {league_name}")
             players_names_to_add, players_names_to_delete = self._name_matcher.match_players(
                 league_name=league_name, 
                 team_name=team_name,
                 players_names=players_names
             )
+            logger.info(f"Adding {len(players_names_to_add)}, deleting {len(players_names_to_delete)} players names for team {team_name.name} in {league_name}")
             self._delete_players_names(players_names_to_delete)
             self._add_players_names(players_names_to_add)
 
@@ -295,12 +302,18 @@ class NamingDAO:
         )
 
         # join teams and players info
-        result.abs_stats = result.abs_stats.merge(teams_info, how="left", on="team")
-        result.norm_stats = result.norm_stats.merge(teams_info, how="left", on="team")
-        result.free_kicks = result.free_kicks.merge(teams_info, how="left", on="team")
-        result.abs_stats = result.abs_stats.merge(players_info, how="left", on=["name", "sports_team"])
-        result.norm_stats = result.norm_stats.merge(players_info, how="left", on=["name", "sports_team"])
-        result.free_kicks = result.free_kicks.merge(players_info, how="left", on=["name", "sports_team"])
+        if "team" in result.abs_stats.columns:
+            result.abs_stats = result.abs_stats.merge(teams_info, how="left", on="team")
+            if "sports_team" in result.abs_stats.columns:
+                result.abs_stats = result.abs_stats.merge(players_info, how="left", on=["name", "sports_team"])
+        if "team" in result.norm_stats.columns:
+            result.norm_stats = result.norm_stats.merge(teams_info, how="left", on="team")
+            if "sports_team" in result.norm_stats.columns:
+                result.norm_stats = result.norm_stats.merge(players_info, how="left", on=["name", "sports_team"])
+        if "team" in result.free_kicks.columns:
+            result.free_kicks = result.free_kicks.merge(teams_info, how="left", on="team")
+            if "sports_team" in result.free_kicks.columns:
+                result.free_kicks = result.free_kicks.merge(players_info, how="left", on=["name", "sports_team"])
 
         return result
     
@@ -378,5 +391,13 @@ class NamingDAO:
                 coeff_match.tour_number = match.gameweek
                 coeff_match.tour_name = match.tour_name
                 result.append(coeff_match)
+            else:  # add match with None coeffs
+                result.append(MatchInfo(
+                    league_name=league_name,
+                    home_team=match.home_team,
+                    away_team=match.away_team,
+                    tour_number=match.gameweek,
+                    tour_name=match.tour_name
+                ))
 
         return result

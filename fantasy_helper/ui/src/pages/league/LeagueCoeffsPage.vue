@@ -1,8 +1,15 @@
 <script setup>
 import { useRoute } from 'vue-router'
+
+function hasTourData(row, tourIndex) {
+  // Check if this team has any data for this specific tour
+  return row.tour_names?.length > tourIndex && 
+         row.tour_numbers?.length > tourIndex && 
+         row.tour_rivals?.length > tourIndex
+}
 import { storeToRefs } from 'pinia'
 import { useLoaderDelay } from '@/composables/useLoaderDelay'
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useCoeffStore } from '@/stores/coeffs.store'
 import Loader from '@/components/Loader.vue'
 
@@ -67,7 +74,7 @@ function getSortValue(row) {
     return row.tour_defence_coeffs?.[sortCoeffsTourIndex.value] || 0
   }
   else if (sortCoeffsBy.value === 'team_name') {
-    return row.team_name || 0
+    return row.team_name || ''
   } else {
     return 0 
   }
@@ -87,15 +94,29 @@ function setSort(type, tourIndex) {
 
 // Helper function to get background color for attack coefficient
 function getAttackCellStyle(row, tourIndex) {
-  const color = row.tour_attack_colors?.[tourIndex] || '#f0f0f0'
+  const color = row.tour_attack_colors?.length > tourIndex ? row.tour_attack_colors[tourIndex] : '#f0f0f0'
   return { backgroundColor: color }
 }
 
 // Helper function to get background color for defence coefficient
 function getDefenceCellStyle(row, tourIndex) {
-  const color = row.tour_defence_colors?.[tourIndex] || '#f0f0f0'
+  const color = row.tour_defence_colors?.length > tourIndex ? row.tour_defence_colors[tourIndex] : '#f0f0f0'
   return { backgroundColor: color }
 }
+
+watch(                                                                                                                                                                                                                                                                                                                                
+  () => route.params.leagueSlug,                                                                                                                                                                                                                                                                                                      
+  async (newLeagueSlug) => {                                                                                                                                                                                                                                                                                                          
+    if (newLeagueSlug) {                                                                                                                                                                                                                                                                                                              
+      sortCoeffsBy.value = null                                                                                                                                                                                                                                                                                                       
+      sortCoeffsTourIndex.value = null                                                                                                                                                                                                                                                                                                
+      sortCoeffsDirection.value = 'asc'                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                       
+      await coeffStore.fetchCoeffs(newLeagueSlug)                                                                                                                                                                                                                                                                                     
+    }                                                                                                                                                                                                                                                                                                                                 
+  },                                                                                                                                                                                                                                                                                                                                  
+  { immediate: true }                                                                                                                                                                                                                                                                                                                
+)
 
 onMounted(async () => {
   try {
@@ -185,15 +206,16 @@ onMounted(async () => {
               <tr v-for="(row, rowIndex) in sortedCoeffs" :key="'row-'+rowIndex" class="hover:bg-gray-25 transition-colors">
                 <td class="team-cell">{{ row.team_name }}</td>
 
-                <template v-for="(tour, tourIndex) in maxTours" :key="`coeff-${rowIndex}-${tourIndex}`">
+                <template v-for="(_, tourIndex) in maxTours" :key="`coeff-${rowIndex}-${tourIndex}`">
                   <td class="attack-cell" :style="getAttackCellStyle(row, tourIndex)">
-                    {{ row.tour_attack_coeffs?.[tourIndex]?.toFixed(2) || '' }}
+                    {{ hasTourData(row, tourIndex) ? (row.tour_attack_coeffs?.[tourIndex]?.toFixed(2) || '') : '' }}
                   </td>
                   <td class="defence-cell" :style="getDefenceCellStyle(row, tourIndex)">
-                    {{ row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '' }}
+                    {{ hasTourData(row, tourIndex) ? (row.tour_defence_coeffs?.[tourIndex]?.toFixed(2) || '') : '' }}
                   </td>
                   <td class="rival-cell">
-                    {{ row.tour_rivals?.[tourIndex] }} {{ row.tour_match_types?.[tourIndex] || '' }}
+                    {{ hasTourData(row, tourIndex) ? (row.tour_rivals?.[tourIndex] || '') : '' }} 
+                    {{ hasTourData(row, tourIndex) ? (row.tour_match_types?.[tourIndex] || '') : '' }}
                   </td>
                 </template>
               </tr>

@@ -5,6 +5,7 @@ import os.path as path
 
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_, func
+from loguru import logger
 
 from fantasy_helper.db.database import Session
 from fantasy_helper.db.models.schedule import Schedule
@@ -115,23 +116,28 @@ class ScheduleDao:
 
         return min_gameweek + 1
 
-    def get_next_matches(self, league_name: str, tour_count: int) -> Optional[List[LeagueScheduleInfo]]:
+    def get_next_matches(self, league_name: str, tour_count: int) -> List[LeagueScheduleInfo]:
         league_year = self._league_2_year.get(league_name)
         schedule = self.get_schedule(league_name, league_year)
         if not schedule:
-            return None
+            return []
 
         ordered_schedule = sorted(schedule, key=lambda x: x.date)
         min_gameweek = ordered_schedule[0].gameweek
         result = []
         for match in ordered_schedule:
-            if match.gameweek >= min_gameweek and match.gameweek <= min_gameweek + tour_count:
+            if match.gameweek >= min_gameweek and match.gameweek < min_gameweek + tour_count:
                 result.append(match)
 
         return result
 
     def update_schedules_all_leagues(self) -> None:
         for league_name in self._sports_parser.get_leagues():
+            self.update_schedules(league_name)
+
+    def update_schedules(self, league_name: str) -> None:
+        if league_name in self._sports_parser.get_leagues():
+            logger.info(f"Start update sports schedules for {league_name}")
             league_year = self._league_2_year.get(league_name)
 
             schedule_rows: List[SportsMatchInfo] = self._sports_parser.get_next_matches(
@@ -156,3 +162,7 @@ class ScheduleDao:
 
             db_session.commit()
             db_session.close()
+
+            logger.info(f"Updated {len(schedule_rows)} sports schedule rows for {league_name}")
+        else:
+            logger.info(f"{league_name} not in sports parser")

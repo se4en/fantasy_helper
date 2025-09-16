@@ -495,6 +495,11 @@ class PlayerDAO:
 
     def update_players_stats_all_leagues(self) -> None:
         for league_name in self.__fbref_parser.get_all_leagues():
+            self.update_players_stats(league_name)
+
+    def update_players_stats(self, league_name: str) -> None:
+        if league_name in self.__fbref_parser.get_all_leagues():
+            logger.info(f"Start update naming for league {league_name}")
             year = self._league_2_year.get(league_name, "2024")
 
             players_stats: List[PlayerStats] = self.__fbref_parser.get_stats_league(
@@ -526,12 +531,22 @@ class PlayerDAO:
             db_session.commit()
             db_session.close()
 
-    def update_feature_store(self) -> None:
-        logger.info(f"start update players stats feature store")
+            logger.info(f"Updated {len(players_stats)} players for {league_name}")
+        else:
+            logger.info(f"League {league_name} not found in fbref parser")
+
+    def update_feature_store(self, league_name: str) -> None:
+        logger.info(f"Start update players stats feature store for {league_name}")
         feature_store = FSPlayersStatsDAO()
 
+        if league_name in [x.name for x in self.__leagues]:
+            players_stats = self.get_players_stats(league_name)
+            feature_store.update_players_free_kicks_stats(league_name, players_stats, add_sports_info=True)
+            players_stats_info = feature_store.compute_players_stats_info(league_name)
+            feature_store.update_players_stats_info(league_name, players_stats_info, add_sports_info=True)
+        else:
+            logger.info(f"League {league_name} not found in players stats")
+
+    def update_feature_store_all_leagues(self) -> None:
         for league in self.__leagues:
-            players_stats = self.get_players_stats(league.name)
-            feature_store.update_players_free_kicks_stats(league.name, players_stats, add_sports_info=True)
-            players_stats_info = feature_store.compute_players_stats_info(league.name)
-            feature_store.update_players_stats_info(league.name, players_stats_info, add_sports_info=True)
+            self.update_feature_store(league.name)

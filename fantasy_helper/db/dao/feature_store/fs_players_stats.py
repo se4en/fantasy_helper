@@ -11,8 +11,9 @@ from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.orm import aliased
 from loguru import logger
 
+from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.db.database import Session
-from fantasy_helper.utils.dataclasses import PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff
+from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff
 from fantasy_helper.db.models.feature_store.fs_players_free_kicks import (
     FSPlayersFreeKicks,
 )
@@ -25,6 +26,9 @@ from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayer
 
 class FSPlayersStatsDAO:
     def __init__(self):
+        cfg = load_config(config_path="../../conf", config_name="config")
+        self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._naming_dao = NamingDAO()
         self._fs_sports_players_dao = FSSportsPlayersDAO()
 
@@ -80,6 +84,8 @@ class FSPlayersStatsDAO:
         return result
 
     def compute_players_stats_info(self, league_name: str) -> List[PlayerStatsInfo]:
+        year = self._league_2_year.get(league_name, "2024")
+
         db_session: SQLSession = Session()
 
         # get all teams matches
@@ -96,6 +102,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.home_team.label("team_name"),
             ).filter(and_(
                 FbrefSchedule.league_name == league_name,
+                FbrefSchedule.year == year,
                 FbrefSchedule.match_parsed == True
             ))
         ).distinct()
@@ -113,6 +120,7 @@ class FSPlayersStatsDAO:
                 FbrefSchedule.away_team.label("team_name"),
             ).filter(and_(
                 FbrefSchedule.league_name == league_name,
+                FbrefSchedule.year == year,
                 FbrefSchedule.match_parsed == True
             ))
         ).distinct()
@@ -164,6 +172,7 @@ class FSPlayersStatsDAO:
             )
             .filter(and_(
                 PlayersMatch.league_name == league_name,
+                PlayersMatch.year == year,
                 PlayersMatch.date != None
             ))
             .distinct()

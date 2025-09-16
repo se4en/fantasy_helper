@@ -12,8 +12,7 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-// Initialize auth after Pinia is set up
-const authStore = useAuthStore()
-authStore.fetchUser()
-
 app.mount('#app')
+
+const authStore = useAuthStore()
+authStore.fetchUser().catch(e => console.error('Auth init error:', e)) 

@@ -17,7 +17,7 @@ const routes = [
     meta: {
       requiresAuth: false,
       showInNavigation: false,
-      navTitle: 'Home'
+      navTitle: 'Старт'
     }
   },
   {
@@ -27,7 +27,7 @@ const routes = [
     meta: {
       requiresAuth: false,
       showInNavigation: true,
-      navTitle: 'Leafues'
+      navTitle: 'Чемпионаты'
     }
   },
   {
@@ -43,7 +43,7 @@ const routes = [
     children: [
       {
         path: '', // Default child route
-        name: 'League',
+        name: 'LeagueDefault',
         redirect: to => {
           return { 
             name: 'LeagueCoeffs', 
@@ -60,7 +60,7 @@ const routes = [
         meta: {
           requiresAuth: false,
           showInSubNavigation: true,
-          subNavTitle: 'Coefficients'
+          subNavTitle: 'Котировки'
         }
       },
       {
@@ -70,7 +70,7 @@ const routes = [
         meta: {
           requiresAuth: false,
           showInSubNavigation: true,
-          subNavTitle: 'Calendar'
+          subNavTitle: 'Календарь'
         }
       }
     ]
@@ -82,7 +82,7 @@ const routes = [
     meta: { 
       requiresAuth: false,
       showInNavigation: false,
-      navTitle: 'Login'
+      navTitle: 'Войти'
     }
   },
   {                                                                                                                                                          

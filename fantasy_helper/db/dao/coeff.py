@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Literal, Optional, Tuple
 import os.path as path
@@ -90,13 +91,13 @@ class CoeffDAO:
 
         return result
 
-    def update_coeffs(self, league_name: str) -> None:
-        logger.info(f"update coeffs for {league_name}")
+    async def update_coeffs(self, league_name: str) -> None:
+        logger.info(f"Start update coeffs for {league_name}")
 
         year = self._league_2_year.get(league_name, "2024")
 
-        matches = self._betcity_parser.get_league_matches(league_name)
-        logger.info(f"got {len(matches)} matches for {league_name}")
+        matches = await self._betcity_parser.get_league_matches(league_name)
+        logger.info(f"Got {len(matches)} matches for {league_name}")
 
         db_session: SQLSession = Session()
 
@@ -112,27 +113,35 @@ class CoeffDAO:
         db_session.commit()
         db_session.close()
 
-    def update_coeffs_all_leagues(self) -> None:
-        for league in self._leagues:
-            self.update_coeffs(league.name)
+        logger.info(f"Updated {len(matches)} match coeffs for {league_name}")
 
-    def update_feature_store(self) -> None:
-        logger.info(f"start update coeffs feature store")
+    async def update_coeffs_all_leagues(self) -> None:
+        for league in self._leagues:
+            await self.update_coeffs(league.name)
+
+    def update_feature_store_all_leagues(self) -> None:
+        for league in self._leagues:
+            self.update_feature_store(league.name)
+
+    def update_feature_store(self, league_name: str) -> None:
+        logger.info(f"start update coeffs feature store for {league_name}")
         feature_store = FSCoeffsDAO()
 
-        for league in self._leagues:
-            actual_coeffs = self.get_actual_coeffs(league.name)
-            logger.info(f"got {len(actual_coeffs)} actual coeffs for {league.name}")
+        if league_name in [x.name for x in self._leagues]:
+            actual_coeffs = self.get_actual_coeffs(league_name)
+            logger.info(f"Got {len(actual_coeffs)} actual coeffs for {league_name}")
 
             sports_matches = self._schedule_dao.get_next_matches(
-                league.name, 2
+                league_name, 3
             )
-            logger.info(f"got {len(sports_matches)} sports matches for {league.name}")
+            logger.info(f"Got {len(sports_matches)} sports matches for {league_name}")
 
             if actual_coeffs and sports_matches:
                 sports_coeffs = self._naming_dao.add_sports_info_to_coeffs(
-                    league.name, actual_coeffs, sports_matches
+                    league_name, actual_coeffs, sports_matches
                 )
             else:
                 sports_coeffs = actual_coeffs
-            feature_store.update_coeffs(league.name, sports_coeffs)
+            feature_store.update_coeffs(league_name, sports_coeffs)
+        else:
+            logger.error(f"{league_name} not found in coeffs dao")

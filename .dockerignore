@@ -20,3 +20,20 @@ keycloak_postgres_data/
 
 # vue js
 node_modules
+
+# aider
+.aider*
+
+# roo code
+.roo*
+
+# uv cache and build artifacts
+.uv/
+.uvcache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python version files
+.python-version

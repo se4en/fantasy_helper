@@ -1,5 +1,7 @@
+import asyncio
 import datetime
 import logging
+import random
 import sys
 import os
 import json
@@ -7,16 +9,12 @@ import time
 import pytz
 from typing import Any, Dict, List, Optional, Tuple
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.proxy import Proxy, ProxyType
-from selenium.webdriver import FirefoxOptions
-from selenium.common.exceptions import WebDriverException, TimeoutException
+from playwright.async_api import async_playwright, Browser, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+from playwright._impl._errors import Error as PlaywrightError
+from bs4 import BeautifulSoup
 from loguru import logger
 
-from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD
+from fantasy_helper.conf.config import PROXY_HOSTS, PROXY_PORTS, PROXY_USERS, PROXY_PASSWORDS
 from fantasy_helper.utils.dataclasses import LeagueInfo, MatchInfo
 
 
@@ -29,99 +27,121 @@ class BetcityParser:
         }
 
         self._bet_group_methods = {
-            "ОБЕ ЗАБЬЮТ": self._parse_both_scores_bets,
-            "ТОТАЛ": self._parse_total_bets,
-            "ФОРА": self._parse_handicap_bets,
-            "ИНДИВИДУАЛЬНЫЙ ТОТАЛ": self._parse_individual_total_bets,
-            "ГОЛЫ": self._parse_goals_bets
+            "обе забьют": self._parse_both_scores_bets,
+            "тотал": self._parse_total_bets,
+            "фора": self._parse_handicap_bets,
+            "индивидуальный тотал": self._parse_individual_total_bets,
+            "голы": self._parse_goals_bets
         }
         
+        self._use_random_port = False
         self._max_retries = 3
         self._retry_delay = 10  # seconds - increased delay
         self._page_timeout = 60  # seconds - increased timeout
 
-    def _create_driver(self, use_proxy: bool = True) -> webdriver.Firefox:
-        """Create a Firefox driver with optional proxy configuration."""
-        opts = FirefoxOptions()
-        opts.add_argument("--headless")
-        opts.add_argument("--disable-blink-features=AutomationControlled")
+    async def _create_browser_context(self, use_proxy: bool = True, attempt: int = 0) -> tuple[Browser, BrowserContext]:
+        """Create a Playwright browser context with optional proxy configuration."""
+        playwright = await async_playwright().start()
         
-        # Add user agent to avoid detection
-        opts.set_preference("general.useragent.override", 
-                          "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0")                                                                                                                                                                            
-        opts.set_preference("network.http.accept.default", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")                                                                                                         
-        opts.set_preference("network.http.accept-language.default", "en-US,en;q=0.5")
+        # Browser launch options
+        launch_options = {
+            "headless": True,
+            "args": [
+                "--disable-blink-features=AutomationControlled",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
+        }
+        
+        USER_AGENTS = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+            'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        ]
+        user_agent = USER_AGENTS[random.randint(0, len(USER_AGENTS) - 1)]
+        # Context options
+        context_options = {
+            "user_agent": user_agent,
+            "extra_http_headers": {
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5"
+            },
+            "viewport": {"width": 1920, "height": 1080}
+        }
+        
+        # Add proxy if configured
+        if use_proxy and PROXY_HOSTS and PROXY_PORTS and PROXY_USERS and PROXY_PASSWORDS:
+            # get random proxy port from 10001 to 10999
+            if attempt == 0:
+                proxy_host = PROXY_HOSTS[0]
+                proxy_port = PROXY_PORTS[0]
+                proxy_user = PROXY_USERS[0]
+                proxy_password = PROXY_PASSWORDS[0]
+            else:
+                proxy_host = PROXY_HOSTS[attempt % len(PROXY_HOSTS)]
+                proxy_port = PROXY_PORTS[attempt % len(PROXY_PORTS)]
+                proxy_user = PROXY_USERS[attempt % len(PROXY_USERS)]
+                proxy_password = PROXY_PASSWORDS[attempt % len(PROXY_PASSWORDS)]
 
-        # Set timeouts - increase for better reliability
-        opts.set_preference("network.http.connection-timeout", 60)
-        opts.set_preference("network.http.response.timeout", 60)
-        opts.set_preference("dom.max_script_run_time", 60)
-        opts.set_preference("dom.max_chrome_script_run_time", 60)
-        
-        # Disable images and CSS for faster loading
-        opts.set_preference("permissions.default.image", 2)
-        opts.set_preference("permissions.default.stylesheet", 2)
-        
-        # Disable JavaScript (if not needed for basic content)
-        # opts.set_preference("javascript.enabled", False)
-        
-        if use_proxy and PROXY_HOST and PROXY_PORT and PROXY_USER and PROXY_PASSWORD:
-            proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
-            proxy = Proxy({
-                'proxyType': ProxyType.MANUAL,
-                'httpProxy': proxy_url,
-                'ftpProxy': proxy_url,
-                'sslProxy': proxy_url,
-                'noProxy': ''
-            })
-            return webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], 
-                options=opts, 
-                proxy=proxy
-            )
-        else:
-            return webdriver.Firefox(
-                executable_path=os.environ["GECKODRIVER_PATH"], 
-                options=opts
-            )
+            if self._use_random_port:
+                proxy_port = str(random.randint(10001, 10999))
 
-    def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
+            context_options["proxy"] = {
+                "server": f"http://{proxy_host}:{proxy_port}",
+                "username": proxy_user,
+                "password": proxy_password
+            }
+        
+        browser = await playwright.chromium.launch(**launch_options)
+        context = await browser.new_context(**context_options)
+        
+        # Block images and CSS for faster loading
+        await context.route("**/*.{png,jpg,jpeg,gif,svg,css}", lambda route: route.abort())
+        
+        return browser, context
+
+    async def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
         if league_name not in self._leagues:
             return None
 
         result = []
-        driver = None
+        browser = None
+        context = None
         use_proxy = True
 
         for attempt in range(self._max_retries):
             try:
-                driver = self._create_driver(use_proxy=use_proxy)
-                driver.set_page_load_timeout(self._page_timeout)
+                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
+                page = await context.new_page()
+                page.set_default_timeout(self._page_timeout * 1000)  # Playwright uses milliseconds
                 
                 logger.info(f"Attempt {attempt + 1}: Getting league matches from {self._leagues[league_name]} (proxy: {use_proxy})")
-                driver.get(self._leagues[league_name])
-                time.sleep(3)
-                champ_line = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "line__champ"))
-                )
-                
+                await page.goto(self._leagues[league_name])
+                await page.wait_for_timeout(3000)  # 3 seconds
+
+                champ_line = await page.wait_for_selector(".line__champ", timeout=10000)
                 if champ_line is None:
                     logger.warning(f"Attempt {attempt + 1} failed: No matches found on page {self._leagues[league_name]}")
                     continue
             
-                all_matches = champ_line.find_elements(By.CLASS_NAME, "line-event")
+                all_matches = await champ_line.query_selector_all(".line-event")
                 for match in all_matches:
-                    match_name_elem = match.find_element(By.CLASS_NAME, "line-event__name")
-                    match_url = match_name_elem.get_attribute("href")
-                    match_teams_names = match_name_elem.find_elements(By.TAG_NAME, "b")
+                    match_name_elem = await match.query_selector(".line-event__name")
+                    if match_name_elem is None:
+                        continue
+                    
+                    match_url = await match_name_elem.get_attribute("href")
+                    match_teams_names = await match_name_elem.query_selector_all("b")
                     if len(match_teams_names) != 2:
                         continue
-                    home_team_name = match_teams_names[0].text.strip()
-                    away_team_name = match_teams_names[1].text.strip()
+                    
+                    home_team_name = (await match_teams_names[0].text_content()).strip()
+                    away_team_name = (await match_teams_names[1].text_content()).strip()
 
                     result.append(
                         MatchInfo(
-                            url=match_url,
+                            url="https://betcity.ru" + match_url,
                             league_name=league_name,
                             home_team=home_team_name,
                             away_team=away_team_name,
@@ -134,20 +154,28 @@ class BetcityParser:
                 else:
                     logger.warning("No matches were successfully parsed")
                 
-            except (WebDriverException, TimeoutException) as ex:
+            except PlaywrightTimeoutError as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for league {league_name}: {str(ex)}")
                 if attempt < self._max_retries - 1:
                     logger.info(f"Retrying in {self._retry_delay} seconds...")
-                    time.sleep(self._retry_delay)
+                    await asyncio.sleep(self._retry_delay)
                 else:
                     logger.error(f"All {self._max_retries} attempts failed for league {league_name}")
+            except PlaywrightError as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for league {league_name} with Playwright error: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    await asyncio.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for league {league_name} with Playwright errors")
             except Exception as ex:
                 logger.exception("An unexpected error while parsing betcity league matches")
                 break
             finally:
-                if driver is not None:
-                    driver.quit()
-                    driver = None
+                if context is not None:
+                    await context.close()
+                if browser is not None:
+                    await browser.close()
 
         return result
 
@@ -160,14 +188,22 @@ class BetcityParser:
         return match_info
     
     def _parse_both_scores_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_blocks = bet_group.find_elements(By.CLASS_NAME, "dops-item-row__block")
+        group_blocks = bet_group.find_all(class_="dops-item-row__block")
         if len(group_blocks) != 2:
             return match_info
 
-        type_1 = group_blocks[0].find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-        value_1 = float(group_blocks[0].find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
-        type_2 = group_blocks[1].find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-        value_2 = float(group_blocks[1].find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
+        type_1_elem = group_blocks[0].find(class_="dops-item-row__block-left")
+        value_1_elem = group_blocks[0].find(class_="dops-item-row__block-right")
+        type_2_elem = group_blocks[1].find(class_="dops-item-row__block-left")
+        value_2_elem = group_blocks[1].find(class_="dops-item-row__block-right")
+
+        if type_1_elem is None or value_1_elem is None or type_2_elem is None or value_2_elem is None:
+            return match_info
+
+        type_1 = type_1_elem.text.strip()
+        value_1 = float(value_1_elem.text.strip())
+        type_2 = type_2_elem.text.strip()
+        value_2 = float(value_2_elem.text.strip())
 
         match_info = self._add_both_scores_value(match_info, type_1, value_1)
         match_info = self._add_both_scores_value(match_info, type_2, value_2)
@@ -215,24 +251,30 @@ class BetcityParser:
         return match_info
     
     def _parse_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = bet_group.find_elements(By.CLASS_NAME, "dops-item-row__section")
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = group_row.find_elements(By.CLASS_NAME, "dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
             base = row_blocks[0].text.strip()
             for row_block in row_blocks[1:]:
-                type = row_block.find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-                value = float(row_block.find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
+                type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if type_elem is None or value_elem is None:
+                    continue
+
+                type = type_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_total_bet_value(match_info, base, type, value)
 
         return match_info
 
     @staticmethod
     def _parse_handicap_base_type(base_type: str) -> Tuple[str, str]:
-        base, type = base_type.split(" ")
+        base, type = base_type.split()
         return base.strip(), type[1:-1].strip()
 
     @staticmethod
@@ -276,16 +318,23 @@ class BetcityParser:
         return match_info
     
     def _parse_handicap_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = bet_group.find_elements(By.CLASS_NAME, "dops-item-row__section")
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = group_row.find_elements(By.CLASS_NAME, "dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) == 0:
                 continue
 
             for row_block in row_blocks:
-                base_type = row_block.find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-                value = float(row_block.find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
+                base_type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if base_type_elem is None or value_elem is None:
+                    continue
+
+                base_type = base_type_elem.text.strip()
+                value = float(value_elem.text.strip())
+
                 base, type = self._parse_handicap_base_type(base_type)
                 match_info = self._add_handicap_bet_value(match_info, base, type, value)
 
@@ -293,7 +342,7 @@ class BetcityParser:
 
     @staticmethod
     def _parse_individual_total_base_type(base_type: str) -> Tuple[str, str]:
-        base, type = base_type.split(" ")
+        base, type = base_type.split()
         return base.strip(), type[1:-1].strip()
 
     @staticmethod
@@ -333,18 +382,25 @@ class BetcityParser:
         return match_info
 
     def _parse_individual_total_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = bet_group.find_elements(By.CLASS_NAME, "dops-item-row__section")
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = group_row.find_elements(By.CLASS_NAME, "dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
             base_type = row_blocks[0].text.strip()
+
             base, type = self._parse_handicap_base_type(base_type)
             for row_block in row_blocks[1:]:
-                subtype = row_block.find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-                value = float(row_block.find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
+                subtype_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if subtype_elem is None or value_elem is None:
+                    continue
+
+                subtype = subtype_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_individual_total_bet_value(match_info, base, type, subtype, value)
 
         return match_info
@@ -362,30 +418,46 @@ class BetcityParser:
         return match_info
 
     def _parse_goals_bets(self, bet_group: Any, match_info: MatchInfo) -> MatchInfo:
-        group_rows = bet_group.find_elements(By.CLASS_NAME, "dops-item-row__section")
+        group_rows = bet_group.find_all(class_="dops-item-row__section")
         for group_row in group_rows:
-            row_blocks = group_row.find_elements(By.CLASS_NAME, "dops-item-row__block")
+            row_blocks = group_row.find_all(class_="dops-item-row__block")
 
             if len(row_blocks) < 2:
                 continue
 
             base = row_blocks[0].text.strip()
             for row_block in row_blocks[1:]:
-                type = row_block.find_element(By.CLASS_NAME, "dops-item-row__block-left").text.strip()
-                value = float(row_block.find_element(By.CLASS_NAME, "dops-item-row__block-right").text.strip())
+                type_elem = row_block.find(class_="dops-item-row__block-left")
+                value_elem = row_block.find(class_="dops-item-row__block-right")
+
+                if type_elem is None or value_elem is None:
+                    continue
+
+                type = type_elem.text.strip()
+                value = float(value_elem.text.strip())
                 match_info = self._add_goals_bet_value(match_info, base, type, value)
 
         return match_info
     
-    def _parse_main_bets(self, driver: Any, match_info: MatchInfo) -> MatchInfo:
-        bet_groups = WebDriverWait(driver, 3).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "dops-item"))
-        )
+    async def _parse_main_bets(self, page: Page, match_info: MatchInfo) -> MatchInfo:
+        bet_groups = await page.wait_for_selector(".dops-item", timeout=3000)
+        if bet_groups is None:
+            logger.warning(f"Line header not found for match: {match_info.url}")
+            return match_info
 
-        for bet_group in bet_groups:
-            group_title = bet_group.find_element(By.CLASS_NAME, "dops-item__title").text.strip()
-            if group_title in self._bet_group_methods:
-                match_info = self._bet_group_methods[group_title](bet_group, match_info)
+        page_content = await page.content()
+        soup = BeautifulSoup(page_content, 'html.parser')
+        all_bet_groups = soup.find_all(class_="dops-item")
+
+        for bet_group in all_bet_groups:
+            group_title_elem = bet_group.find(class_="dops-item__title")
+            
+            if group_title_elem is None:
+                continue
+            group_title = group_title_elem.text.strip()
+
+            if group_title.lower() in self._bet_group_methods:
+                match_info = self._bet_group_methods[group_title.lower()](bet_group, match_info)
 
         return match_info
 
@@ -412,8 +484,8 @@ class BetcityParser:
                 type=prev_value, 
                 value=float(cur_value)
             )
-        elif prev_title is not None and prev_title == "ТОТ":
-            if cur_title == "М":
+        elif prev_title is not None and (prev_title == "ТОТ" or prev_title == "TOT"):
+            if cur_title == "М" or cur_title == "M":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_value, 
@@ -427,15 +499,15 @@ class BetcityParser:
                     type="Бол", 
                     value=float(cur_value)
                 )
-        elif prev_prev_title is not None and prev_prev_title == "ТОТ":
-            if prev_title == "М":
+        elif prev_prev_title is not None and (prev_prev_title == "ТОТ" or prev_prev_title == "TOT"):
+            if cur_title == "М" or cur_title == "M":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_prev_value, 
                     type="Мен", 
                     value=float(cur_value)
                 )
-            elif prev_title == "Б":
+            elif cur_title == "Б":
                 match_info = BetcityParser._add_total_bet_value(
                     match_info=match_info, 
                     base=prev_prev_value, 
@@ -445,14 +517,14 @@ class BetcityParser:
         return match_info
     
     def _parse_header_bets_titles(self, line_header: Any) -> List[str]:
-        header_items = line_header.find_elements(By.CLASS_NAME, "line__header-item_dop")
+        header_items = line_header.find_all("span", {"class": "line__header-item_dop"})
         result = []
         for header_item in header_items:
             result.append(header_item.text.strip())
         return result
 
     def _parse_header_bets_values(self, main_bets: Any) -> List[str]:
-        bets_buttons = main_bets.find_elements(By.CLASS_NAME, "line-event__main-bets-button")
+        bets_buttons = main_bets.find_all(class_="line-event__main-bets-button")
         result = []
         for bet_button in bets_buttons:
             result.append(bet_button.text.strip())
@@ -479,61 +551,91 @@ class BetcityParser:
 
         return match_info
 
-    def _parse_header_bets(self, driver: Any, match_info: MatchInfo) -> MatchInfo:
-        line_header = WebDriverWait(driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "line__header"))
-        )
-        main_bets = WebDriverWait(driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "line-event__main-bets"))
-        )
+    async def _parse_header_bets(self, page: Page, match_info: MatchInfo) -> MatchInfo:
+        try:
+            await page.wait_for_load_state('networkidle', timeout=30000)
+            
+            line_header = await page.wait_for_selector(".line__header", timeout=3000)
+            if line_header is None:
+                logger.warning(f"Line header not found for match: {match_info.url}")
+                return match_info
+            main_bets = await page.wait_for_selector(".line-event__main-bets", timeout=3000)
+            if main_bets is None:
+                logger.warning(f"Main bets not found for match: {match_info.url}")
+                return match_info
 
-        bets_titles = self._parse_header_bets_titles(line_header)
-        bets_values = self._parse_header_bets_values(main_bets)
-        match_info = self._merge_header_bets(bets_titles, bets_values, match_info)
+            page_content = await page.content()
+            soup = BeautifulSoup(page_content, 'html.parser')
+
+            line_header = soup.find("div", {"class": "line__header"})
+            main_bets = soup.find("div", {"class": "line-event__main-bets"})
+            
+            if line_header is None or main_bets is None:
+                logger.warning(f"Line header or main bets not found for match: {match_info.url}")
+                return match_info
+
+            bets_titles = self._parse_header_bets_titles(line_header)
+            bets_values = self._parse_header_bets_values(main_bets)
+            match_info = self._merge_header_bets(bets_titles, bets_values, match_info)
+        except Exception as e:
+            logger.exception(f"Error in _parse_header_bets for match: {match_info.url}: {e}")
 
         return match_info
 
-    def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
-        driver = None
-        
+    async def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
+        browser = None
+        context = None
+        use_proxy = True
+
         for attempt in range(self._max_retries):
             try:
-                # Try with proxy first, then without if it fails
-                use_proxy = attempt == 0
-                driver = self._create_driver(use_proxy=use_proxy)
-                driver.set_page_load_timeout(self._page_timeout)
-                
-                logger.info(f"Attempt {attempt + 1}: Parsing match {match_info.url} (proxy: {use_proxy})")
-                driver.get(match_info.url)
+                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
+                page = await context.new_page()
+                page.set_default_timeout(self._page_timeout * 1000)
 
-                match_info = self._parse_header_bets(driver, match_info)
-                match_info = self._parse_main_bets(driver, match_info)
-                break  # Success, exit retry loop
+                logger.info(f"Attempt {attempt + 1}: Parsing match {match_info.url} (proxy: {use_proxy})")
                 
-            except (WebDriverException, TimeoutException) as ex:
+                response = await page.goto(match_info.url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(3000)
+                await page.wait_for_load_state('networkidle', timeout=30000)
+
+                match_info = await self._parse_header_bets(page, match_info)
+                match_info = await self._parse_main_bets(page, match_info)
+
+                logger.info(f"Match {match_info.url} parsed successfully")
+                break
+            except PlaywrightTimeoutError as ex:
                 logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url}: {str(ex)}")
                 if attempt < self._max_retries - 1:
                     logger.info(f"Retrying in {self._retry_delay} seconds...")
-                    time.sleep(self._retry_delay)
+                    await asyncio.sleep(self._retry_delay)
                 else:
                     logger.error(f"All {self._max_retries} attempts failed for match {match_info.url}")
+            except PlaywrightError as ex:
+                logger.warning(f"Attempt {attempt + 1} failed for match {match_info.url} with Playwright error: {str(ex)}")
+                if attempt < self._max_retries - 1:
+                    logger.info(f"Retrying in {self._retry_delay} seconds...")
+                    await asyncio.sleep(self._retry_delay)
+                else:
+                    logger.error(f"All {self._max_retries} attempts failed for match {match_info.url} with Playwright errors")
             except Exception as ex:
                 logger.exception("An unexpected error while parsing betcity match")
                 break
             finally:
-                if driver is not None:
-                    driver.quit()
-                    driver = None
+                if context is not None:
+                    await context.close()
+                if browser is not None:
+                    await browser.close()
 
         return match_info
 
-    def get_league_matches(self, league_name: str) -> List[MatchInfo]:
+    async def get_league_matches(self, league_name: str) -> List[MatchInfo]:
         result = []
         logger.info(f"get betcity matches for {league_name}")
-        league_matches = self._parse_league_matches(league_name)
+        league_matches = await self._parse_league_matches(league_name)
         if league_matches is not None:
             for match in league_matches:
-                parsed_match = self._parse_match(match)
+                parsed_match = await self._parse_match(match)
                 if (
                     parsed_match.total_1_over_1_5 is not None
                     or parsed_match.total_1_under_0_5 is not None

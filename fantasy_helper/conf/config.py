@@ -1,10 +1,72 @@
 import os
+import ast
+from typing import Any, List
 
 from dotenv import load_dotenv
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 
 from fantasy_helper.utils.common import load_config, instantiate_leagues
+
+
+def parse_env_list(var_name: str) -> List[Any]:
+    value = os.getenv(var_name)
+    print("value", value)
+    if not value or not value.strip():
+        print("fork 0")
+        return []
+    
+    value = value.strip()
+    
+    if value.startswith('[') and value.endswith(']'):
+        print("fork 1")
+        try:
+            return ast.literal_eval(value)
+        except (SyntaxError, ValueError):
+            pass
+    
+    if value.startswith('[') and value.endswith(']'):
+        print("fork 2")
+        inner_content = value[1:-1].strip()
+        if not inner_content:
+            return []
+        
+        items = []
+        for item in inner_content.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            
+            try:
+                parsed_item = ast.literal_eval(item)
+            except (SyntaxError, ValueError):
+                parsed_item = item
+            
+            items.append(parsed_item)
+        
+        return items
+    elif ',' in value:
+        print("fork 3")
+        items = []
+        for item in value.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            
+            try:
+                parsed_item = ast.literal_eval(item)
+            except (SyntaxError, ValueError):
+                parsed_item = item
+            
+            items.append(parsed_item)
+        
+        return items
+    else:
+        print("fork 4")
+        try:
+            return [ast.literal_eval(value)]
+        except (SyntaxError, ValueError):
+            return [value]
 
 
 load_dotenv()
@@ -22,13 +84,14 @@ POSTGRES_URI = str(os.getenv("POSTGRES_URI"))
 DATABASE_URI = str(os.getenv("DATABASE_URI"))
 
 # proxy
-PROXY_HOST = str(os.getenv("PROXY_HOST"))
-PROXY_PORT = str(os.getenv("PROXY_PORT"))
-PROXY_USER = str(os.getenv("PROXY_USER"))
-PROXY_PASSWORD = str(os.getenv("PROXY_PASSWORD"))
+PROXY_HOSTS = parse_env_list("PROXY_HOSTS")
+PROXY_PORTS = parse_env_list("PROXY_PORTS")
+PROXY_USERS = parse_env_list("PROXY_USERS")
+PROXY_PASSWORDS = parse_env_list("PROXY_PASSWORDS")
 
 # open ai
 OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
+OPENROUTER_API_KEY = str(os.getenv("OPENROUTER_API_KEY"))
 
 # keycloak
 FRONTEND_URL=str(os.getenv("FRONTEND_URL"))

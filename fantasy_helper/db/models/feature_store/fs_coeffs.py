@@ -27,15 +27,15 @@ class FSCoeffs(Base):
         self,
         team_name: str,
         league_name: str,
-        tour_names: Optional[List[str]] = None,
-        tour_numbers: Optional[List[int]] = None,
-        tour_rivals: Optional[List[str]] = None,
-        tour_match_types: Optional[List[str]] = None,
-        tour_attack_coeffs: Optional[List[float]] = None,
-        tour_defence_coeffs: Optional[List[float]] = None,
-        tour_attack_colors: Optional[List[str]] = None,
-        tour_defence_colors: Optional[List[str]] = None,
-        timestamp: Optional[datetime] = None
+        tour_names: Optional[List[Optional[str]]] = None,
+        tour_numbers: Optional[List[Optional[int]]] = None,
+        tour_rivals: Optional[List[Optional[str]]] = None,
+        tour_match_types: Optional[List[Optional[str]]] = None,
+        tour_attack_coeffs: Optional[List[Optional[float]]] = None,
+        tour_defence_coeffs: Optional[List[Optional[float]]] = None,
+        tour_attack_colors: Optional[List[Optional[str]]] = None,
+        tour_defence_colors: Optional[List[Optional[str]]] = None,
+        timestamp: Optional[Optional[datetime]] = None
     ):
         self.team_name = team_name
         self.league_name = league_name

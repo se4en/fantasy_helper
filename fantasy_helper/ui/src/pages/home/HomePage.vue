@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: 'HomePage',
   data() {
     return {
       features: [
@@ -47,22 +48,22 @@ export default {
           <h1 class="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight">
             Fantasy Helper
           </h1>
-          <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <!-- <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Advanced analytics and AI-powered insights for fantasy sports success. 
             Make smarter decisions with real-time data and expert predictions.
-          </p>
+          </p> -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <router-link 
               to="/leagues" 
               class="bg-gray-900 text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all duration-200 text-lg font-medium shadow-sm"
             >
-              Browse Leagues
+              Выбрать чемпионат
             </router-link>
             <router-link 
               to="/login" 
               class="text-gray-700 px-8 py-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-lg font-medium"
             >
-              Sign In
+              Войти
             </router-link>
           </div>
         </div>
@@ -70,7 +71,7 @@ export default {
     </section>
 
     <!-- Stats Section -->
-    <section class="border-t border-gray-100 py-16">
+    <!-- <section class="border-t border-gray-100 py-16">
       <div class="max-w-6xl mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div class="space-y-2">
@@ -91,10 +92,10 @@ export default {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Features Section -->
-    <section class="py-20">
+    <!-- <section class="py-20">
       <div class="max-w-6xl mx-auto px-6">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -119,10 +120,10 @@ export default {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- How It Works -->
-    <section class="bg-gray-50 py-20">
+    <!-- <section class="bg-gray-50 py-20">
       <div class="max-w-4xl mx-auto px-6">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -149,10 +150,10 @@ export default {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- CTA Section -->
-    <section class="py-20">
+    <!-- <section class="py-20">
       <div class="max-w-4xl mx-auto px-6 text-center">
         <div class="bg-gray-900 rounded-3xl p-12 text-white">
           <h2 class="text-3xl md:text-4xl font-bold mb-4">
@@ -169,7 +170,7 @@ export default {
           </router-link>
         </div>
       </div>
-    </section>
+    </section> -->
   </div>
 </template>
   

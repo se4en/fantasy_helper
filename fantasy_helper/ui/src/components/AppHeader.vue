@@ -11,6 +11,11 @@
       const authStore = useAuthStore()
       const { isAuthenticated, user } = storeToRefs(authStore)
       
+      // Wait for auth before fetching leagues
+      if (!authStore.isInitialized) {
+        authStore.fetchUser()
+      }
+
       return { 
         leaguesInfoStore,
         leaguesInfo,
@@ -31,6 +36,7 @@
     },
     computed: {
       availableRoutes() {
+        // return this.$router.getRoutes().filter(route => 
         return this.$router.options.routes.filter(route => 
           route.meta?.showInNavigation && 
           !route.meta?.requiresAuth && 
@@ -63,7 +69,7 @@
         if (this.isAuthenticated && this.user?.given_name) {
           return this.user.given_name
         }
-        return 'Login'
+        return 'Войти'
       }
     },
     watch: {
@@ -83,7 +89,7 @@
       <!-- Left Navigation -->
       <div class="nav-left">
         <router-link :to="{ name: 'Home' }" class="nav-item nav-home">
-          Home
+          Старт
         </router-link>
         
         <router-link 
@@ -92,7 +98,7 @@
           :to="{ name: route.name }" 
           class="nav-item"
         >
-          {{ route.meta?.label || route.name }}
+          {{ route.meta?.navTitle || route.name }}
         </router-link>
       </div>
 

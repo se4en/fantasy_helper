@@ -30,6 +30,13 @@ onMounted(async () => {
 })
 </script>
 
+<script>                                                                                                                                                                                                                                                                                                                              
+// Add this for compatibility                                                                                                                                                                                                                                                                                                         
+export default {                                                                                                                                                                                                                                                                                                                      
+  name: 'LeaguesPage'                                                                                                                                                                                                                                                                                                                 
+}                                                                                                                                                                                                                                                                                                                                     
+</script>
+
 <template>
   <div class="min-h-screen bg-white">
     <div class="max-w-6xl mx-auto px-6 py-12">

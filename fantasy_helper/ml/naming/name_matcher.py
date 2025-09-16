@@ -2,25 +2,31 @@ from typing import Any, Dict, List, Optional, Tuple
 import os.path as path
 import json
 from datetime import datetime
+import asyncio
+import random
+import time
 
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy import and_
 from openai import OpenAI
+import openai
 import httpx
+from loguru import logger
 
 from fantasy_helper.db.models.coeff import Coeff
 from fantasy_helper.db.models.actual_player import ActualPlayer
 from fantasy_helper.db.models.sports_player import SportsPlayer
 from fantasy_helper.db.database import Session
-from fantasy_helper.conf.config import PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD, OPENAI_API_KEY
+from fantasy_helper.conf.config import PROXY_HOSTS, PROXY_PORTS, PROXY_USERS, PROXY_PASSWORDS, OPENROUTER_API_KEY
 from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "gpt-4o-mini-2024-07-18"):
-        proxy_url = f"http://{PROXY_USER}:{PROXY_PASSWORD}@{PROXY_HOST}:{PROXY_PORT}"
+    def __init__(self, openai_model: str = "deepseek/deepseek-r1-0528:free"):
+        proxy_url = f"http://{PROXY_USERS[-1]}:{PROXY_PASSWORDS[-1]}@{PROXY_HOSTS[-1]}:{PROXY_PORTS[-1]}"
         self._openai_client = OpenAI(
-            api_key=OPENAI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+            api_key=OPENROUTER_API_KEY,
             http_client=httpx.Client(proxy=proxy_url)
         )
         self._openai_model = openai_model
@@ -31,6 +37,10 @@ class NameMatcher:
         self._players_names_prompt = json.load(
             open(path.join(path.dirname(__file__), "prompts/players_names.json"), "r")
         )
+        
+        # Add retry configuration
+        self._max_retries = 3
+        self._retry_delay = 5  # seconds
 
     def get_sports_teams_names(self, league_name: str) -> Optional[List[str]]:
         db_session: SQLSession = Session()
@@ -148,15 +158,46 @@ class NameMatcher:
             return {}
 
         user_message = {"role": "user", "content": f"list 1: {teams_names_1}, list 2: {teams_names_2}"}
-        completion = self._openai_client.chat.completions.create(
-            model=self._openai_model,
-            messages=self._teams_names_prompt + [user_message],
-        )
+        
+        for attempt in range(self._max_retries):
+            try:
+                completion = self._openai_client.chat.completions.create(
+                    model=self._openai_model,
+                    messages=self._teams_names_prompt + [user_message],
+                    response_format={"type": "json_object"},
+                )
 
-        try:
-            return json.loads(completion.choices[0].message.content)
-        except json.JSONDecodeError as e:
-            return {}
+                if completion.choices is None:
+                    logger.warning(f"Failed to match teams names for {teams_names_1[0]}... {teams_names_2[0]}... (attempt {attempt + 1}/{self._max_retries})")
+                    if attempt < self._max_retries - 1:
+                        time.sleep(self._retry_delay)
+                    continue
+
+                result = json.loads(completion.choices[0].message.content)
+                logger.info(f"Successfully matched {len(result)} teams names for {teams_names_1[0]}... {teams_names_2[0]}...")
+                return result
+            except openai.APIConnectionError as e:
+                logger.warning(f"API connection error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except openai.APITimeoutError as e:
+                logger.warning(f"API timeout error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except openai.RateLimitError as e:
+                logger.warning(f"API rate limit error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse response for {teams_names_1[0]}... {teams_names_2[0]}... (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except Exception as e:
+                logger.exception(f"An unexpected error while matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                break
+
+        logger.error(f"All {self._max_retries} attempts failed for matching teams names")
+        return {}
 
     def match_teams_names(self, teams_names_1: List[str], teams_names_2: List[str]) -> Dict[str, str]:
         result = self._get_match_teams_names(teams_names_1, teams_names_2)
@@ -170,15 +211,46 @@ class NameMatcher:
             return {}
 
         user_message = {"role": "user", "content": f"list 1: {players_names_1}, list 2: {players_names_2}"}
-        completion = self._openai_client.chat.completions.create(
-            model=self._openai_model,
-            messages=self._players_names_prompt + [user_message],
-        )
+        
+        for attempt in range(self._max_retries):
+            try:
+                completion = self._openai_client.chat.completions.create(
+                    model=self._openai_model,
+                    messages=self._players_names_prompt + [user_message],
+                    response_format={"type": "json_object"},
+                )
 
-        try:
-            return json.loads(completion.choices[0].message.content)
-        except json.JSONDecodeError as e:
-            return {}
+                if completion.choices is None:
+                    logger.warning(f"Failed to match players names for {players_names_1[0]}... {players_names_2[0]}... (attempt {attempt + 1}/{self._max_retries})")
+                    if attempt < self._max_retries - 1:
+                        time.sleep(self._retry_delay)
+                    continue
+
+                result = json.loads(completion.choices[0].message.content)
+                logger.info(f"Successfully matched {len(result)} players names for {players_names_1[0]}... {players_names_2[0]}...")
+                return result
+            except openai.APIConnectionError as e:
+                logger.warning(f"API connection error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except openai.APITimeoutError as e:
+                logger.warning(f"API timeout error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except openai.RateLimitError as e:
+                logger.warning(f"API rate limit error when matching teams names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse response for {players_names_1[0]}... {players_names_2[0]}... (attempt {attempt + 1}/{self._max_retries}): {e}")
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._retry_delay)
+            except Exception as e:
+                logger.exception(f"Unexpected error when matching players names (attempt {attempt + 1}/{self._max_retries}): {e}")
+                break
+
+        logger.error(f"All {self._max_retries} attempts failed for matching players names")
+        return {}
 
     def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
         result = self._get_match_players_names(players_names_1, players_names_2)
@@ -207,6 +279,7 @@ class NameMatcher:
         cur_fbref_teams_names = self.get_fbref_teams_names(league_name)
         cur_xbet_teams_names = self.get_xbet_teams_names(league_name)
         cur_betcity_teams_names = self.get_betcity_teams_names(league_name)
+        logger.info(f"Cur teams names for {league_name}: sports({len(cur_sports_teams_names)}), fbref({len(cur_fbref_teams_names)}), xbet({len(cur_xbet_teams_names)}), betcity({len(cur_betcity_teams_names)})")
 
         free_sports_teams_names, free_fbref_teams_names, free_xbet_teams_names, free_betcity_teams_names = [], [], [], []
         teams_to_add, teams_to_delete = [], []
@@ -288,6 +361,8 @@ class NameMatcher:
         ) -> Tuple[List[PlayerName], List[PlayerName]]:
         cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
         cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
+        logger.info(f"Cur players names for {team_name.name} in {league_name}: sports({len(cur_sports_players_names)}), fbref({len(cur_fbref_players_names)})")
+
         free_sports_players_names, free_fbref_players_names = [], []
         players_to_add, players_to_delete = [], []
 
