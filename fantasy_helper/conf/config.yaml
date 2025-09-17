@@ -213,10 +213,10 @@ leagues:
     name: ChampionsLeague
     ru_name: "Лига Чемпионов"
     emoji: 🇪🇺
-    squad_id: 406400
-    is_active: false
+    squad_id: 502257
+    is_active: true
     xber_url: https://1xstavka.ru/en/line/football/118587-uefa-champions-league
-    betcity_url: https://betcity.ru/ru/line/soccer/1295
+    betcity_url: https://betcity.ru/ru/line/soccer/450327
     fbref_league_id: 8
     fbref_table_url: https://fbref.com/en/comps/8/Champions-League-Stats
     fbref_schedule_url: https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures
@@ -228,6 +228,7 @@ leagues:
     fbref_possesion_url: null
     fbref_shot_creation_url: null
     sportsmole_name: "Champions League"
+    year: "2025"
   - _target_: fantasy_helper.utils.dataclasses.LeagueInfo
     name: EuropaLeague
     ru_name: "Лига Европы"
