@@ -50,6 +50,9 @@ async def main(league_name: str):
     sports_player_dao.update_feature_store(league_name)
     player_dao.update_feature_store(league_name)
 
+    import gc
+    gc.collect()
+
 
 if __name__ == "__main__":
     create_db()
