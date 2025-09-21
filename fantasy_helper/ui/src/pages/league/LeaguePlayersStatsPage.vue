@@ -130,7 +130,7 @@ async function fetchData() {
 }
 
 function formatIntStat(value) {
-  if (value === null || value === undefined) return '-'
+  if (value === null || value === undefined || value === 0) return '-'
   
   if (value % 1 === 0) {
     return value.toString()
@@ -199,24 +199,24 @@ onMounted(async () => {
             
             <div class="flex flex-wrap gap-6 mt-4">
               <div class="filter-group">
-                <label for="gamesCount" class="filter-label">Games Count</label>
+                <label for="gamesCount" class="filter-label">Кол-во матчей</label>
                 <input
                   id="gamesCount"
                   v-model.number="gamesCount"
                   type="number"
-                  placeholder="5"
+                  placeholder="все"
                   class="filter-input"
                 >
               </div>
               
               <div class="filter-group">
-                <label for="teamFilter" class="filter-label">Team</label>
+                <label for="teamFilter" class="filter-label">Команда</label>
                 <select
                   id="teamFilter"
                   v-model="selectedTeam"
                   class="filter-select min-w-[160px]"
                 >
-                  <option value="">All Teams</option>
+                  <option value="">все</option>
                   <option v-for="team in availableTeams" :key="team" :value="team">
                     {{ team }}
                   </option>
@@ -224,13 +224,13 @@ onMounted(async () => {
               </div>
               
               <div class="filter-group">
-                <label for="roleFilter" class="filter-label">Position</label>
+                <label for="roleFilter" class="filter-label">Позиция</label>
                 <select
                   id="roleFilter"
                   v-model="selectedRole"
                   class="filter-select min-w-[140px]"
                 >
-                  <option value="">All Positions</option>
+                  <option value="">все</option>
                   <option v-for="role in availableRoles" :key="role" :value="role">
                     {{ role }}
                   </option>
@@ -238,7 +238,7 @@ onMounted(async () => {
               </div>
               
               <div class="filter-group">
-                <label for="maxPrice" class="filter-label">Max Price</label>
+                <label for="maxPrice" class="filter-label">Макс цена</label>
                 <input
                   id="maxPrice"
                   v-model.number="maxPrice"
@@ -246,31 +246,31 @@ onMounted(async () => {
                   :min="priceBoundaries.min"
                   :max="priceBoundaries.max"
                   step="0.5"
-                  placeholder="Max"
+                  placeholder="нет"
                   class="filter-input"
                 >
               </div>
               
               <div class="filter-group">
-                <label for="normalizationFilter" class="filter-label">Normalization</label>
+                <label for="normalizationFilter" class="filter-label">Усреднение</label>
                 <select
                   id="normalizationFilter"
                   v-model="normalizationType"
                   class="filter-select min-w-[160px]"
                 >
-                  <option value="">No normalization</option>
-                  <option value="minutes">Normalize by minutes</option>
-                  <option value="matches">Normalize by matches</option>
+                  <option value="">нет</option>
+                  <option value="minutes">по минутам (90)</option>
+                  <option value="matches">по матчам</option>
                 </select>
               </div>
               
               <div class="filter-group">
-                <label for="minMinutes" class="filter-label">Min Minutes</label>
+                <label for="minMinutes" class="filter-label">Мин минут</label>
                 <input
                   id="minMinutes"
                   v-model.number="minMinutes"
                   type="number"
-                  placeholder="90"
+                  placeholder="нет"
                   class="filter-input"
                 >
               </div>
@@ -310,7 +310,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'name' }"
                 >
                   <span class="header-content">
-                    <span>Player</span>
+                    <span>Игрок</span>
                     <span class="sort-arrow" v-if="sortBy === 'name'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -322,7 +322,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'team_name' }"
                 >
                   <span class="header-content">
-                    <span>Team</span>
+                    <span>Команда</span>
                     <span class="sort-arrow" v-if="sortBy === 'team_name'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -334,7 +334,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'role' }"
                 >
                   <span class="header-content">
-                    <span>Role</span>
+                    <span>Позиция</span>
                     <span class="sort-arrow" v-if="sortBy === 'role'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -346,7 +346,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'price' }"
                 >
                   <span class="header-content">
-                    <span>Price</span>
+                    <span>Цена</span>
                     <span class="sort-arrow" v-if="sortBy === 'price'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -358,7 +358,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'games' }"
                 >
                   <span class="header-content">
-                    <span>Games</span>
+                    <span>Матчи</span>
                     <span class="sort-arrow" v-if="sortBy === 'games'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -370,7 +370,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'minutes' }"
                 >
                   <span class="header-content">
-                    <span>Minutes</span>
+                    <span>Минуты</span>
                     <span class="sort-arrow" v-if="sortBy === 'minutes'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -382,7 +382,7 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'goals' }"
                 >
                   <span class="header-content">
-                    <span>Goals</span>
+                    <span>Голы</span>
                     <span class="sort-arrow" v-if="sortBy === 'goals'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
@@ -394,8 +394,32 @@ onMounted(async () => {
                   :class="{ active: sortBy === 'assists' }"
                 >
                   <span class="header-content">
-                    <span>Assists</span>
+                    <span>Ассисты</span>
                     <span class="sort-arrow" v-if="sortBy === 'assists'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th 
+                  @click="setSort('shots')" 
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'shots' }"
+                >
+                  <span class="header-content">
+                    <span>Удары</span>
+                    <span class="sort-arrow" v-if="sortBy === 'shots'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('shots_on_target')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'shots_on_target' }"
+                >
+                  <span class="header-content">
+                    <span>Удары в ств.</span>
+                    <span class="sort-arrow" v-if="sortBy === 'shots_on_target'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
                   </span>
@@ -424,26 +448,134 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('shots')" 
+                <th
+                  @click="setSort('xg_xa')"
                   class="sortable-header"
-                  :class="{ active: sortBy === 'shots' }"
+                  :class="{ active: sortBy === 'xg_xa' }"
                 >
                   <span class="header-content">
-                    <span>Shots</span>
-                    <span class="sort-arrow" v-if="sortBy === 'shots'">
+                    <span>xG+xA</span>
+                    <span class="sort-arrow" v-if="sortBy === 'xg_xa'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('sca')" 
+                <th
+                  @click="setSort('xg_np')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'xg_np' }"
+                >
+                  <span class="header-content">
+                    <span>xGnp</span>
+                    <span class="sort-arrow" v-if="sortBy === 'xg_np'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('xg_np_xa')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'xg_np_xa' }"
+                >
+                  <span class="header-content">
+                    <span>xGnp+xA</span>
+                    <span class="sort-arrow" v-if="sortBy === 'xg_np_xa'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('passes_into_penalty_area')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'passes_into_penalty_area' }"
+                >
+                  <span class="header-content">
+                    <span>ПерПен</span>
+                    <span class="sort-arrow" v-if="sortBy === 'passes_into_penalty_area'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('crosses_into_penalty_area')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'crosses_into_penalty_area' }"
+                >
+                  <span class="header-content">
+                    <span>КросыПен</span>
+                    <span class="sort-arrow" v-if="sortBy === 'crosses_into_penalty_area'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('touches_in_attacking_third')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'touches_in_attacking_third' }"
+                >
+                  <span class="header-content">
+                    <span>КасТреть</span>
+                    <span class="sort-arrow" v-if="sortBy === 'touches_in_attacking_third'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('touches_in_attacking_penalty_area')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'touches_in_attacking_penalty_area' }"
+                >
+                  <span class="header-content">
+                    <span>КасПен</span>
+                    <span class="sort-arrow" v-if="sortBy === 'touches_in_attacking_penalty_area'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('carries_in_attacking_third')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'carries_in_attacking_third' }"
+                >
+                  <span class="header-content">
+                    <span>ПродвТреть</span>
+                    <span class="sort-arrow" v-if="sortBy === 'carries_in_attacking_third'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('carries_in_attacking_penalty_area')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'carries_in_attacking_penalty_area' }"
+                >
+                  <span class="header-content">
+                    <span>ПродвПен</span>
+                    <span class="sort-arrow" v-if="sortBy === 'carries_in_attacking_penalty_area'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('sca')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'sca' }"
                 >
                   <span class="header-content">
                     <span>SCA</span>
                     <span class="sort-arrow" v-if="sortBy === 'sca'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
+                  @click="setSort('gca')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'gca' }"
+                >
+                  <span class="header-content">
+                    <span>GCA</span>
+                    <span class="sort-arrow" v-if="sortBy === 'gca'">
                       {{ sortDirection === 'asc' ? '↑' : '↓' }}
                     </span>
                   </span>
@@ -461,10 +593,21 @@ onMounted(async () => {
                 <td class="data-cell">{{ player.minutes || '-' }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.goals) }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.assists) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.shots) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.shots_on_target) }}</td>
                 <td class="data-cell stat-cell">{{ player.xg ? player.xg.toFixed(2) : '-' }}</td>
                 <td class="data-cell stat-cell">{{ player.xa ? player.xa.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.shots) }}</td>
+                <td class="data-cell stat-cell">{{ player.xg_xa ? player.xg_xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell stat-cell">{{ player.xg_np ? player.xg_np.toFixed(2) : '-' }}</td>
+                <td class="data-cell stat-cell">{{ player.xg_np_xa ? player.xg_np_xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.passes_into_penalty_area) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.crosses_into_penalty_area) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.touches_in_attacking_third) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.touches_in_attacking_penalty_area) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.carries_in_attacking_third) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.carries_in_attacking_penalty_area) }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.sca) }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.gca) }}</td>
               </tr>
             </tbody>
           </table>
@@ -543,7 +686,7 @@ td {
   font-weight: 600;
   text-align: left;
   min-width: 150px;
-  border-right: 1px solid #f3f4f6;
+  border-right: 2px solid #9ca3af;
 }
 
 /* Sticky header for player name column */
