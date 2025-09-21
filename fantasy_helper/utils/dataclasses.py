@@ -531,6 +531,8 @@ class PlayerStatsInfo:
     # shot creation
     sca: Optional[int] = None
     gca: Optional[int] = None
+    # miscellaneous
+    ball_recoveries: Optional[int] = None
     # sports info
     sports_name: Optional[str] = None
     sports_team: Optional[str] = None
@@ -732,10 +734,11 @@ class PlayersTableRow:
     shots: Optional[float] = None
     shots_on_target: Optional[float] = None
     xg: Optional[float] = None
-    xg_np: Optional[float] = None
-    xg_xa: Optional[float] = None
-    xg_np_xa: Optional[float] = None
     xa: Optional[float] = None
+    xg_xa: Optional[float] = None
+    xg_np: Optional[float] = None
+    xg_np_xa: Optional[float] = None
+    ball_recoveries: Optional[float] = None
     passes_into_penalty_area: Optional[float] = None
     crosses_into_penalty_area: Optional[float] = None
     touches_in_attacking_third: Optional[float] = None

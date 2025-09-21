@@ -43,6 +43,8 @@ class FSPlayersStats(Base):
     # shot creation
     sca = Column(Integer, nullable=True)
     gca = Column(Integer, nullable=True)
+    # miscellaneous
+    ball_recoveries = Column(Integer, nullable=True)
     # sports info
     sports_team = Column(String, nullable=True)
     sports_name = Column(String, nullable=True)
@@ -86,6 +88,8 @@ class FSPlayersStats(Base):
         # shot creation
         sca: Optional[float] = None,
         gca: Optional[float] = None,
+        # miscellaneous
+        ball_recoveries: Optional[int] = None,
         # sports info
         sports_team: Optional[str] = None,
         sports_name: Optional[str] = None,
@@ -127,6 +131,8 @@ class FSPlayersStats(Base):
         # shot creation
         self.sca = sca
         self.gca = gca
+        # miscellaneous
+        self.ball_recoveries = ball_recoveries
         # sports info
         self.sports_team = sports_team
         self.sports_name = sports_name

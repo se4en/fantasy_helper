@@ -24,6 +24,7 @@
  * @property {number} [carries_in_attacking_penalty_area]
  * @property {number} [sca]
  * @property {number} [gca]
+ * @property {number} [ball_recoveries]
  */
 
 import { z } from 'zod'
@@ -52,7 +53,8 @@ export const PlayersTableRowSchema = z.object({
   carries_in_attacking_third: z.number().nullable().optional(),
   carries_in_attacking_penalty_area: z.number().nullable().optional(),
   sca: z.number().nullable().optional(),
-  gca: z.number().nullable().optional()
+  gca: z.number().nullable().optional(),
+  ball_recoveries: z.number().nullable().optional()
 })
 
 export default {

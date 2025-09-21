@@ -485,6 +485,18 @@ onMounted(async () => {
                   </span>
                 </th>
                 <th
+                  @click="setSort('ball_recoveries')"
+                  class="sortable-header"
+                  :class="{ active: sortBy === 'ball_recoveries' }"
+                >
+                  <span class="header-content">
+                    <span>Возвраты</span>
+                    <span class="sort-arrow" v-if="sortBy === 'ball_recoveries'">
+                      {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                    </span>
+                  </span>
+                </th>
+                <th
                   @click="setSort('passes_into_penalty_area')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'passes_into_penalty_area' }"
@@ -600,6 +612,7 @@ onMounted(async () => {
                 <td class="data-cell stat-cell">{{ player.xg_xa ? player.xg_xa.toFixed(2) : '-' }}</td>
                 <td class="data-cell stat-cell">{{ player.xg_np ? player.xg_np.toFixed(2) : '-' }}</td>
                 <td class="data-cell stat-cell">{{ player.xg_np_xa ? player.xg_np_xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell stat-cell">{{ formatIntStat(player.ball_recoveries) }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.passes_into_penalty_area) }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.crosses_into_penalty_area) }}</td>
                 <td class="data-cell stat-cell">{{ formatIntStat(player.touches_in_attacking_third) }}</td>

@@ -29,7 +29,7 @@ STATS_COLUMNS = (
     "goals", "shots", "shots_on_target", "xg", "xg_np", "xg_xa", "xg_np_xa", "assists", "xa",
     "passes_into_penalty_area", "crosses_into_penalty_area", "touches_in_attacking_third",
     "touches_in_attacking_penalty_area", "carries_in_attacking_third", "carries_in_attacking_penalty_area",
-    "sca", "gca",
+    "sca", "gca", "ball_recoveries",
 )
 
 POSITIONS_MAPPING = {
@@ -185,6 +185,7 @@ class FSPlayersStatsDAO:
                 PlayersMatch.carries_into_penalty_area.label("carries_into_penalty_area"),
                 PlayersMatch.sca.label("sca"),
                 PlayersMatch.gca.label("gca"),
+                PlayersMatch.ball_recoveries.label("ball_recoveries"),
             )
             .filter(and_(
                 PlayersMatch.league_name == league_name,
@@ -309,7 +310,12 @@ class FSPlayersStatsDAO:
             func.sum(clean_matches_with_players.c.gca).over(
                 partition_by=clean_matches_with_players.c.player_id, 
                 order_by=clean_matches_with_players.c.match_number
-            ).label("gca")
+            ).label("gca"),
+            # miscellaneous
+            func.sum(clean_matches_with_players.c.ball_recoveries).over(
+                partition_by=clean_matches_with_players.c.player_id, 
+                order_by=clean_matches_with_players.c.match_number
+            ).label("ball_recoveries")
         )
         logger.info(f"got {db_session.query(func.count()).select_from(cumulitive_stats).scalar()} cumulitive stats for {league_name}")
 
@@ -369,6 +375,8 @@ class FSPlayersStatsDAO:
                 # shot creation
                 sca=player_stat.sca,
                 gca=player_stat.gca,
+                # miscellaneous
+                ball_recoveries=player_stat.ball_recoveries,
                 # sports info
                 sports_team=player_stat.sports_team,
                 sports_name=player_stat.sports_name,
@@ -619,7 +627,6 @@ class FSPlayersStatsDAO:
         return [
             PlayersTableRow(
                 # common
-                # player_id=row["player_id"],
                 league_name=league_name,
                 name=row["sports_name"],
                 team_name=row["sports_team"],
@@ -629,15 +636,15 @@ class FSPlayersStatsDAO:
                 minutes=row["minutes"],
                 # stats
                 goals=row["goals"],
+                assists=row["assists"],
                 shots=row["shots"],
                 shots_on_target=row["shots_on_target"],
-                # average_shot_distance=row["average_shot_distance"],
                 xg=row["xg"],
-                xg_np=row["xg_np"],
-                xg_xa=row["xg_xa"],
-                xg_np_xa=row["xg_np_xa"],
-                assists=row["assists"],
                 xa=row["xa"],
+                xg_xa=row["xg_xa"],
+                xg_np=row["xg_np"],
+                xg_np_xa=row["xg_np_xa"],
+                ball_recoveries=row["ball_recoveries"],
                 passes_into_penalty_area=row["passes_into_penalty_area"],
                 crosses_into_penalty_area=row["crosses_into_penalty_area"],
                 touches_in_attacking_third=row["touches_in_attacking_third"],
