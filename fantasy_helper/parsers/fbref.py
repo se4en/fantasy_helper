@@ -2250,6 +2250,18 @@ class FbrefParser:
             )
             players = self._update_players_stat(players, shot_creation_players)
         return list(players.values())
+    
+    def get_actual_players_league(self, league_name: str) -> List[PlayerStats]:
+        playing_time_players = []
+        if league_name in self._playing_time_leagues:
+            url = self._playing_time_leagues[league_name]
+            playing_time_players = self._parse_league_stats(
+                league_name=league_name,
+                url=url,
+                table_name="stats_playing_time",
+                parse_func=self._parse_player_playing_time_stat,
+            )
+        return playing_time_players
 
     def get_all_leagues(self) -> List[str]:
         all_leagues: List[str] = []

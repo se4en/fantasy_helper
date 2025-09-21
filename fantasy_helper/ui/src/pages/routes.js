@@ -5,9 +5,10 @@ import HomePage from './home/HomePage.vue'
 import LeaguesPage from './leagues/LeaguesPage.vue'
 import LeaguePage from './league/LeaguePage.vue'
 import LeagueCoeffsPage from './league/LeagueCoeffsPage.vue'
+import LeaguePlayersStatsPage from './league/LeaguePlayersStatsPage.vue'
 import LeagueCalendarPage from './league/LeagueCalendarPage.vue'
 import LoginPage from './login/LoginPage.vue'
-import LoginCallback from './login/LoginCallback.vue'; 
+import LoginCallback from './login/LoginCallback.vue';
 
 const routes = [
   {
@@ -61,6 +62,16 @@ const routes = [
           requiresAuth: false,
           showInSubNavigation: true,
           subNavTitle: 'Котировки'
+        }
+      },
+      {
+        path: 'players-stats',
+        name: 'LeaguePlayersStats',
+        component: LeaguePlayersStatsPage,
+        meta: {
+          requiresAuth: false,
+          showInSubNavigation: true,
+          subNavTitle: 'Статистика игроков'
         }
       },
       {

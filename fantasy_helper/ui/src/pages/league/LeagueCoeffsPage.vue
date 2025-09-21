@@ -323,8 +323,7 @@ td {
 
 .attack-cell,
 .defence-cell {
-  font-weight: 600;
-  font-family: 'Monaco', 'Menlo', monospace;
+  min-width: 80px;
 }
 
 .rival-cell {

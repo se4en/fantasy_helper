@@ -531,6 +531,8 @@ class PlayerStatsInfo:
     # shot creation
     sca: Optional[int] = None
     gca: Optional[int] = None
+    # miscellaneous
+    ball_recoveries: Optional[int] = None
     # sports info
     sports_name: Optional[str] = None
     sports_team: Optional[str] = None
@@ -714,3 +716,34 @@ class PlayersLeagueStats:
         self.abs_stats = pd.read_json(json_data["abs_stats"])
         self.norm_stats = pd.read_json(json_data["norm_stats"])
         self.free_kicks = pd.read_json(json_data["free_kicks"])
+
+
+@dataclass
+class PlayersTableRow:
+    # common
+    league_name: str
+    name: str
+    team_name: str
+    role: Optional[str] = None
+    price: Optional[float] = None
+    games: Optional[int] = None
+    minutes: Optional[int] = None
+    # stats
+    goals: Optional[float] = None 
+    assists: Optional[float] = None
+    shots: Optional[float] = None
+    shots_on_target: Optional[float] = None
+    xg: Optional[float] = None
+    xa: Optional[float] = None
+    xg_xa: Optional[float] = None
+    xg_np: Optional[float] = None
+    xg_np_xa: Optional[float] = None
+    ball_recoveries: Optional[float] = None
+    passes_into_penalty_area: Optional[float] = None
+    crosses_into_penalty_area: Optional[float] = None
+    touches_in_attacking_third: Optional[float] = None
+    touches_in_attacking_penalty_area: Optional[float] = None
+    carries_in_attacking_third: Optional[float] = None
+    carries_in_attacking_penalty_area: Optional[float] = None
+    sca: Optional[float] = None
+    gca: Optional[float] = None

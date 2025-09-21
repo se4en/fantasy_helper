@@ -108,19 +108,25 @@ onMounted(async () => {
       
       <!-- Controls and Table -->
       <div v-else class="space-y-6">
-        <!-- View Options -->
-        <div class="flex justify-center">
-          <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <label for="viewSelect" class="block text-sm font-medium text-gray-700 mb-2">Display Mode:</label>
-            <select 
-              id="viewSelect" 
-              v-model="calendarType" 
-              class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="points">Points</option>
-              <option value="goals">Goals</option>
-              <option value="xg">Expected Goals (xG)</option>
-            </select>
+        <!-- Filters -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <!-- <div class="flex flex-wrap items-center justify-between gap-6">
+            <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+          </div> -->
+          
+          <div class="flex flex-wrap gap-6 mt-4">
+            <div class="filter-group">
+              <label for="viewSelect" class="filter-label">Способ подсчета</label>
+              <select
+                id="viewSelect"
+                v-model="calendarType"
+                class="filter-select min-w-[200px]"
+              >
+                <option value="points">Набранные очки</option>
+                <option value="goals">Забитые и пропущенные голы</option>
+                <option value="xg">Созданные и допущенные xG</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -130,7 +136,7 @@ onMounted(async () => {
             <table class="w-full">
               <thead>
                 <tr class="bg-gray-50">
-                  <th class="team-column">Team</th>
+                  <th class="team-column">Команда</th>
                   
                   <template v-for="(tourName, index) in tourCalendarHeaders" :key="'cal-header-'+index">
                     <th class="tour-header">
@@ -177,18 +183,18 @@ table {
 }
 
 th {
-  padding: 16px 12px;
+  padding: 8px 6px;
   text-align: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   color: #374151;
   border-bottom: 1px solid #e5e7eb;
 }
 
 td {
-  padding: 12px;
+  padding: 8px 6px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
   color: #111827;
   border-bottom: 1px solid #f3f4f6;
 }
@@ -209,12 +215,13 @@ td {
   border-bottom: 1px solid #e5e7eb;
   font-weight: 700;
   color: #111827;
-  min-width: 120px;
+  min-width: 90px;
 }
 
 .team-cell {
   background: white;
   font-weight: 600;
+  color: #111827;
   position: sticky;
   left: 0;
   z-index: 1;
@@ -224,20 +231,20 @@ td {
 
 .calendar-cell {
   position: relative;
-  min-width: 120px;
-  padding: 12px 8px;
+  min-width: 90px;
+  padding: 8px 6px;
 }
 
 .rival {
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 4px;
+  font-size: 11px;
+  color: #111827;
+  margin-bottom: 2px;
   line-height: 1.2;
 }
 
 .value {
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 12px;
   color: #111827;
   font-family: 'Monaco', 'Menlo', monospace;
 }
@@ -254,29 +261,80 @@ tbody tr:hover .team-cell {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   th, td {
-    padding: 12px 6px;
-    font-size: 13px;
-  }
-  
-  .team-column {
-    min-width: 120px;
-  }
-  
-  .tour-header {
-    min-width: 100px;
-  }
-  
-  .calendar-cell {
-    min-width: 100px;
-    padding: 10px 6px;
-  }
-  
-  .rival {
+    padding: 6px 4px;
     font-size: 11px;
   }
   
+  .team-column {
+    min-width: 100px;
+  }
+  
+  .tour-header {
+    min-width: 80px;
+  }
+  
+  .calendar-cell {
+    min-width: 80px;
+    padding: 6px 4px;
+  }
+  
+  .rival {
+    font-size: 10px;
+  }
+  
   .value {
-    font-size: 14px;
+    font-size: 11px;
+  }
+}
+/* Filter styling */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.filter-select {
+  appearance: none;
+  background: white;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px 40px 12px 16px;
+  font-size: 14px;
+  color: #111827;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select:hover {
+  border-color: #9ca3af;
+}
+
+/* Responsive adjustments for filters */
+@media (max-width: 768px) {
+  .filter-group {
+    min-width: 100%;
+  }
+  
+  .filter-select {
+    min-width: 100%;
   }
 }
 </style>

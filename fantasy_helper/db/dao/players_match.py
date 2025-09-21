@@ -153,7 +153,9 @@ class PlayersMatchDao:
             carries_in_attacking_penalty_area=player_match.carries_into_penalty_area,
             # shot creation
             sca=player_match.sca,
-            gca=player_match.gca
+            gca=player_match.gca,
+            # miscellaneous
+            ball_recoveries=player_match.ball_recoveries,
         )
 
     def get_players_match_stats(self, league_name: str) -> List[PlayerMatchStats]:

@@ -5,6 +5,7 @@ from typing import List, Literal, Optional
 
 import numpy as np
 import pandas as pd
+import polars as pl
 from sqlalchemy import and_, func, union, case
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy.sql.functions import coalesce
@@ -13,7 +14,7 @@ from loguru import logger
 
 from fantasy_helper.utils.common import instantiate_leagues, load_config
 from fantasy_helper.db.database import Session
-from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff
+from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerStatsInfo, PlayersLeagueStats, PlayersTableRow, SportsPlayerDiff
 from fantasy_helper.db.models.feature_store.fs_players_free_kicks import (
     FSPlayersFreeKicks,
 )
@@ -22,6 +23,21 @@ from fantasy_helper.db.models.fbref_schedule import FbrefSchedule
 from fantasy_helper.db.models.players_match import PlayersMatch
 from fantasy_helper.db.dao.ml.naming import NamingDAO
 from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayersDAO
+
+
+STATS_COLUMNS = (
+    "goals", "shots", "shots_on_target", "xg", "xg_np", "xg_xa", "xg_np_xa", "assists", "xa",
+    "passes_into_penalty_area", "crosses_into_penalty_area", "touches_in_attacking_third",
+    "touches_in_attacking_penalty_area", "carries_in_attacking_third", "carries_in_attacking_penalty_area",
+    "sca", "gca", "ball_recoveries",
+)
+
+POSITIONS_MAPPING = {
+    "GOALKEEPER": "вр",
+    "DEFENDER": "зщ",
+    "MIDFIELDER": "пз",
+    "FORWARD": "нп",
+}
 
 
 class FSPlayersStatsDAO:
@@ -169,6 +185,7 @@ class FSPlayersStatsDAO:
                 PlayersMatch.carries_into_penalty_area.label("carries_into_penalty_area"),
                 PlayersMatch.sca.label("sca"),
                 PlayersMatch.gca.label("gca"),
+                PlayersMatch.ball_recoveries.label("ball_recoveries"),
             )
             .filter(and_(
                 PlayersMatch.league_name == league_name,
@@ -293,7 +310,12 @@ class FSPlayersStatsDAO:
             func.sum(clean_matches_with_players.c.gca).over(
                 partition_by=clean_matches_with_players.c.player_id, 
                 order_by=clean_matches_with_players.c.match_number
-            ).label("gca")
+            ).label("gca"),
+            # miscellaneous
+            func.sum(clean_matches_with_players.c.ball_recoveries).over(
+                partition_by=clean_matches_with_players.c.player_id, 
+                order_by=clean_matches_with_players.c.match_number
+            ).label("ball_recoveries")
         )
         logger.info(f"got {db_session.query(func.count()).select_from(cumulitive_stats).scalar()} cumulitive stats for {league_name}")
 
@@ -353,6 +375,8 @@ class FSPlayersStatsDAO:
                 # shot creation
                 sca=player_stat.sca,
                 gca=player_stat.gca,
+                # miscellaneous
+                ball_recoveries=player_stat.ball_recoveries,
                 # sports info
                 sports_team=player_stat.sports_team,
                 sports_name=player_stat.sports_name,
@@ -548,3 +572,99 @@ class FSPlayersStatsDAO:
         db_session.close()
 
         return sorted([player_name[0] for player_name in player_names if player_name[0] is not None])
+    
+    def get_players_table_rows(
+        self,
+        league_name: str,
+        games_count: Optional[int] = None,
+        normalize_minutes: bool = False,
+        normalize_matches: bool = False,
+        min_minutes: Optional[int] = None
+    ) -> List[PlayersTableRow]:
+        players_stats_info = self.get_players_stats_info(league_name)
+        df = pl.DataFrame([asdict(player_stats) for player_stats in players_stats_info])
+
+        if df.is_empty():
+            return []
+
+        # Apply team-specific games count filtering
+        if games_count is not None:
+            # For each team, find max games_all and apply min(team_max_games, games_count) filter
+            team_max_games = df.group_by("team").agg(pl.col("games_all").max().alias("team_max_games"))
+            df = df.join(team_max_games, on="team")
+            df = df.with_columns(
+                pl.min_horizontal(pl.col("team_max_games"), pl.lit(games_count)).alias("games_count_filter")
+            )
+            df = df.filter(pl.col("games_all") == pl.col("games_count_filter"))
+            df = df.drop(["team_max_games", "games_count_filter"])
+        else:
+            # If games_count is None, use each team's maximum games_all
+            team_max_games = df.group_by("team").agg(pl.col("games_all").max().alias("team_max_games"))
+            df = df.join(team_max_games, on="team")
+            df = df.filter(pl.col("games_all") == pl.col("team_max_games"))
+            df = df.drop("team_max_games")
+
+        if min_minutes is not None:
+            df = df.filter(pl.col("minutes") >= min_minutes)
+
+        # Normalization logic
+        if normalize_minutes:
+            minutes_mask = pl.col("minutes") > 0
+            for col in STATS_COLUMNS:
+                if col in df.columns:
+                    df = df.with_columns(
+                        pl.when(minutes_mask).then(pl.col(col) / pl.col("minutes"))
+                        .otherwise(pl.col(col)).alias(col)
+                    )
+        elif normalize_matches:
+            games_mask = pl.col("games") > 0
+            for col in STATS_COLUMNS:
+                if col in df.columns:
+                    df = df.with_columns(
+                        pl.when(games_mask).then(pl.col(col) / pl.col("games"))
+                        .otherwise(pl.col(col)).alias(col)
+                    )
+
+        # Drop columns with all null values
+        # df = df[[col for col in df.columns if not df[col].null_count() == df.height]]
+
+        # Final processing
+        if not df.is_empty() and "sports_name" in df.columns and "role" in df.columns:
+            df = df.filter(pl.col("sports_name").is_not_null())
+            df = df.with_columns(
+                pl.col("role").map_elements(POSITIONS_MAPPING.get).alias("role")
+            )
+            df = df.fill_null(0)
+
+        return [
+            PlayersTableRow(
+                # common
+                league_name=league_name,
+                name=row["sports_name"],
+                team_name=row["sports_team"],
+                role=row["role"],
+                price=row["price"],
+                games=row["games"],
+                minutes=row["minutes"],
+                # stats
+                goals=row["goals"],
+                assists=row["assists"],
+                shots=row["shots"],
+                shots_on_target=row["shots_on_target"],
+                xg=row["xg"],
+                xa=row["xa"],
+                xg_xa=row["xg_xa"],
+                xg_np=row["xg_np"],
+                xg_np_xa=row["xg_np_xa"],
+                ball_recoveries=row["ball_recoveries"],
+                passes_into_penalty_area=row["passes_into_penalty_area"],
+                crosses_into_penalty_area=row["crosses_into_penalty_area"],
+                touches_in_attacking_third=row["touches_in_attacking_third"],
+                touches_in_attacking_penalty_area=row["touches_in_attacking_penalty_area"],
+                carries_in_attacking_third=row["carries_in_attacking_third"],
+                carries_in_attacking_penalty_area=row["carries_in_attacking_penalty_area"],
+                sca=row["sca"],
+                gca=row["gca"],
+            ) 
+            for row in df.to_dicts()
+        ]
