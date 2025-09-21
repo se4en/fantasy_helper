@@ -267,8 +267,20 @@ async def get_players_stats(league_name: str) -> Dict:
 
 
 @app.get("/players_stats_info/")
-async def get_players_stats_info(league_name: str) -> List[PlayerStatsInfo]:
-    players_stats_info = FS_Player_dao.get_players_stats_info(league_name)
+async def get_players_stats_info(
+    league_name: str,
+    games_count: int,
+    normalize_minutes: bool = False,
+    normalize_matches: bool = False,
+    min_minutes: Optional[int] = None
+) -> List[PlayerStatsInfo]:
+    players_stats_info = FS_Player_dao.get_players_table_rows(
+        league_name,
+        games_count,
+        normalize_minutes,
+        normalize_matches,
+        min_minutes
+    )
     return players_stats_info
 
 

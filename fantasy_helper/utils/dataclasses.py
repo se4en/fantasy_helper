@@ -714,3 +714,33 @@ class PlayersLeagueStats:
         self.abs_stats = pd.read_json(json_data["abs_stats"])
         self.norm_stats = pd.read_json(json_data["norm_stats"])
         self.free_kicks = pd.read_json(json_data["free_kicks"])
+
+
+@dataclass
+class PlayersTableRow:
+    # common
+    league_name: str
+    name: str
+    team_name: str
+    role: Optional[str] = None
+    price: Optional[float] = None
+    games: Optional[int] = None
+    minutes: Optional[int] = None
+    # stats
+    goals: Optional[int] = None 
+    shots: Optional[int] = None
+    shots_on_target: Optional[int] = None
+    xg: Optional[float] = None
+    xg_np: Optional[float] = None
+    xg_xa: Optional[float] = None
+    xg_np_xa: Optional[float] = None
+    assists: Optional[int] = None
+    xa: Optional[float] = None
+    passes_into_penalty_area: Optional[int] = None
+    crosses_into_penalty_area: Optional[int] = None
+    touches_in_attacking_third: Optional[int] = None
+    touches_in_attacking_penalty_area: Optional[int] = None
+    carries_in_attacking_third: Optional[int] = None
+    carries_in_attacking_penalty_area: Optional[int] = None
+    sca: Optional[float] = None
+    gca: Optional[float] = None
