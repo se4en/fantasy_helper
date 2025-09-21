@@ -689,24 +689,24 @@ onMounted(async () => {
                 <td class="data-cell">{{ player.price ? player.price.toFixed(1) : '-' }}</td>
                 <td class="data-cell">{{ player.games || '-' }}</td>
                 <td class="data-cell">{{ player.minutes || '-' }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.goals) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.assists) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.shots) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.shots_on_target) }}</td>
-                <td class="data-cell stat-cell">{{ player.xg ? player.xg.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ player.xa ? player.xa.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ player.xg_xa ? player.xg_xa.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ player.xg_np ? player.xg_np.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ player.xg_np_xa ? player.xg_np_xa.toFixed(2) : '-' }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.ball_recoveries) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.passes_into_penalty_area) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.crosses_into_penalty_area) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.touches_in_attacking_third) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.touches_in_attacking_penalty_area) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.carries_in_attacking_third) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.carries_in_attacking_penalty_area) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.sca) }}</td>
-                <td class="data-cell stat-cell">{{ formatIntStat(player.gca) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.goals) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.assists) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.shots) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.shots_on_target) }}</td>
+                <td class="data-cell">{{ player.xg ? player.xg.toFixed(2) : '-' }}</td>
+                <td class="data-cell">{{ player.xa ? player.xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell">{{ player.xg_xa ? player.xg_xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell">{{ player.xg_np ? player.xg_np.toFixed(2) : '-' }}</td>
+                <td class="data-cell">{{ player.xg_np_xa ? player.xg_np_xa.toFixed(2) : '-' }}</td>
+                <td class="data-cell">{{ formatIntStat(player.ball_recoveries) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.passes_into_penalty_area) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.crosses_into_penalty_area) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.touches_in_attacking_third) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.touches_in_attacking_penalty_area) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.carries_in_attacking_third) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.carries_in_attacking_penalty_area) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.sca) }}</td>
+                <td class="data-cell">{{ formatIntStat(player.gca) }}</td>
               </tr>
             </tbody>
           </table>
@@ -797,11 +797,6 @@ th.sticky {
 
 .data-cell {
   min-width: 80px;
-}
-
-.stat-cell {
-  font-weight: 600;
-  font-family: 'Monaco', 'Menlo', monospace;
 }
 
 /* Hover effects */
