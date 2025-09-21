@@ -23,7 +23,7 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "google/gemini-2.0-flash-001"):
+    def __init__(self, openai_model: str = "google/gemini-2.5-flash"):
         proxy_url = f"http://{PROXY_USERS[-1]}:{PROXY_PASSWORDS[-1]}@{PROXY_HOSTS[-1]}:{PROXY_PORTS[-1]}"
         self._openai_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
@@ -63,13 +63,16 @@ class NameMatcher:
 
         return [elem[0] for elem in team_names]
 
-    def get_sports_players_names(self, league_name: str, team_name: str) -> Optional[List[str]]:
+    def get_sports_players_names(
+        self, league_name: str, team_name: str, year: str = "2024"
+    ) -> Optional[List[str]]:
         db_session: SQLSession = Session()
 
         query = (
             db_session.query(SportsPlayer.name).filter(and_(
                 SportsPlayer.league_name == league_name,
-                SportsPlayer.team_name == team_name
+                SportsPlayer.team_name == team_name,
+                SportsPlayer.year == year
             ))
             .distinct()
             .order_by(SportsPlayer.name)
@@ -97,13 +100,16 @@ class NameMatcher:
 
         return [elem[0] for elem in team_names]
 
-    def get_fbref_players_names(self, league_name: str, team_name: str) -> Optional[List[str]]:
+    def get_fbref_players_names(
+        self, league_name: str, team_name: str, year: str = "2024"
+    ) -> Optional[List[str]]:
         db_session: SQLSession = Session()
 
         query = (
             db_session.query(ActualPlayer.name).filter(and_(
                 ActualPlayer.league_name == league_name,
-                ActualPlayer.team_name == team_name
+                ActualPlayer.team_name == team_name,
+                ActualPlayer.year == year
             ))
             .distinct()
             .order_by(ActualPlayer.name)
@@ -380,10 +386,11 @@ class NameMatcher:
         return teams_to_add, teams_to_delete
 
     def match_players(
-            self, league_name: str, team_name: TeamName, players_names: List[PlayerName]
-        ) -> Tuple[List[PlayerName], List[PlayerName]]:
-        cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name)
-        cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name)
+        self, league_name: str, team_name: TeamName, players_names: List[PlayerName]
+    ) -> Tuple[List[PlayerName], List[PlayerName]]:
+        year = self._league_2_year.get(league_name, "2024")
+        cur_sports_players_names = self.get_sports_players_names(league_name, team_name.sports_name, year)
+        cur_fbref_players_names = self.get_fbref_players_names(league_name, team_name.fbref_name, year)
         logger.info(f"Cur players names for {team_name.name} in {league_name}: sports({len(cur_sports_players_names)}), fbref({len(cur_fbref_players_names)})")
 
         free_sports_players_names, free_fbref_players_names = [], []

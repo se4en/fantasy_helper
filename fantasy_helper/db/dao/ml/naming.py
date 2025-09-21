@@ -43,7 +43,7 @@ class NamingDAO:
         self._add_teams_names(teams_names_to_add)
 
         # update players names
-        new_teams_names = self._get_teams_names(league_name)
+        new_teams_names = self._get_teams_names(league_name, year)
         for team_name in new_teams_names:
             players_names = self._get_players_names(league_name, team_name.name)
             logger.info(f"Found {len(players_names)} players names for team {team_name.name} in {league_name}")
