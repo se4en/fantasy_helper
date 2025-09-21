@@ -587,10 +587,22 @@ class FSPlayersStatsDAO:
         if df.is_empty():
             return []
 
-        max_games_count = df["games_all"].max()
-        games_count_filter = min(max_games_count, games_count) if games_count is not None else max_games_count
-
-        df = df.filter(pl.col("games_all") == games_count_filter)
+        # Apply team-specific games count filtering
+        if games_count is not None:
+            # For each team, find max games_all and apply min(team_max_games, games_count) filter
+            team_max_games = df.group_by("team").agg(pl.col("games_all").max().alias("team_max_games"))
+            df = df.join(team_max_games, on="team")
+            df = df.with_columns(
+                pl.min_horizontal(pl.col("team_max_games"), pl.lit(games_count)).alias("games_count_filter")
+            )
+            df = df.filter(pl.col("games_all") == pl.col("games_count_filter"))
+            df = df.drop(["team_max_games", "games_count_filter"])
+        else:
+            # If games_count is None, use each team's maximum games_all
+            team_max_games = df.group_by("team").agg(pl.col("games_all").max().alias("team_max_games"))
+            df = df.join(team_max_games, on="team")
+            df = df.filter(pl.col("games_all") == pl.col("team_max_games"))
+            df = df.drop("team_max_games")
 
         if min_minutes is not None:
             df = df.filter(pl.col("minutes") >= min_minutes)
