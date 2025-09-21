@@ -27,11 +27,11 @@ export const usePlayersStatsStore = defineStore('playersStats', {
           normalize_matches: normalizeMatches
         }
 
-        if (gamesCount !== null) {
+        if (gamesCount !== null && gamesCount !== undefined && gamesCount !== '') {
           params.games_count = gamesCount
         }
 
-        if (minMinutes !== null) {
+        if (minMinutes !== null && minMinutes !== undefined && minMinutes !== '') {
           params.min_minutes = minMinutes
         }
 

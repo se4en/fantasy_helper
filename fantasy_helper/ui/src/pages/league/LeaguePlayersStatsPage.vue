@@ -99,8 +99,8 @@ const filteredPlayersStats = computed(() => {
       return false
     }
     
-    // Price filters
-    if (maxPrice.value !== null && player.price > maxPrice.value) {
+    // Price filters - ensure we only filter when maxPrice has a valid numeric value
+    if (maxPrice.value !== null && maxPrice.value !== undefined && maxPrice.value !== '' && player.price > maxPrice.value) {
       return false
     }
     
@@ -147,13 +147,36 @@ function setSort(column) {
 
 async function fetchData() {
   if (route.params.leagueSlug) {
+    // Ensure empty values are converted to null
+    const cleanGamesCount = gamesCount.value === '' || gamesCount.value === undefined ? null : gamesCount.value
+    const cleanMinMinutes = minMinutes.value === '' || minMinutes.value === undefined ? null : minMinutes.value
+    
     await playersStatsStore.fetchPlayersStats(
       route.params.leagueSlug,
-      gamesCount.value,
+      cleanGamesCount,
       normalizationType.value === 'minutes',
       normalizationType.value === 'matches',
-      minMinutes.value
+      cleanMinMinutes
     )
+  }
+}
+
+// Handle input clearing for number inputs
+function handleGamesCountInput(event) {
+  if (event.target.value === '') {
+    gamesCount.value = null
+  }
+}
+
+function handleMaxPriceInput(event) {
+  if (event.target.value === '') {
+    maxPrice.value = null
+  }
+}
+
+function handleMinMinutesInput(event) {
+  if (event.target.value === '') {
+    minMinutes.value = null
   }
 }
 
@@ -168,8 +191,16 @@ function formatIntStat(value) {
 }
 
 // Watch for parameter changes
-watch([gamesCount, normalizationType, minMinutes, maxPrice], () => {
+watch([gamesCount, normalizationType, minMinutes], () => {
   fetchData()
+})
+
+// Separate watcher for maxPrice to handle empty values
+watch(maxPrice, (newValue) => {
+  // Convert empty string to null for consistency
+  if (newValue === '' || newValue === undefined) {
+    maxPrice.value = null
+  }
 })
 
 watch(
@@ -234,6 +265,7 @@ onMounted(async () => {
                   type="number"
                   placeholder="все"
                   class="filter-input"
+                  @input="handleGamesCountInput"
                 >
               </div>
               
@@ -276,6 +308,7 @@ onMounted(async () => {
                   step="0.5"
                   placeholder="нет"
                   class="filter-input"
+                  @input="handleMaxPriceInput"
                 >
               </div>
               
@@ -300,6 +333,7 @@ onMounted(async () => {
                   type="number"
                   placeholder="нет"
                   class="filter-input"
+                  @input="handleMinMinutesInput"
                 >
               </div>
             </div>
