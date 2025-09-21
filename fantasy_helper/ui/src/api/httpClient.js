@@ -37,6 +37,7 @@ httpClient.interceptors.response.use(
 export const ENDPOINTS = {
   LEAGUES_INFO: '/leagues_info/',
   COEFFS: '/coeffs/',
+  PLAYERS_STATS_INFO: '/players_stats_info/',
   CALENDAR: '/calendar/',
   ME: '/me',
   LOGOUT: '/logout'

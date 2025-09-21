@@ -568,7 +568,7 @@ class FSPlayersStatsDAO:
     def get_players_table_rows(
         self,
         league_name: str,
-        games_count: int,
+        games_count: Optional[int] = None,
         normalize_minutes: bool = False,
         normalize_matches: bool = False,
         min_minutes: Optional[int] = None
@@ -577,7 +577,7 @@ class FSPlayersStatsDAO:
         df = pl.DataFrame([asdict(player_stats) for player_stats in players_stats_info])
 
         if df.is_empty():
-            return
+            return []
 
         max_games_count = df["games_all"].max()
         games_count_filter = min(max_games_count, games_count) if games_count is not None else max_games_count

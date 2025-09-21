@@ -26,7 +26,7 @@ from fantasy_helper.db.dao.feature_store.fs_sports_players import FSSportsPlayer
 from fantasy_helper.api.keycloak_client import KeycloakClient
 from fantasy_helper.api.auth_dep import get_keycloak_client, get_current_user
 
-from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, SportsPlayerDiff, TeamLineup
+from fantasy_helper.utils.dataclasses import CalendarInfo, CalendarTableRow, CoeffTableRow, KeycloakUser, LeagueInfo, MatchInfo, PlayerStatsInfo, PlayersLeagueStats, PlayersTableRow, SportsPlayerDiff, TeamLineup
 from fantasy_helper.conf.config import KEYCLOAK_BASE_URL, KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, FRONTEND_URL_HTTPS, BACKEND_URL_HTTPS
 
 
@@ -269,11 +269,11 @@ async def get_players_stats(league_name: str) -> Dict:
 @app.get("/players_stats_info/")
 async def get_players_stats_info(
     league_name: str,
-    games_count: int,
+    games_count: Optional[int] = None,
     normalize_minutes: bool = False,
     normalize_matches: bool = False,
     min_minutes: Optional[int] = None
-) -> List[PlayerStatsInfo]:
+) -> List[PlayersTableRow]:
     players_stats_info = FS_Player_dao.get_players_table_rows(
         league_name,
         games_count,
