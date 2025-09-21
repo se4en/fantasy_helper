@@ -24,6 +24,7 @@ class FSCalendarsDAO:
     def __init__(self):
         cfg = load_config(config_path="../../conf", config_name="config")
         self._leagues: List[LeagueInfo] = instantiate_leagues(cfg)
+        self._league_2_year = {league.name: league.year for league in self._leagues}
         self._schedule_dao = ScheduleDao()
         self._table_dao = TableDao()
         self._naming_dao = NamingDAO()
@@ -35,7 +36,8 @@ class FSCalendarsDAO:
                 self._valid_leagues.append(league.name)
 
     def _prepare_league_table(self, league_name: str) -> Dict[str, LeagueTableInfo]:
-        table: List[LeagueTableInfo] = self._table_dao.get_table(league_name)
+        year = self._league_2_year.get(league_name, "2024")
+        table: List[LeagueTableInfo] = self._table_dao.get_table(league_name, year)
 
         result = {}
         for table_row in table:
@@ -44,7 +46,11 @@ class FSCalendarsDAO:
         return result
 
     def _prepare_league_schedule(self, league_name: str) -> List[LeagueScheduleInfo]:
-        schedule: List[LeagueScheduleInfo] = self._schedule_dao.get_schedule(league_name)
+        year = self._league_2_year.get(league_name, "2024")
+        schedule: List[LeagueScheduleInfo] = self._schedule_dao.get_schedule(
+            league_name,
+            year
+        )
         
         result = []
         for schedule_row in sorted(schedule, key=lambda x: x.date):
@@ -53,13 +59,22 @@ class FSCalendarsDAO:
 
         return result
 
-    def _compute_points_score(self, team: LeagueTableInfo) -> float:
+    def _compute_points_score(self, team: Optional[LeagueTableInfo]) -> Optional[float]:
+        if team is None:
+            return None
+
         return team.points
 
-    def _compute_goals_score(self, team: LeagueTableInfo) -> float:
+    def _compute_goals_score(self, team: Optional[LeagueTableInfo]) -> Optional[float]:
+        if team is None:
+            return None
+
         return team.goals_for - team.goals_against
 
-    def _compute_xg_score(self, team: LeagueTableInfo) -> Optional[float]:
+    def _compute_xg_score(self, team: Optional[LeagueTableInfo]) -> Optional[float]:
+        if team is None:
+            return None
+
         if team.xg_for is None or team.xg_against is None:
             return None
         else:

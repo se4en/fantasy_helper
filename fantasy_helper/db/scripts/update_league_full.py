@@ -31,6 +31,10 @@ async def main(league_name: str):
     naming_dao = NamingDAO()
     player_dao = PlayerDAO()
     
+    # update actual fbref names and players
+    player_dao.update_actual_players_stats(league_name)
+    naming_dao.update_league_naming(league_name)
+
     # update main tables
     schedule_dao.update_schedules(league_name)
     table_dao.update_tables(league_name)
@@ -41,9 +45,8 @@ async def main(league_name: str):
     
     sports_player_dao.update_players(league_name)
 
-    naming_dao.update_league_naming(league_name)
-
-    player_dao.update_players_stats(league_name)
+    # disable for player_dao.update_feature_store
+    # player_dao.update_players_stats(league_name)
 
     # update feature stores
     coeff_dao.update_feature_store(league_name)

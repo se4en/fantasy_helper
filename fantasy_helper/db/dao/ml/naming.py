@@ -30,7 +30,7 @@ class NamingDAO:
     def update_league_naming(self, league_name: str) -> None:
         logger.info(f"Updating naming for league {league_name}")
         year = self._league_2_year.get(league_name, "2024")
-        teams_names = self._get_teams_names(league_name)
+        teams_names = self._get_teams_names(league_name, year)
         logger.info(f"Found {len(teams_names)} teams names for league {league_name}")
 
         # update teams names
@@ -56,9 +56,7 @@ class NamingDAO:
             self._delete_players_names(players_names_to_delete)
             self._add_players_names(players_names_to_add)
 
-    def _get_teams_names(self, league_name: str) -> List[TeamName]:
-        year = self._league_2_year.get(league_name, "2024")
-
+    def _get_teams_names(self, league_name: str, year: str = "2024") -> List[TeamName]:
         db_session: SQLSession = Session()
 
         teams_names = (

@@ -535,6 +535,45 @@ class PlayerDAO:
         else:
             logger.info(f"League {league_name} not found in fbref parser")
 
+    def update_actual_players_all_leagues(self) -> None:
+        for league_name in self.__fbref_parser.get_all_leagues():
+            self.update_actual_players_stats(league_name)
+
+    def update_actual_players_stats(self, league_name: str) -> None:
+        if league_name in self.__fbref_parser.get_all_leagues():
+            logger.info(f"Start update actual players for league {league_name}")
+            year = self._league_2_year.get(league_name, "2024")
+
+            players_stats: List[PlayerStats] = self.__fbref_parser.get_actual_players_league(
+                league_name
+            )
+            db_session: SQLSession = Session()
+
+            db_session.query(ActualPlayer).filter(and_(
+                ActualPlayer.league_name == league_name,
+                ActualPlayer.year == year
+            )).delete()
+
+            for player in players_stats:
+                db_session.add(
+                    ActualPlayer(
+                        name=player.name,
+                        league_name=player.league_name,
+                        team_name=player.team_name,
+                        position=player.position,
+                        timestamp=datetime.now().replace(tzinfo=utc),
+                        year=year
+                    )
+                )
+
+            db_session.commit()
+            db_session.close()
+
+            logger.info(f"Updated {len(players_stats)} actual players for {league_name}")
+        else:
+            logger.info(f"League {league_name} not found in fbref parser")
+
+
     def update_feature_store(self, league_name: str) -> None:
         logger.info(f"Start update players stats feature store for {league_name}")
         feature_store = FSPlayersStatsDAO()
