@@ -23,6 +23,34 @@ const maxPrice = ref(null)
 const sortBy = ref(null)
 const sortDirection = ref('desc')
 
+// Column descriptions for tooltips
+const columnDescriptions = {
+  name: 'Имя игрока',
+  team_name: 'Название команды',
+  role: 'Позиция игрока',
+  price: 'Цена игрока в fantasy',
+  games: 'Количество сыгранных матчей',
+  minutes: 'Количество сыгранных минут',
+  goals: 'Количество забитых голов',
+  assists: 'Количество ассистов',
+  shots: 'Количество ударов по воротам',
+  shots_on_target: 'Количество ударов в ставку',
+  xg: 'Ожидаемые голы (Expected Goals)',
+  xa: 'Ожидаемые ассисты (Expected Assists)',
+  xg_xa: 'Сумма ожидаемых голов и ассистов',
+  xg_np: 'Ожидаемые голы без пенальти',
+  xg_np_xa: 'Сумма ожидаемых голов без пенальти и ассистов',
+  ball_recoveries: 'Количество возвратов мяча',
+  passes_into_penalty_area: 'Количество передач в штрафную площадь',
+  crosses_into_penalty_area: 'Количество навесов в штрафную площадь',
+  touches_in_attacking_third: 'Количество касаний в атакующей трети поля',
+  touches_in_attacking_penalty_area: 'Количество касаний в штрафной площади',
+  carries_in_attacking_third: 'Количество продвижений мяча в атакующей трети поля',
+  carries_in_attacking_penalty_area: 'Количество продвижений мяча в штрафной площади',
+  sca: 'Создание моментов (Shot Creating Actions)',
+  gca: 'Создание голов (Goal Creating Actions)'
+}
+
 // Get unique teams and roles for filter options
 const availableTeams = computed(() => {
   if (!playersStats.value) return []
@@ -304,10 +332,11 @@ onMounted(async () => {
           <table class="w-full">
             <thead>
               <tr class="bg-gray-50">
-                <th 
-                  @click="setSort('name')" 
+                <th
+                  @click="setSort('name')"
                   class="sortable-header sticky left-0 bg-gray-50 z-10"
                   :class="{ active: sortBy === 'name' }"
+                  :title="columnDescriptions.name"
                 >
                   <span class="header-content">
                     <span>Игрок</span>
@@ -320,6 +349,7 @@ onMounted(async () => {
                   @click="setSort('team_name')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'team_name' }"
+                  :title="columnDescriptions.team_name"
                 >
                   <span class="header-content">
                     <span>Команда</span>
@@ -332,6 +362,7 @@ onMounted(async () => {
                   @click="setSort('role')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'role' }"
+                  :title="columnDescriptions.role"
                 >
                   <span class="header-content">
                     <span>Позиция</span>
@@ -340,10 +371,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('price')" 
+                <th
+                  @click="setSort('price')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'price' }"
+                  :title="columnDescriptions.price"
                 >
                   <span class="header-content">
                     <span>Цена</span>
@@ -352,10 +384,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('games')" 
+                <th
+                  @click="setSort('games')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'games' }"
+                  :title="columnDescriptions.games"
                 >
                   <span class="header-content">
                     <span>Матчи</span>
@@ -364,10 +397,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('minutes')" 
+                <th
+                  @click="setSort('minutes')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'minutes' }"
+                  :title="columnDescriptions.minutes"
                 >
                   <span class="header-content">
                     <span>Минуты</span>
@@ -376,10 +410,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('goals')" 
+                <th
+                  @click="setSort('goals')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'goals' }"
+                  :title="columnDescriptions.goals"
                 >
                   <span class="header-content">
                     <span>Голы</span>
@@ -388,10 +423,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('assists')" 
+                <th
+                  @click="setSort('assists')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'assists' }"
+                  :title="columnDescriptions.assists"
                 >
                   <span class="header-content">
                     <span>Ассисты</span>
@@ -400,10 +436,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('shots')" 
+                <th
+                  @click="setSort('shots')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'shots' }"
+                  :title="columnDescriptions.shots"
                 >
                   <span class="header-content">
                     <span>Удары</span>
@@ -416,6 +453,7 @@ onMounted(async () => {
                   @click="setSort('shots_on_target')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'shots_on_target' }"
+                  :title="columnDescriptions.shots_on_target"
                 >
                   <span class="header-content">
                     <span>Удары в ств.</span>
@@ -424,10 +462,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('xg')" 
+                <th
+                  @click="setSort('xg')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'xg' }"
+                  :title="columnDescriptions.xg"
                 >
                   <span class="header-content">
                     <span>xG</span>
@@ -436,10 +475,11 @@ onMounted(async () => {
                     </span>
                   </span>
                 </th>
-                <th 
-                  @click="setSort('xa')" 
+                <th
+                  @click="setSort('xa')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'xa' }"
+                  :title="columnDescriptions.xa"
                 >
                   <span class="header-content">
                     <span>xA</span>
@@ -452,6 +492,7 @@ onMounted(async () => {
                   @click="setSort('xg_xa')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'xg_xa' }"
+                  :title="columnDescriptions.xg_xa"
                 >
                   <span class="header-content">
                     <span>xG+xA</span>
@@ -464,6 +505,7 @@ onMounted(async () => {
                   @click="setSort('xg_np')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'xg_np' }"
+                  :title="columnDescriptions.xg_np"
                 >
                   <span class="header-content">
                     <span>xGnp</span>
@@ -476,6 +518,7 @@ onMounted(async () => {
                   @click="setSort('xg_np_xa')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'xg_np_xa' }"
+                  :title="columnDescriptions.xg_np_xa"
                 >
                   <span class="header-content">
                     <span>xGnp+xA</span>
@@ -488,6 +531,7 @@ onMounted(async () => {
                   @click="setSort('ball_recoveries')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'ball_recoveries' }"
+                  :title="columnDescriptions.ball_recoveries"
                 >
                   <span class="header-content">
                     <span>Возвраты</span>
@@ -500,6 +544,7 @@ onMounted(async () => {
                   @click="setSort('passes_into_penalty_area')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'passes_into_penalty_area' }"
+                  :title="columnDescriptions.passes_into_penalty_area"
                 >
                   <span class="header-content">
                     <span>ПерПен</span>
@@ -512,6 +557,7 @@ onMounted(async () => {
                   @click="setSort('crosses_into_penalty_area')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'crosses_into_penalty_area' }"
+                  :title="columnDescriptions.crosses_into_penalty_area"
                 >
                   <span class="header-content">
                     <span>КросыПен</span>
@@ -524,6 +570,7 @@ onMounted(async () => {
                   @click="setSort('touches_in_attacking_third')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'touches_in_attacking_third' }"
+                  :title="columnDescriptions.touches_in_attacking_third"
                 >
                   <span class="header-content">
                     <span>КасТреть</span>
@@ -536,6 +583,7 @@ onMounted(async () => {
                   @click="setSort('touches_in_attacking_penalty_area')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'touches_in_attacking_penalty_area' }"
+                  :title="columnDescriptions.touches_in_attacking_penalty_area"
                 >
                   <span class="header-content">
                     <span>КасПен</span>
@@ -548,6 +596,7 @@ onMounted(async () => {
                   @click="setSort('carries_in_attacking_third')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'carries_in_attacking_third' }"
+                  :title="columnDescriptions.carries_in_attacking_third"
                 >
                   <span class="header-content">
                     <span>ПродвТреть</span>
@@ -560,6 +609,7 @@ onMounted(async () => {
                   @click="setSort('carries_in_attacking_penalty_area')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'carries_in_attacking_penalty_area' }"
+                  :title="columnDescriptions.carries_in_attacking_penalty_area"
                 >
                   <span class="header-content">
                     <span>ПродвПен</span>
@@ -572,6 +622,7 @@ onMounted(async () => {
                   @click="setSort('sca')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'sca' }"
+                  :title="columnDescriptions.sca"
                 >
                   <span class="header-content">
                     <span>SCA</span>
@@ -584,6 +635,7 @@ onMounted(async () => {
                   @click="setSort('gca')"
                   class="sortable-header"
                   :class="{ active: sortBy === 'gca' }"
+                  :title="columnDescriptions.gca"
                 >
                   <span class="header-content">
                     <span>GCA</span>
