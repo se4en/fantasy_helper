@@ -22,7 +22,7 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "deepseek/deepseek-r1-0528:free"):
+    def __init__(self, openai_model: str = "google/gemini-2.0-flash-001"):
         proxy_url = f"http://{PROXY_USERS[-1]}:{PROXY_PASSWORDS[-1]}@{PROXY_HOSTS[-1]}:{PROXY_PORTS[-1]}"
         self._openai_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
@@ -253,10 +253,14 @@ class NameMatcher:
         return {}
 
     def match_players_names(self, players_names_1: List[str], players_names_2: List[str]) -> Dict[str, str]:
-        result = self._get_match_players_names(players_names_1, players_names_2)
-        players_names_1_add = list(filter(lambda x: x not in result.keys(), players_names_1))
-        players_names_2_add = list(filter(lambda x: x not in result.values(), players_names_2))
-        result.update(self._get_match_players_names(players_names_1_add, players_names_2_add))
+        try:
+            result = self._get_match_players_names(players_names_1, players_names_2)
+            players_names_1_add = list(filter(lambda x: x not in result.keys(), players_names_1))
+            players_names_2_add = list(filter(lambda x: x not in result.values(), players_names_2))
+            result.update(self._get_match_players_names(players_names_1_add, players_names_2_add))
+        except AttributeError:
+            logger.error(f"Failed to parse matching result for {players_names_1[0]}... {players_names_2[0]}...")
+            result = {}
         return result
     
     def _compute_free_and_delete_elements(
