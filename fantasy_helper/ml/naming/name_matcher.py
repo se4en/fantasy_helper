@@ -23,7 +23,7 @@ from fantasy_helper.utils.dataclasses import LeagueInfo, PlayerName, TeamName
 
 
 class NameMatcher:
-    def __init__(self, openai_model: str = "google/gemini-2.5-flash"):
+    def __init__(self, openai_model: str = "google/gemini-2.0-flash-001"):
         proxy_url = f"http://{PROXY_USERS[-1]}:{PROXY_PASSWORDS[-1]}@{PROXY_HOSTS[-1]}:{PROXY_PORTS[-1]}"
         self._openai_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
