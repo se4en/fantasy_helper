@@ -8,9 +8,9 @@ export default {
   },
   computed: {
     availableRoutes() {
-      return this.$router.getRoutes().filter(route => 
-        route.meta?.showInNavigation && 
-        !route.meta?.requiresAuth && 
+      return this.$router.options.routes.filter(route =>
+        route.meta?.showInNavigation &&
+        !route.meta?.requiresAuth &&
         route.name &&
         route.name !== 'Home' &&
         route.name !== 'Login'
