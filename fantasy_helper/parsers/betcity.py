@@ -98,21 +98,22 @@ class BetcityParser:
         
         # Block images and CSS for faster loading
         await context.route("**/*.{png,jpg,jpeg,gif,svg,css}", lambda route: route.abort())
-        
-        return browser, context
+    
+        return playwright, browser, context
 
     async def _parse_league_matches(self, league_name: str) -> Optional[List[MatchInfo]]:
         if league_name not in self._leagues:
             return None
 
         result = []
+        playwright = None
         browser = None
         context = None
         use_proxy = True
 
         for attempt in range(self._max_retries):
             try:
-                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
+                playwright, browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
                 page = await context.new_page()
                 page.set_default_timeout(self._page_timeout * 1000)  # Playwright uses milliseconds
                 
@@ -176,6 +177,8 @@ class BetcityParser:
                     await context.close()
                 if browser is not None:
                     await browser.close()
+                if playwright is not None:
+                    await playwright.stop()
 
         return result
 
@@ -583,13 +586,14 @@ class BetcityParser:
         return match_info
 
     async def _parse_match(self, match_info: MatchInfo) -> MatchInfo:
+        playwright = None
         browser = None
         context = None
         use_proxy = True
 
         for attempt in range(self._max_retries):
             try:
-                browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
+                playwright, browser, context = await self._create_browser_context(use_proxy=use_proxy, attempt=attempt)
                 page = await context.new_page()
                 page.set_default_timeout(self._page_timeout * 1000)
 
@@ -626,6 +630,8 @@ class BetcityParser:
                     await context.close()
                 if browser is not None:
                     await browser.close()
+                if playwright is not None:
+                    await playwright.stop()
 
         return match_info
 
