@@ -35,6 +35,24 @@ def run_command(command, description):
     return result
 
 
+def get_alembic_command():
+    """Get the appropriate alembic command based on environment"""
+    # Check if uv is available and if we're in a uv project
+    try:
+        # Check if uv.lock exists (indicates uv project)
+        uv_lock_path = project_root / "uv.lock"
+        if uv_lock_path.exists():
+            # Try to run uv to see if it's available
+            result = subprocess.run(["uv", "--version"], capture_output=True, text=True)
+            if result.returncode == 0:
+                return ["uv", "run", "alembic"]
+    except FileNotFoundError:
+        pass
+    
+    # Fallback to direct alembic command
+    return ["alembic"]
+
+
 def main():
     """Main migration function"""
     if len(sys.argv) < 2:
@@ -50,39 +68,42 @@ def main():
     
     action = sys.argv[1]
     
+    # Get the appropriate alembic command
+    alembic_cmd = get_alembic_command()
+    
     if action == "generate":
         if len(sys.argv) < 3:
             print("Error: Migration message required for generate")
             sys.exit(1)
         message = sys.argv[2]
         run_command(
-            ["alembic", "revision", "--autogenerate", "-m", message],
+            alembic_cmd + ["revision", "--autogenerate", "-m", message],
             f"Generating migration: {message}"
         )
     
     elif action == "upgrade":
         target = sys.argv[2] if len(sys.argv) > 2 else "head"
         run_command(
-            ["alembic", "upgrade", target],
+            alembic_cmd + ["upgrade", target],
             f"Upgrading database to {target}"
         )
     
     elif action == "downgrade":
         target = sys.argv[2] if len(sys.argv) > 2 else "-1"
         run_command(
-            ["alembic", "downgrade", target],
+            alembic_cmd + ["downgrade", target],
             f"Downgrading database to {target}"
         )
     
     elif action == "current":
         run_command(
-            ["alembic", "current"],
+            alembic_cmd + ["current"],
             "Showing current migration"
         )
     
     elif action == "history":
         run_command(
-            ["alembic", "history"],
+            alembic_cmd + ["history"],
             "Showing migration history"
         )
     
