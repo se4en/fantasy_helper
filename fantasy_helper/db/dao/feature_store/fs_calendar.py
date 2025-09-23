@@ -286,7 +286,7 @@ class FSCalendarsDAO:
         db_session.commit()
         db_session.close()
 
-        return result
+        return list(sorted(result, key=lambda x: x.team_name))
 
     def update_calendar(self, league_name: str) -> None:
         logger.info(f"Start update calendar feature store for {league_name}")
