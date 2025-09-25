@@ -11,6 +11,9 @@ const playersStatsStore = usePlayersStatsStore()
 const { playersStats, isLoading: isPlayersStatsLoading, error } = storeToRefs(playersStatsStore)
 const { showLoader } = useLoaderDelay(isPlayersStatsLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 // Filter and sorting state
 const gamesCount = ref(null)
 const minMinutes = ref(null)
@@ -25,21 +28,21 @@ const sortDirection = ref('desc')
 
 // Column descriptions for tooltips
 const columnDescriptions = {
-  name: 'Имя игрока',
-  team_name: 'Название команды',
-  role: 'Позиция игрока',
-  price: 'Цена игрока в fantasy',
+  // name: 'Имя игрока',
+  // team_name: 'Название команды',
+  // role: 'Позиция игрока',
+  // price: 'Цена игрока в fantasy',
   games: 'Количество сыгранных матчей',
   minutes: 'Количество сыгранных минут',
   goals: 'Количество забитых голов',
   assists: 'Количество ассистов',
   shots: 'Количество ударов по воротам',
-  shots_on_target: 'Количество ударов в ставку',
-  xg: 'Ожидаемые голы (Expected Goals)',
-  xa: 'Ожидаемые ассисты (Expected Assists)',
-  xg_xa: 'Сумма ожидаемых голов и ассистов',
+  shots_on_target: 'Количество ударов в створ',
+  xg: 'Ожидаемые голы',
+  xa: 'Ожидаемые ассисты',
+  xg_xa: 'Ожидаемые голы и ассисты',
   xg_np: 'Ожидаемые голы без пенальти',
-  xg_np_xa: 'Сумма ожидаемых голов без пенальти и ассистов',
+  xg_np_xa: 'Ожидаемые голы без пенальти и ассисты',
   ball_recoveries: 'Количество возвратов мяча',
   passes_into_penalty_area: 'Количество передач в штрафную площадь',
   crosses_into_penalty_area: 'Количество навесов в штрафную площадь',
@@ -47,8 +50,8 @@ const columnDescriptions = {
   touches_in_attacking_penalty_area: 'Количество касаний в штрафной площади',
   carries_in_attacking_third: 'Количество продвижений мяча в атакующей трети поля',
   carries_in_attacking_penalty_area: 'Количество продвижений мяча в штрафной площади',
-  sca: 'Создание моментов (Shot Creating Actions)',
-  gca: 'Создание голов (Goal Creating Actions)'
+  sca: 'Два атакующих действия, непосредственно приведших к удару, такие как пасы, успешные попытки дриблинга и заработанные фолы',
+  gca: 'Два атакующих действия, непосредственно приведших к голу, такие как пасы, успешные попытки дриблинга и заработанные фолы'
 }
 
 // Get unique teams and roles for filter options
@@ -147,17 +150,21 @@ function setSort(column) {
 
 async function fetchData() {
   if (route.params.leagueSlug) {
-    // Ensure empty values are converted to null
-    const cleanGamesCount = gamesCount.value === '' || gamesCount.value === undefined ? null : gamesCount.value
-    const cleanMinMinutes = minMinutes.value === '' || minMinutes.value === undefined ? null : minMinutes.value
-    
-    await playersStatsStore.fetchPlayersStats(
-      route.params.leagueSlug,
-      cleanGamesCount,
-      normalizationType.value === 'minutes',
-      normalizationType.value === 'matches',
-      cleanMinMinutes
-    )
+    try {
+      // Ensure empty values are converted to null
+      const cleanGamesCount = gamesCount.value === '' || gamesCount.value === undefined ? null : gamesCount.value
+      const cleanMinMinutes = minMinutes.value === '' || minMinutes.value === undefined ? null : minMinutes.value
+      
+      await playersStatsStore.fetchPlayersStats(
+        route.params.leagueSlug,
+        cleanGamesCount,
+        normalizationType.value === 'minutes',
+        normalizationType.value === 'matches',
+        cleanMinMinutes
+      )
+    } finally {
+      hasInitiallyLoaded.value = true
+    }
   }
 }
 
@@ -207,6 +214,7 @@ watch(
   () => route.params.leagueSlug,
   async (newLeagueSlug) => {
     if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
       sortBy.value = null
       sortDirection.value = 'desc'
       selectedTeam.value = ''
@@ -223,9 +231,12 @@ onMounted(async () => {
   try {
     if (!playersStats.value?.length && route.params.leagueSlug) {
       await fetchData()
+    } else if (playersStats.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load players stats:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -235,28 +246,14 @@ onMounted(async () => {
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Player Statistics</h1>
-        <p class="text-gray-600">Performance statistics for players in the league</p>
+        <!-- <h1 class="text-2xl font-bold text-gray-900 mb-2">Player Statistics</h1>
+        <p class="text-gray-600">Performance statistics for players in the league</p> -->
         
         <!-- Filters -->
         <div class="mt-6">
           <!-- Combined Filters Card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div class="flex flex-wrap items-center justify-between gap-6">
-              <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
-              <button
-                v-if="selectedTeam || selectedRole || gamesCount !== null || maxPrice !== null || normalizationType || minMinutes !== null"
-                @click="selectedTeam = ''; selectedRole = ''; gamesCount = null; maxPrice = null; normalizationType = ''; minMinutes = null"
-                class="clear-filters-btn"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                Clear Filters
-              </button>
-            </div>
-            
-            <div class="flex flex-wrap gap-6 mt-4">
+            <div class="flex flex-wrap items-end gap-6">
               <div class="filter-group">
                 <label for="gamesCount" class="filter-label">Кол-во матчей</label>
                 <input
@@ -336,6 +333,20 @@ onMounted(async () => {
                   @input="handleMinMinutesInput"
                 >
               </div>
+              
+              <!-- Clear Filters Button -->
+              <div class="filter-group" v-if="selectedTeam || selectedRole || gamesCount !== null || maxPrice !== null || normalizationType || minMinutes !== null">
+                <label class="filter-label">&nbsp;</label>
+                <button
+                  @click="selectedTeam = ''; selectedRole = ''; gamesCount = null; maxPrice = null; normalizationType = ''; minMinutes = null"
+                  class="clear-filters-btn"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                  Очистить
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -354,7 +365,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!playersStats || playersStats.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!playersStats || playersStats.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">⚽</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No player statistics available</h3>
         <p class="text-gray-600">Check back later for player stats updates</p>

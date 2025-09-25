@@ -18,6 +18,9 @@ const coeffStore = useCoeffStore()
 const { coeffs, isLoading: isCoeffsLoading, error } = storeToRefs(coeffStore)
 const { showLoader } = useLoaderDelay(isCoeffsLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 // Get tour names for headers
 const tourHeaders = computed(() => {
   try {
@@ -104,27 +107,35 @@ function getDefenceCellStyle(row, tourIndex) {
   return { backgroundColor: color }
 }
 
-watch(                                                                                                                                                                                                                                                                                                                                
-  () => route.params.leagueSlug,                                                                                                                                                                                                                                                                                                      
-  async (newLeagueSlug) => {                                                                                                                                                                                                                                                                                                          
-    if (newLeagueSlug) {                                                                                                                                                                                                                                                                                                              
-      sortCoeffsBy.value = null                                                                                                                                                                                                                                                                                                       
-      sortCoeffsTourIndex.value = null                                                                                                                                                                                                                                                                                                
-      sortCoeffsDirection.value = 'asc'                                                                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                                                                                                       
-      await coeffStore.fetchCoeffs(newLeagueSlug)                                                                                                                                                                                                                                                                                     
-    }                                                                                                                                                                                                                                                                                                                                 
-  },                                                                                                                                                                                                                                                                                                                                  
-  { immediate: true }                                                                                                                                                                                                                                                                                                                
+watch(
+  () => route.params.leagueSlug,
+  async (newLeagueSlug) => {
+    if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
+      sortCoeffsBy.value = null
+      sortCoeffsTourIndex.value = null
+      sortCoeffsDirection.value = 'asc'
+                                                                                                                                                                                                                                                                                                        
+      try {
+        await coeffStore.fetchCoeffs(newLeagueSlug)
+      } finally {
+        hasInitiallyLoaded.value = true
+      }
+    }
+  },
+  { immediate: true }
 )
 
 onMounted(async () => {
   try {
     if (!coeffs.value?.length && route.params.leagueSlug) {
       await coeffStore.fetchCoeffs(route.params.leagueSlug)
+    } else if (coeffs.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load coefficients:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -133,10 +144,10 @@ onMounted(async () => {
   <div class="min-h-screen bg-white">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
-      <div class="mb-8">
+      <!-- <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Team Coefficients</h1>
         <p class="text-gray-600">Attack and defense coefficients for upcoming matches</p>
-      </div>
+      </div> -->
 
       <!-- Loading State -->
       <div v-if="showLoader" class="flex justify-center py-20">
@@ -151,7 +162,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!coeffs || coeffs.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!coeffs || coeffs.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">📊</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No coefficient data available</h3>
         <p class="text-gray-600">Check back later for coefficient updates</p>

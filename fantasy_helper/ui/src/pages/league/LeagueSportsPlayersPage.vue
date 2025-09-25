@@ -11,6 +11,9 @@ const sportsPlayersStore = useSportsPlayersStore()
 const { sportsPlayers, isLoading: isSportsPlayersLoading, error } = storeToRefs(sportsPlayersStore)
 const { showLoader } = useLoaderDelay(isSportsPlayersLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 // Filter and sorting state
 const selectedTeam = ref('')
 const selectedRole = ref('')
@@ -77,21 +80,21 @@ const filteredSportsPlayers = computed(() => {
   })
 })
 
-// Top 10 most popular players (highest percent_ownership_diff)
+// Top 10 most popular players (highest percent_ownership_diff) - unaffected by filters
 const topMostPopularPlayers = computed(() => {
-  if (!filteredSportsPlayers.value) return []
+  if (!sportsPlayers.value) return []
   
-  return [...filteredSportsPlayers.value]
+  return [...sportsPlayers.value]
     .filter(player => player.percent_ownership_diff !== null && player.percent_ownership_diff !== undefined)
     .sort((a, b) => (b.percent_ownership_diff || 0) - (a.percent_ownership_diff || 0))
     .slice(0, 10)
 })
 
-// Top 10 less popular players (lowest percent_ownership_diff)
+// Top 10 less popular players (lowest percent_ownership_diff) - unaffected by filters
 const topLessPopularPlayers = computed(() => {
-  if (!filteredSportsPlayers.value) return []
+  if (!sportsPlayers.value) return []
   
-  return [...filteredSportsPlayers.value]
+  return [...sportsPlayers.value]
     .filter(player => player.percent_ownership_diff !== null && player.percent_ownership_diff !== undefined)
     .sort((a, b) => (a.percent_ownership_diff || 0) - (b.percent_ownership_diff || 0))
     .slice(0, 10)
@@ -136,7 +139,11 @@ function setSort(column) {
 
 async function fetchData() {
   if (route.params.leagueSlug) {
-    await sportsPlayersStore.fetchSportsPlayers(route.params.leagueSlug)
+    try {
+      await sportsPlayersStore.fetchSportsPlayers(route.params.leagueSlug)
+    } finally {
+      hasInitiallyLoaded.value = true
+    }
   }
 }
 
@@ -178,6 +185,7 @@ watch(
   () => route.params.leagueSlug,
   async (newLeagueSlug) => {
     if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
       sortBy.value = 'percent_ownership_diff'
       sortDirection.value = 'desc'
       selectedTeam.value = ''
@@ -193,9 +201,12 @@ onMounted(async () => {
   try {
     if (!sportsPlayers.value?.length && route.params.leagueSlug) {
       await fetchData()
+    } else if (sportsPlayers.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load sports players:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -204,10 +215,10 @@ onMounted(async () => {
   <div class="min-h-screen bg-white">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
-      <div class="mb-8">
+      <!-- <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Sports Players Popularity</h1>
         <p class="text-gray-600">Player ownership and popularity trends in fantasy sports</p>
-      </div>
+      </div> -->
 
       <!-- Loading State -->
       <div v-if="showLoader" class="flex justify-center py-20">
@@ -222,7 +233,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!sportsPlayers || sportsPlayers.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!sportsPlayers || sportsPlayers.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">⚽</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No sports players data available</h3>
         <p class="text-gray-600">Check back later for player updates</p>
@@ -236,7 +247,7 @@ onMounted(async () => {
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span class="text-green-500 mr-2">📈</span>
-              Top 10 Most Popular Players
+              Самые популярные покупки:
             </h3>
             <div class="space-y-3">
               <div v-for="(player, index) in topMostPopularPlayers" :key="'popular-'+index" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0">
@@ -258,7 +269,7 @@ onMounted(async () => {
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span class="text-red-500 mr-2">📉</span>
-              Top 10 Less Popular Players
+              Самые популярные продажи:
             </h3>
             <div class="space-y-3">
               <div v-for="(player, index) in topLessPopularPlayers" :key="'unpopular-'+index" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0">
@@ -281,21 +292,7 @@ onMounted(async () => {
         <div class="mb-8">
           <!-- Combined Filters Card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div class="flex flex-wrap items-center justify-between gap-6">
-              <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
-              <button
-                v-if="selectedTeam || selectedRole || maxPrice !== null"
-                @click="selectedTeam = ''; selectedRole = ''; maxPrice = null"
-                class="clear-filters-btn"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                Clear Filters
-              </button>
-            </div>
-            
-            <div class="flex flex-wrap gap-6 mt-4">
+            <div class="flex flex-wrap items-end gap-6">
               <div class="filter-group">
                 <label for="teamFilter" class="filter-label">Команда</label>
                 <select
@@ -338,16 +335,30 @@ onMounted(async () => {
                   @input="handleMaxPriceInput"
                 >
               </div>
+              
+              <!-- Clear Filters Button -->
+              <div class="filter-group" v-if="selectedTeam || selectedRole || maxPrice !== null">
+                <label class="filter-label">&nbsp;</label>
+                <button
+                  @click="selectedTeam = ''; selectedRole = ''; maxPrice = null"
+                  class="clear-filters-btn"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                  Очистить
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Full Table -->
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-100">
+          <!-- <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900">All Players</h3>
             <p class="text-sm text-gray-600 mt-1">Complete list of players with ownership data</p>
-          </div>
+          </div> -->
           
           <div class="overflow-x-auto">
             <table class="w-full">

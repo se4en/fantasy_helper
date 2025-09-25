@@ -62,7 +62,7 @@ const routes = [
         meta: {
           requiresAuth: false,
           showInSubNavigation: true,
-          subNavTitle: 'Котировки'
+          subNavTitle: 'Коэффициенты'
         }
       },
       {

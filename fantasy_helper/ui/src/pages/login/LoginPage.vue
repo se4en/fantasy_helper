@@ -57,11 +57,11 @@ export default {
   <div class="min-h-screen bg-gray-50 flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
       <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Welcome to Fantasy Helper
+       Вход сейчас недоступен 
       </h1>
 
       <!-- Error message -->
-      <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <!-- <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         {{ errorMessage }}
       </div>
 
@@ -87,7 +87,7 @@ export default {
 
       <p class="text-sm text-gray-600 text-center mt-6">
         Secure authentication powered by Keycloak
-      </p>
+      </p> -->
     </div>
   </div>
 </template>
