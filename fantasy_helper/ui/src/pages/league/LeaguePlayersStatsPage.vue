@@ -365,7 +365,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="hasInitiallyLoaded && (!playersStats || playersStats.length === 0)" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && !isPlayersStatsLoading && (!playersStats || playersStats.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">⚽</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No player statistics available</h3>
         <p class="text-gray-600">Check back later for player stats updates</p>

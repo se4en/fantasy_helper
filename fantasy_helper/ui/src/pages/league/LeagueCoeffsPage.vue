@@ -162,7 +162,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="hasInitiallyLoaded && (!coeffs || coeffs.length === 0)" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && !isCoeffsLoading && (!coeffs || coeffs.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">📊</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No coefficient data available</h3>
         <p class="text-gray-600">Check back later for coefficient updates</p>
