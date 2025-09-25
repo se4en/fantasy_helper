@@ -292,21 +292,7 @@ onMounted(async () => {
         <div class="mb-8">
           <!-- Combined Filters Card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div class="flex flex-wrap items-center justify-between gap-6">
-              <!-- <h3 class="text-lg font-semibold text-gray-900">Filters</h3> -->
-              <button
-                v-if="selectedTeam || selectedRole || maxPrice !== null"
-                @click="selectedTeam = ''; selectedRole = ''; maxPrice = null"
-                class="clear-filters-btn"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                Очистить
-              </button>
-            </div>
-            
-            <div class="flex flex-wrap gap-6 mt-0">
+            <div class="flex flex-wrap items-end gap-6">
               <div class="filter-group">
                 <label for="teamFilter" class="filter-label">Команда</label>
                 <select
@@ -348,6 +334,20 @@ onMounted(async () => {
                   class="filter-input"
                   @input="handleMaxPriceInput"
                 >
+              </div>
+              
+              <!-- Clear Filters Button -->
+              <div class="filter-group" v-if="selectedTeam || selectedRole || maxPrice !== null">
+                <label class="filter-label">&nbsp;</label>
+                <button
+                  @click="selectedTeam = ''; selectedRole = ''; maxPrice = null"
+                  class="clear-filters-btn"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                  Очистить
+                </button>
               </div>
             </div>
           </div>
