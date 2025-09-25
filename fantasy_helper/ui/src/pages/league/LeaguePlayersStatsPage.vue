@@ -28,21 +28,21 @@ const sortDirection = ref('desc')
 
 // Column descriptions for tooltips
 const columnDescriptions = {
-  name: 'Имя игрока',
-  team_name: 'Название команды',
-  role: 'Позиция игрока',
-  price: 'Цена игрока в fantasy',
+  // name: 'Имя игрока',
+  // team_name: 'Название команды',
+  // role: 'Позиция игрока',
+  // price: 'Цена игрока в fantasy',
   games: 'Количество сыгранных матчей',
   minutes: 'Количество сыгранных минут',
   goals: 'Количество забитых голов',
   assists: 'Количество ассистов',
   shots: 'Количество ударов по воротам',
-  shots_on_target: 'Количество ударов в ставку',
-  xg: 'Ожидаемые голы (Expected Goals)',
-  xa: 'Ожидаемые ассисты (Expected Assists)',
-  xg_xa: 'Сумма ожидаемых голов и ассистов',
+  shots_on_target: 'Количество ударов в створ',
+  xg: 'Ожидаемые голы',
+  xa: 'Ожидаемые ассисты',
+  xg_xa: 'Ожидаемые голы и ассисты',
   xg_np: 'Ожидаемые голы без пенальти',
-  xg_np_xa: 'Сумма ожидаемых голов без пенальти и ассистов',
+  xg_np_xa: 'Ожидаемые голы без пенальти и ассисты',
   ball_recoveries: 'Количество возвратов мяча',
   passes_into_penalty_area: 'Количество передач в штрафную площадь',
   crosses_into_penalty_area: 'Количество навесов в штрафную площадь',
@@ -50,8 +50,8 @@ const columnDescriptions = {
   touches_in_attacking_penalty_area: 'Количество касаний в штрафной площади',
   carries_in_attacking_third: 'Количество продвижений мяча в атакующей трети поля',
   carries_in_attacking_penalty_area: 'Количество продвижений мяча в штрафной площади',
-  sca: 'Создание моментов (Shot Creating Actions)',
-  gca: 'Создание голов (Goal Creating Actions)'
+  sca: 'Два атакующих действия, непосредственно приведших к удару, такие как пасы, успешные попытки дриблинга и заработанные фолы',
+  gca: 'Два атакующих действия, непосредственно приведших к голу, такие как пасы, успешные попытки дриблинга и заработанные фолы'
 }
 
 // Get unique teams and roles for filter options
