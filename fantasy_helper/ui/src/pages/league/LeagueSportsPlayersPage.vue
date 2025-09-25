@@ -11,6 +11,9 @@ const sportsPlayersStore = useSportsPlayersStore()
 const { sportsPlayers, isLoading: isSportsPlayersLoading, error } = storeToRefs(sportsPlayersStore)
 const { showLoader } = useLoaderDelay(isSportsPlayersLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 // Filter and sorting state
 const selectedTeam = ref('')
 const selectedRole = ref('')
@@ -136,7 +139,11 @@ function setSort(column) {
 
 async function fetchData() {
   if (route.params.leagueSlug) {
-    await sportsPlayersStore.fetchSportsPlayers(route.params.leagueSlug)
+    try {
+      await sportsPlayersStore.fetchSportsPlayers(route.params.leagueSlug)
+    } finally {
+      hasInitiallyLoaded.value = true
+    }
   }
 }
 
@@ -178,6 +185,7 @@ watch(
   () => route.params.leagueSlug,
   async (newLeagueSlug) => {
     if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
       sortBy.value = 'percent_ownership_diff'
       sortDirection.value = 'desc'
       selectedTeam.value = ''
@@ -193,9 +201,12 @@ onMounted(async () => {
   try {
     if (!sportsPlayers.value?.length && route.params.leagueSlug) {
       await fetchData()
+    } else if (sportsPlayers.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load sports players:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -222,7 +233,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!sportsPlayers || sportsPlayers.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!sportsPlayers || sportsPlayers.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">⚽</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No sports players data available</h3>
         <p class="text-gray-600">Check back later for player updates</p>

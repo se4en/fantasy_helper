@@ -11,6 +11,9 @@ const playersStatsStore = usePlayersStatsStore()
 const { playersStats, isLoading: isPlayersStatsLoading, error } = storeToRefs(playersStatsStore)
 const { showLoader } = useLoaderDelay(isPlayersStatsLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 // Filter and sorting state
 const gamesCount = ref(null)
 const minMinutes = ref(null)
@@ -147,17 +150,21 @@ function setSort(column) {
 
 async function fetchData() {
   if (route.params.leagueSlug) {
-    // Ensure empty values are converted to null
-    const cleanGamesCount = gamesCount.value === '' || gamesCount.value === undefined ? null : gamesCount.value
-    const cleanMinMinutes = minMinutes.value === '' || minMinutes.value === undefined ? null : minMinutes.value
-    
-    await playersStatsStore.fetchPlayersStats(
-      route.params.leagueSlug,
-      cleanGamesCount,
-      normalizationType.value === 'minutes',
-      normalizationType.value === 'matches',
-      cleanMinMinutes
-    )
+    try {
+      // Ensure empty values are converted to null
+      const cleanGamesCount = gamesCount.value === '' || gamesCount.value === undefined ? null : gamesCount.value
+      const cleanMinMinutes = minMinutes.value === '' || minMinutes.value === undefined ? null : minMinutes.value
+      
+      await playersStatsStore.fetchPlayersStats(
+        route.params.leagueSlug,
+        cleanGamesCount,
+        normalizationType.value === 'minutes',
+        normalizationType.value === 'matches',
+        cleanMinMinutes
+      )
+    } finally {
+      hasInitiallyLoaded.value = true
+    }
   }
 }
 
@@ -207,6 +214,7 @@ watch(
   () => route.params.leagueSlug,
   async (newLeagueSlug) => {
     if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
       sortBy.value = null
       sortDirection.value = 'desc'
       selectedTeam.value = ''
@@ -223,9 +231,12 @@ onMounted(async () => {
   try {
     if (!playersStats.value?.length && route.params.leagueSlug) {
       await fetchData()
+    } else if (playersStats.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load players stats:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -354,7 +365,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!playersStats || playersStats.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!playersStats || playersStats.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">⚽</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No player statistics available</h3>
         <p class="text-gray-600">Check back later for player stats updates</p>

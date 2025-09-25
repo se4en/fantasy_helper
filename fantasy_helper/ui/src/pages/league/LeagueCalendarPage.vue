@@ -11,6 +11,9 @@ const calendarStore = useCalendarStore()
 const { calendar, isLoading: isCalendarLoading, error } = storeToRefs(calendarStore)
 const { showLoader } = useLoaderDelay(isCalendarLoading, 500)
 
+// Track if we've made the initial data fetch attempt
+const hasInitiallyLoaded = ref(false)
+
 const calendarType = ref('points')
 
 // Get tour names for headers
@@ -55,24 +58,32 @@ const getCalendarCellStyle = (row, tourIndex) => {
   }
 }
 
-watch(                                                                                                                                                                                                                                                                                                                                
-  () => route.params.leagueSlug,                                                                                                                                                                                                                                                                                                      
-  async (newLeagueSlug) => {                                                                                                                                                                                                                                                                                                          
-    if (newLeagueSlug) {                                                                                                                                                                                                                                                                                                            
-      calendarType.value = 'points'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-      await calendarStore.fetchCalendar(newLeagueSlug)                                                                                                                                                                                                                                                                                     
-    }                                                                                                                                                                                                                                                                                                                                 
-  },                                                                                                                                                                                                                                                                                                                                  
-  { immediate: true }                                                                                                                                                                                                                                                                                                                
+watch(
+  () => route.params.leagueSlug,
+  async (newLeagueSlug) => {
+    if (newLeagueSlug) {
+      hasInitiallyLoaded.value = false
+      calendarType.value = 'points'
+      try {
+        await calendarStore.fetchCalendar(newLeagueSlug)
+      } finally {
+        hasInitiallyLoaded.value = true
+      }
+    }
+  },
+  { immediate: true }
 )
 
 onMounted(async () => {
   try {
     if (!calendar.value?.length && route.params.leagueSlug) {
       await calendarStore.fetchCalendar(route.params.leagueSlug)
+    } else if (calendar.value?.length) {
+      hasInitiallyLoaded.value = true
     }
   } catch (error) {
     console.error('Failed to load calendar:', error)
+    hasInitiallyLoaded.value = true
   }
 })
 </script>
@@ -99,7 +110,7 @@ onMounted(async () => {
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="!calendar || calendar.length === 0" class="text-center py-20">
+      <div v-else-if="hasInitiallyLoaded && (!calendar || calendar.length === 0)" class="text-center py-20">
         <div class="text-gray-400 text-5xl mb-4">📅</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No calendar data available</h3>
         <p class="text-gray-600">Check back later for calendar updates</p>
