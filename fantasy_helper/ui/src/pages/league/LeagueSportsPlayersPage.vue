@@ -80,21 +80,21 @@ const filteredSportsPlayers = computed(() => {
   })
 })
 
-// Top 10 most popular players (highest percent_ownership_diff)
+// Top 10 most popular players (highest percent_ownership_diff) - unaffected by filters
 const topMostPopularPlayers = computed(() => {
-  if (!filteredSportsPlayers.value) return []
+  if (!sportsPlayers.value) return []
   
-  return [...filteredSportsPlayers.value]
+  return [...sportsPlayers.value]
     .filter(player => player.percent_ownership_diff !== null && player.percent_ownership_diff !== undefined)
     .sort((a, b) => (b.percent_ownership_diff || 0) - (a.percent_ownership_diff || 0))
     .slice(0, 10)
 })
 
-// Top 10 less popular players (lowest percent_ownership_diff)
+// Top 10 less popular players (lowest percent_ownership_diff) - unaffected by filters
 const topLessPopularPlayers = computed(() => {
-  if (!filteredSportsPlayers.value) return []
+  if (!sportsPlayers.value) return []
   
-  return [...filteredSportsPlayers.value]
+  return [...sportsPlayers.value]
     .filter(player => player.percent_ownership_diff !== null && player.percent_ownership_diff !== undefined)
     .sort((a, b) => (a.percent_ownership_diff || 0) - (b.percent_ownership_diff || 0))
     .slice(0, 10)
