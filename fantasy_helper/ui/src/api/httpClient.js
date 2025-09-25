@@ -39,6 +39,7 @@ export const ENDPOINTS = {
   COEFFS: '/coeffs/',
   PLAYERS_STATS_INFO: '/players_stats_info/',
   CALENDAR: '/calendar/',
+  SPORTS_PLAYERS: '/sports_players/',
   ME: '/me',
   LOGOUT: '/logout'
 }

@@ -10,4 +10,5 @@
 0 5 * * * cd /fantasy_helper && /usr/local/bin/uv run python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Italy > /proc/1/fd/1 2>/proc/1/fd/2
 0 6 * * * cd /fantasy_helper && /usr/local/bin/uv run python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py Russia > /proc/1/fd/1 2>/proc/1/fd/2
 0 7 * * * cd /fantasy_helper && /usr/local/bin/uv run python /fantasy_helper/fantasy_helper/db/scripts/update_league_full.py ChampionsLeague > /proc/1/fd/1 2>/proc/1/fd/2
+15 * * * * cd /fantasy_helper && /usr/local/bin/uv run python /fantasy_helper/fantasy_helper/db/scripts/update_sports_players.py > /proc/1/fd/1 2>/proc/1/fd/2
 # END CRON JOB
