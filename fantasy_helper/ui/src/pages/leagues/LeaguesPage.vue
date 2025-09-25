@@ -43,11 +43,11 @@ export default {
       <!-- Header Section -->
       <div class="text-center mb-12">
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Choose Your League
+          Доступные чемпионаты
         </h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        <!-- <p class="text-lg text-gray-600 max-w-2xl mx-auto">
           Select from our supported fantasy leagues to get started with advanced analytics and insights
-        </p>
+        </p> -->
       </div>
 
       <!-- Loading State -->

@@ -215,10 +215,10 @@ onMounted(async () => {
   <div class="min-h-screen bg-white">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
-      <div class="mb-8">
+      <!-- <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Sports Players Popularity</h1>
         <p class="text-gray-600">Player ownership and popularity trends in fantasy sports</p>
-      </div>
+      </div> -->
 
       <!-- Loading State -->
       <div v-if="showLoader" class="flex justify-center py-20">
@@ -247,7 +247,7 @@ onMounted(async () => {
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span class="text-green-500 mr-2">📈</span>
-              Top 10 Most Popular Players
+              Самые популярные покупки:
             </h3>
             <div class="space-y-3">
               <div v-for="(player, index) in topMostPopularPlayers" :key="'popular-'+index" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0">
@@ -269,7 +269,7 @@ onMounted(async () => {
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span class="text-red-500 mr-2">📉</span>
-              Top 10 Less Popular Players
+              Самые популярные продажи:
             </h3>
             <div class="space-y-3">
               <div v-for="(player, index) in topLessPopularPlayers" :key="'unpopular-'+index" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0">
@@ -293,7 +293,7 @@ onMounted(async () => {
           <!-- Combined Filters Card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex flex-wrap items-center justify-between gap-6">
-              <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+              <!-- <h3 class="text-lg font-semibold text-gray-900">Filters</h3> -->
               <button
                 v-if="selectedTeam || selectedRole || maxPrice !== null"
                 @click="selectedTeam = ''; selectedRole = ''; maxPrice = null"
@@ -302,11 +302,11 @@ onMounted(async () => {
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
-                Clear Filters
+                Очистить
               </button>
             </div>
             
-            <div class="flex flex-wrap gap-6 mt-4">
+            <div class="flex flex-wrap gap-6 mt-0">
               <div class="filter-group">
                 <label for="teamFilter" class="filter-label">Команда</label>
                 <select
@@ -355,10 +355,10 @@ onMounted(async () => {
 
         <!-- Full Table -->
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-100">
+          <!-- <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900">All Players</h3>
             <p class="text-sm text-gray-600 mt-1">Complete list of players with ownership data</p>
-          </div>
+          </div> -->
           
           <div class="overflow-x-auto">
             <table class="w-full">

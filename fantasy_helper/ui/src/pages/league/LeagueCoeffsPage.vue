@@ -144,10 +144,10 @@ onMounted(async () => {
   <div class="min-h-screen bg-white">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
-      <div class="mb-8">
+      <!-- <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Team Coefficients</h1>
         <p class="text-gray-600">Attack and defense coefficients for upcoming matches</p>
-      </div>
+      </div> -->
 
       <!-- Loading State -->
       <div v-if="showLoader" class="flex justify-center py-20">

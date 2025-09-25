@@ -92,10 +92,10 @@ onMounted(async () => {
   <div class="min-h-screen bg-white">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Header Section -->
-      <div class="mb-8">
+      <!-- <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">League Calendar</h1>
         <p class="text-gray-600">Team performance across tournament rounds</p>
-      </div>
+      </div> -->
 
       <!-- Loading State -->
       <div v-if="showLoader" class="flex justify-center py-20">
@@ -124,7 +124,7 @@ onMounted(async () => {
             <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
           </div> -->
           
-          <div class="flex flex-wrap gap-6 mt-4">
+          <div class="flex flex-wrap gap-6 mt-0">
             <div class="filter-group">
               <label for="viewSelect" class="filter-label">Способ подсчета</label>
               <select
