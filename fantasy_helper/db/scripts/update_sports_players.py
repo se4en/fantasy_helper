@@ -14,5 +14,5 @@ if __name__ == "__main__":
     logger.info(f"Start update sports players")
     dao = SportsPlayerDAO()
     dao.update_players_all_leagues()
-    dao.update_feature_store()
+    dao.update_feature_store_all_leagues()
     logger.info(f"Finish update sports players")

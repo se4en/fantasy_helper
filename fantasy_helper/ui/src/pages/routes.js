@@ -6,6 +6,7 @@ import LeaguesPage from './leagues/LeaguesPage.vue'
 import LeaguePage from './league/LeaguePage.vue'
 import LeagueCoeffsPage from './league/LeagueCoeffsPage.vue'
 import LeaguePlayersStatsPage from './league/LeaguePlayersStatsPage.vue'
+import LeagueSportsPlayersPage from './league/LeagueSportsPlayersPage.vue'
 import LeagueCalendarPage from './league/LeagueCalendarPage.vue'
 import LoginPage from './login/LoginPage.vue'
 import LoginCallback from './login/LoginCallback.vue';
@@ -72,6 +73,16 @@ const routes = [
           requiresAuth: false,
           showInSubNavigation: true,
           subNavTitle: 'Статистика игроков'
+        }
+      },
+      {
+        path: 'sports-players',
+        name: 'LeagueSportsPlayers',
+        component: LeagueSportsPlayersPage,
+        meta: {
+          requiresAuth: false,
+          showInSubNavigation: true,
+          subNavTitle: 'Популярность игроков'
         }
       },
       {

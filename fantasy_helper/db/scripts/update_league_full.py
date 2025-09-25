@@ -43,14 +43,16 @@ async def main(league_name: str):
 
     await coeff_dao.update_coeffs(league_name)
     
-    sports_player_dao.update_players(league_name)
+    # disable for separate script
+    # sports_player_dao.update_players(league_name)
 
     # disable for player_dao.update_feature_store
     # player_dao.update_players_stats(league_name)
 
     # update feature stores
     coeff_dao.update_feature_store(league_name)
-    sports_player_dao.update_feature_store(league_name)
+    # disable for separate script
+    # sports_player_dao.update_feature_store(league_name)
     player_dao.update_feature_store(league_name)
 
     import gc

@@ -8,6 +8,14 @@ from fantasy_helper.db.database import Session
 from fantasy_helper.utils.dataclasses import SportsPlayerDiff
 
 
+POSITIONS_MAPPING = {
+    "GOALKEEPER": "вр",
+    "DEFENDER": "зщ",
+    "MIDFIELDER": "пз",
+    "FORWARD": "нп",
+}
+
+
 class FSSportsPlayersDAO:
     def get_sports_players(self, league_name: str) -> List[SportsPlayerDiff]:
         db_session: SQLSession = Session()
@@ -23,7 +31,7 @@ class FSSportsPlayersDAO:
                 name=player.name,
                 league_name=player.league_name,
                 team_name=player.team_name,
-                role=player.role,
+                role=POSITIONS_MAPPING.get(player.role),
                 price=player.price,
                 percent_ownership=player.percent_ownership,
                 percent_ownership_diff=player.percent_ownership_diff,
